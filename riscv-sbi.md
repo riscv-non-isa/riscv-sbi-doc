@@ -2,11 +2,11 @@
 
 ## Table of Contents
 1. [Introduction](#Introduction)
-2. [SBI calls](#SBI calls)
+2. [SBI List](#sbi-list)
 3. [Description](#Description)
 	* [Timer](#Timer)
 	* [Inter Processor Interrupt (IPI)](#IPI)
-	* [Memory Model](#Memory Model)
+	* [Memory Model](#memory-model)
 	* [Console](#Console)
 	* [Shutdown](#Shutdown)
 4. [Conclusion](#Conclusion)
@@ -32,7 +32,7 @@ supervisor operating system (OS) directly are handled via SBI calls to the SEE i
 RISC-V. This provides a cleaner interface for the supervisor OS. Currently,
 The next section will describe different types of SBI calls defined for RISC-V.
 
-## SBI calls
+## SBI List<a name=sbi-list>
 There are mainly 5 types of SBI calls defined in the specification as per below
 table.
 
@@ -68,7 +68,7 @@ void sbi_clear_ipi(void)
 ```
 Clears any pending IPIs in the hart for which this SBI is invoked.
 
-### Memory Model
+### Memory Model<a name=#memory-model>
 ```C
 void sbi_remote_fence_i(const unsigned long *hart_mask)
 ```
