@@ -109,7 +109,7 @@ rounded up to the next integer.
 If hart_mask is `NULL`, an IPI is sent to every hart in the system.
 
 ```C
-	void sbi_clear_ipi(void)
+void sbi_clear_ipi(void)
 ```
 Clears the pending IPIs if any. The IPI is cleared only in the hart for which
 this SBI call is invoked.
