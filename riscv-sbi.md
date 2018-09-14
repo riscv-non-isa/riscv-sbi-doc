@@ -55,8 +55,9 @@ environment. When executed in S-mode, it generates an environment-call-from-S-mo
 exception and performs no other operation. The required arguments are passed
 through registers *a0-a2* and the SBI call type is passed via register *a7*. Once
 the machine mode receives the trap, it identifies the type of SBI call from *a7*
-register and perform required operation. Individual SBI call signature and its
-purpose is described next.
+register and perform required operation. Any unsupported SBI call shoud return
+error i.e.ENOSYS to indicate the supervisor mode that it is not supported.
+Individual SBI call signature and its purpose is described next.
 
 ### Timer
 ```C
