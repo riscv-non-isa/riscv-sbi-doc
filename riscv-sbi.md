@@ -60,8 +60,8 @@ environment. When executed in S-mode, it generates an environment-call-from-S-mo
 exception and performs no other operation. The required arguments are passed
 through registers *a0-a2* and the SBI call type is passed via register *a7*. Once
 the machine mode receives the trap, it identifies the type of SBI call from *a7*
-register and perform required operation. Any unsupported SBI call should return
-error i.e. -ENOSYS to indicate the supervisor mode that it is not supported.
+register and perform required operation. Any unsupported SBI call should return error code *-38*
+(which is the value of -ENOSYS in Linux) to indicate the supervisor mode that it is not supported.
 All SBI calls should be assumed to clobber a0 i.e. any return value will be passed
 through register *a0*. Individual SBI call signature and its purpose is described next.
 
