@@ -39,13 +39,13 @@ describe different types of SBI calls defined for RISC-V.
 There are mainly 5 types of SBI calls defined in the specification as per below
 table.
 
-| Type          | Function          |
-|:--------------|:------------------|
-| Timer         | sbi_set_timer     |
-| IPI           | sbi_clear_ipi<br>sbi_send_ipi  |
-| Memory Model| sbi_remote_fence_i<br>sbi_remote_sfence_vma<br>sbi_remote_sfence_vma_asid
-|	Console				| sbi_console_putchar <br> sbi_console_getchar |
-| Shutdown         |	sbi_shutdown |
+| Type          | Function          | Function ID |
+|:--------------|:------------------|-------------|
+| Timer         | sbi_set_timer     |0		  |
+| IPI           | sbi_clear_ipi<br>sbi_send_ipi  | 3<br>4|
+| Memory Model| sbi_remote_fence_i<br>sbi_remote_sfence_vma<br>sbi_remote_sfence_vma_asid | 5<br>6<br>7 |
+|	Console				| sbi_console_putchar <br> sbi_console_getchar | 1<br>2 |
+| Shutdown         |	sbi_shutdown | 8 |
 
 ## Types<a name="Types" />
 Most types are defined through standards such as C99's `stdbool.h`, `stdint.h`, etc.
