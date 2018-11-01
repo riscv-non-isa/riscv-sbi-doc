@@ -35,6 +35,9 @@ RISC-V. This provides a cleaner interface for the supervisor OS. Currently, SBI
 is currently implemented by Berkeley Boot Loader (BBL). The next section will
 describe different types of SBI calls defined for RISC-V.
 
+The SBI may be provided by the kernel, itself, or by firmware. That does not change the nature
+of the services provided.
+
 ## SBI List<a name="sbi-list" />
 There are mainly 5 types of SBI calls defined in the specification as per below
 table.
@@ -54,16 +57,31 @@ SBI-specific types are defined here.
 ## Description<a name="Description" />
 Each SBI call adheres to a specific calling convention that defines how data is
 provided as input to or read as output. The SBI calling convention matches the
-syscall calling convention (which in turn is very similar to the function calling
-convention). Every SBI call uses *ecall* instructions to make a request to the SEE
+RISC-V system call ABI. Every SBI call uses *ecall* instructions to make a request to the SEE
 environment. When executed in S-mode, it generates an environment-call-from-S-mode
 exception and performs no other operation. The required arguments are passed
-through registers *a0-a2* and the SBI call type is passed via register *a7*. Once
+through registers the argument registers define by the ABI 
+and the SBI call type is passed via register *a7*. Once
 the machine mode receives the trap, it identifies the type of SBI call from *a7*
-register and perform required operation. Any unsupported SBI call should return error code *-38*
-(which is the value of -ENOSYS in Linux) to indicate the supervisor mode that it is not supported.
-All SBI calls should be assumed to clobber a0 i.e. any return value will be passed
-through register *a0*. Individual SBI call signature and its purpose is described next.
+register and perform required operation. 
+
+SBI returns two values, in *a0* and *a1*. *a0* has a generic SBI error, and *a1* has the 
+result of actually running a function. This two-value model is to avoid the classic problem of distinguishing
+transport level errors, i.e. S-mode calls to an unimplemented function, and errors in the functions.
+A single return value, as in the earlier proposal, has the problem that no SBI function could return
+a value of -38, ever, as that could not be distinguished from the SBI error of calling an invalid function. 
+
+The value returned in *a0* is a generic SBI error. 
+For example, S-mode code may call a function with an unimplemented function, either because it really is
+invalid or S-mode is running on an older firmware build and requesting a newer SBI function. In that case,
+SBI will return -38. Note that the set of errors may grow over time. A return value of 0 in *a0* means
+the function is supported and was called. 
+
+Assuming a valid function is called, i.e. *a0* is 0, its return value will be in *a1*. For void functions, the value
+of *a1* is undefined, else it will have a value as defined by the function.
+
+All SBI calls should be assumed to clobber *a0* and *a1*, i.e. any return value will be passed
+through register *a0* and *a1*. Individual SBI call signature and its purpose is described next.
 
 ### Timer<a name="Timer" />
 ```C
@@ -149,3 +167,6 @@ The objective of defining SBI at this point is to prevent any further changes
 unless absolutely necessary. Thus, we can say that It is mostly a permanent
 interface. This also allows the OS developers to develop supervisor code without
 worrying about modifying their code in future due to change in SBI interface.
+It should always be possible for a newer kernel to call an older SBI implementation
+and function correctly, meaning that if a newer kernel calls an SBI that does not implement
+an older function, -38 is returned.
