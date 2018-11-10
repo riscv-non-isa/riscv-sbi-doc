@@ -72,7 +72,9 @@ SBI Function ID is u32 type.
 Function Set   | Function Type          |
 ```
 Bit[31]    =  ID overflow bit
+
 Bit[30:24] =  Function Set
+
 Bit[23:0]  =  Function Type within Function Set
 
 The Function set is Bits [31:24] describing both function set number and overflow
@@ -266,22 +268,23 @@ can lead to a robust SBI specification.
 1. Overflow Reserved bit example.
 
 Let's choose function set type as Hart PM (0x1)
-Function1 : 0x01 000001
-Function2 : 0x01 000002
-Function3 : 0x01 000004
-.
-.
-.
-Function24:0x01 800000
+
+Function1 : 0x01 000001<br>
+Function2 : 0x01 000002<br>
+Function3 : 0x01 000004<br>
+.<br>
+.<br>
+.<br>
+Function24:0x01 800000<br>
+
 At this point in future, Let's say we need more function IDs for Hart PM.
 The scheme can be switched to an integer scheme by setting the overflow bit.
 
-Function25: 0x81 000001
-Function26: 0x81 000002
-Function27: 0x81 000003
-Function28: 0x81 000004
-.
-.
-Function34: 0x81 00000A
-.
-.
+Function25: 0x81 000001<br>
+Function26: 0x81 000002<br>
+Function27: 0x81 000003<br>
+Function28: 0x81 000004<br>
+.<br>
+.<br>
+Function34: 0x81 00000A<br>
+.<br>
