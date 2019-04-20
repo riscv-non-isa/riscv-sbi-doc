@@ -43,7 +43,7 @@ table.
 |:--------------|:------------------|-------------|
 | Timer         | sbi_set_timer     |0		  |
 | IPI           | sbi_clear_ipi<br>sbi_send_ipi  | 3<br>4|
-| Memory Model| sbi_remote_fence_i<br>sbi_remote_sfence_vma<br>sbi_remote_sfence_vma_asid | 5<br>6<br>7 |
+| Memory Model| sbi_remote_fence_i<br>sbi_remote_sfence_vma<br>sbi_remote_sfence_vma_asid<br>sbi_fence_dma | 5<br>6<br>7<br>9 |
 |	Console				| sbi_console_putchar <br> sbi_console_getchar | 1<br>2 |
 | Shutdown         |	sbi_shutdown | 8 |
 
@@ -118,6 +118,29 @@ void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
                                 unsigned long asid)
 ```
 //TODO
+
+```C
+void sbi_fence_dma(unsigned long start,
+		   unsigned long size,
+		   unsigned long dir)
+```
+Some SOC systems cannot maintain memory consistency and they need sbi_fence_dma() to
+sync data from CPU dcache to dma device in the same memory.
+
+The first param must be physical address which could be used in bbl m-state exception
+without MMU translation.
+
+The last param is the direction of dma operation which is the same with linux's
+definition in include/linux/dma-direction.h:
+
+```C
+enum dma_data_direction {
+	DMA_BIDIRECTIONAL = 0,
+	DMA_TO_DEVICE = 1,
+	DMA_FROM_DEVICE = 2,
+	DMA_NONE = 3,
+};
+```
 
 ### Console<a name="Console" />
 
