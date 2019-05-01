@@ -1,6 +1,7 @@
-# RISC-V Supervisor Binary Interface Specification
 
-## Copyright and license information
+= RISC-V Supervisor Binary Interface Specification
+
+== Copyright and license information
 
 This RISC-V SBI specification is
 
@@ -12,7 +13,7 @@ It is licensed under the Creative Commons Attribution 4.0 International
 License (CC-BY 4.0).  The full license text is available at
 https://creativecommons.org/licenses/by/4.0/.
 
-## Introduction
+== Introduction
 
 This specification describes the RISC-V Supervisor Binary Interface, known from
 here on as SBI.  This interface allows supervisor-mode software to be written
@@ -20,18 +21,18 @@ that is portable to all RISC-V implementations.  The design of the SBI follows
 the general RISC-V philosophy of having a small core along with a set of
 optional modular extensions.
 
-### Versioning and History
+=== Versioning and History
 
 This document describes a draft of version 0.2 of the RISC-V SBI specification.
 
-#### Changes Since Version 0.1
+==== Changes Since Version 0.1
 
 * The entire v0.1 SBI has been moved to the legacy extension, which is now an
   optional extension.  This is technically a backwards-incompatible change
   because the legacy extension is optional and v0.1 of the SBI doesn't allow
   probing, but it's as good as we can do.
 
-## Binary Encoding
+== Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
 of SBI extensions.  This binary encoding matches the standard RISC-V UNIX
@@ -57,24 +58,28 @@ standard RISC-V calling convention rules.
 SBI functions generally return a pair of values in `a0` and `a1`, with `a1`
 returning an error code.  This is analogous to returning the C structure
 
+[source, C]
+----
     struct sbiret {
         long value;
         long error;
     };
+----
 
 Standard SBI error codes are listed below
 
-| Error Type               | Value  |
-|:------------------------:|:------:|
-|  SBI_SUCCESS             |  0     |
-|  SBI_ERR_FAILURE         | -1     |
-|  SBI_ERR_NOT_SUPPORTED   | -2     |
-|  SBI_ERR_INVALID_PARAM   | -3     |
-|  SBI_ERR_DENIED          | -4     |
-|  SBI_ERR_INVALID_ADDRESS | -5     |
+[cols="<,>",options="header,compact"]
+|===
+|  Error Type              |Value
+|  SBI_SUCCESS             |  0
+|  SBI_ERR_FAILURE         | -1
+|  SBI_ERR_NOT_SUPPORTED   | -2
+|  SBI_ERR_INVALID_PARAM   | -3
+|  SBI_ERR_DENIED          | -4
+|  SBI_ERR_INVALID_ADDRESS | -5
+|===
 
-
-## SBI Base Functionality, Extension ID 0x10
+== SBI Base Functionality, Extension ID 0x10
 
 The base of the supervisor binary interface is designed to be as small as
 possible.  As such, it only contains functionality for probing which SBI
@@ -82,69 +87,79 @@ extensions are available and for querying the version of the SBI.  All
 functions in the base must be supported by all SBI implementations, so there
 are no error returns defined.
 
-```
+[source, C]
+----
 long sbi_get_sbi_spec_version(void);
-```
+----
 Returns the current SBI specification version.  This function must always
 succeed.  The minor number of the SBI specification is encoded in the low 24
 bits, with the major number encoded in the next 7 bits.  Bit 32 must be 0 and
 is reserved for future expansion.
 
-```
+[source, C]
+----
 long sbi_get_sbi_impl_id(void);
-```
+----
 Returns the current SBI implementation ID, which is different for every SBI
 implementation.  It is intended that this implementation ID allows software to
 probe for SBI implementation quirks.
 
-````
+[source, C]
+----
 long sbi_get_sbi_impl_version(void);
-````
+----
 Returns the current SBI implementation version.  The encoding of this version
 number is specific to the SBI implementation.
 
-````
+[source, C]
+----
 long sbi_probe_extension(long extension_id);
-````
+----
 Returns 0 if the given extension ID is not available, or an extension-specific
 non-zero value if it is available.
 
-````
+[source, C]
+----
 long sbi_get_mvendorid(void);
 long sbi_get_marchid(void);
 long sbi_get_mimpid(void);
-````
-Returns a value that is legal for the corresponding CSR.  0 is always a legal
+----
+Return a value that is legal for the corresponding CSR.  0 is always a legal
 value for any of these CSRs.
 
-### Function IDs
+=== Function IDs
 
-| Function Name                 | Function ID |
-|:-----------------------------:|:-----------:|
-| sbi_get_sbi_spec_version      |           0 |
-| sbi_get_sbi_impl_id           |           1 |
-| sbi_get_sbi_impl_version      |           2 |
-| sbi_probe_extension           |           3 |
-| sbi_get_mvendorid             |           4 |
-| sbi_get_marchid               |           5 |
-| sbi_get_mimpid                |           6 |
+[cols="<,>",options="header,compact"]
+|===
+| Function Name                 | Function ID
+| sbi_get_sbi_spec_version      |           0
+| sbi_get_sbi_impl_id           |           1
+| sbi_get_sbi_impl_version      |           2
+| sbi_probe_extension           |           3
+| sbi_get_mvendorid             |           4
+| sbi_get_marchid               |           5
+| sbi_get_mimpid                |           6
+|===
 
-### SBI Implementation IDs
+=== SBI Implementation IDs
 
-| Implementation ID | Name                       |
-|:-----------------:|:--------------------------:|
-| 0                 | Berkeley Boot Loader (BBL) |
-| 1                 | OpenSBI                    |
+[cols="<,>",options="header,compact"]
+|===
+| Implementation ID | Name
+| 0                 | Berkeley Boot Loader (BBL)
+| 1                 | OpenSBI
+|===
 
-## Legacy SBI Extension, Extension IDs 0x00 through 0x0F
+== Legacy SBI Extension, Extension IDs 0x00 through 0x0F
 
 The legacy SBI ignores the function ID field, instead being encoded as multiple
 extension IDs.  Each of these extension IDs must be probed for directly.  This
 extension is deprecated in favor of the following extensions:
 
-```C
+[source, C]
+----
 void sbi_set_timer(uint64_t stime_value)
-```
+----
 Programs the clock for next event after *stime_value* time. This function also
 clears the pending timer interrupt bit.
 
@@ -153,9 +168,10 @@ timer event, it can either request a timer interrupt infinitely far into the
 future (i.e., (uint64_t)-1), or it can instead mask the timer interrupt by
 clearing sie.STIE.
 
-```C
+[source, C]
+----
 void sbi_send_ipi(const unsigned long *hart_mask)
-```
+----
 Send an inter-processor interrupt to all the harts defined in hart_mask.
 Interprocessor interrupts manifest at the receiving harts as Supervisor Software
 Interrupts.
@@ -165,45 +181,51 @@ vector is represented as a sequence of unsigned longs whose length equals the
 number of harts in the system divided by the number of bits in an unsigned long,
 rounded up to the next integer.
 
-```C
+[source, C]
+----
 void sbi_clear_ipi(void)
-```
+----
 Clears the pending IPIs if any. The IPI is cleared only in the hart for which
 this SBI call is invoked.
 
-```C
+[source, C]
+----
 void sbi_remote_fence_i(const unsigned long *hart_mask)
-```
-Instruct remote harts to execute FENCE.I instruction.
+----
+Instructs remote harts to execute FENCE.I instruction.
 N.B. hart_mask is as described in sbi_send_ipi.
 
-```C
+[source, C]
+----
 void sbi_remote_sfence_vma(const unsigned long *hart_mask,
                            unsigned long start,
                            unsigned long size)
-```
-Instruct the remote harts to execute one or more SFENCE.VMA instructions,
+----
+Instructs the remote harts to execute one or more SFENCE.VMA instructions,
 covering the range of virtual addresses between start and size.
 
-```C
+[source, C]
+----
 void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
                                 unsigned long start,
                                 unsigned long size,
                                 unsigned long asid)
-```
+----
 Instruct the remote harts to execute one or more SFENCE.VMA instructions,
 covering the range of virtual addresses between start and size.  This covers
 only the given ASID.
 
-```C
+[source, C]
+----
 int sbi_console_getchar(void)
-```
+----
 Read a byte from debug console; returns the byte on success, or -1 for failure.
 Note. This is the only SBI call that has a non-void return type.
 
-```C
+[source, C]
+----
 void sbi_console_putchar(int ch)
-```
+----
 Write data present in *ch* to debug console.
 
 Unlike `sbi_console_getchar`, this SBI call **will block** if there
@@ -211,43 +233,48 @@ remain any pending characters to be transmitted or if the receiving terminal
 is not yet ready to receive the byte. However, if the console doesn't exist
 at all, then the character is thrown away.
 
-```C
+[source, C]
+----
 void sbi_shutdown(void)
-```
+----
 Puts all the harts to shut down state from supervisor point of view. This SBI
 call doesn't return.
 
-| Function Name             | Replacement Extension |
-|:-------------------------:|:---------------------:|
-| sbi_set_timer             |                   N/A |
-| sbi_console_putchar       |                   N/A |
-| sbi_console_getchar       |                   N/A |
-| sbi_clear_ipi             |                   N/A |
-| sbi_send_ipi              |                   N/A |
-| sbi_remote_fence_i        |                   N/A |
-| sbi_remote_sfence_vma     |                   N/A |
-| sbi_remote_sfence_vma_asid|                   N/A |
-| sbi_shutdown              |                   N/A |
+[cols="<,>",options="header,compact"]
+|===
+| Function Name             | Replacement Extension
+| sbi_set_timer             |                   N/A
+| sbi_console_putchar       |                   N/A
+| sbi_console_getchar       |                   N/A
+| sbi_clear_ipi             |                   N/A
+| sbi_send_ipi              |                   N/A
+| sbi_remote_fence_i        |                   N/A
+| sbi_remote_sfence_vma     |                   N/A
+| sbi_remote_sfence_vma_asid|                   N/A
+| sbi_shutdown              |                   N/A
+|===
 
-### Extension IDs
+=== Extension IDs
 
-| Function Name             | Extension ID |
-|:-------------------------:|:------------:|
-| sbi_set_timer             |         0x00 |
-| sbi_console_putchar       |         0x01 |
-| sbi_console_getchar       |         0x02 |
-| sbi_clear_ipi             |         0x03 |
-| sbi_send_ipi              |         0x04 |
-| sbi_remote_fence_i        |         0x05 |
-| sbi_remote_sfence_vma     |         0x06 |
-| sbi_remote_sfence_vma_asid|         0x07 |
-| sbi_shutdown              |         0x08 |
-| *RESERVED*                |    0x09-0x0F |
+[cols="<,>",options="header,compact"]
+|===
+| Function Name             | Extension ID
+| sbi_set_timer             |         0x00
+| sbi_console_putchar       |         0x01
+| sbi_console_getchar       |         0x02
+| sbi_clear_ipi             |         0x03
+| sbi_send_ipi              |         0x04
+| sbi_remote_fence_i        |         0x05
+| sbi_remote_sfence_vma     |         0x06
+| sbi_remote_sfence_vma_asid|         0x07
+| sbi_shutdown              |         0x08
+| *RESERVED*                |    0x09-0x0F
+|===
 
-## Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
+== Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
 
 No management.
 
-## Vendor-Specific SBI Extension Space, Extension Ids 0x09000000 through 0x09FFFFFF
+== Vendor-Specific SBI Extension Space, Extension Ids 0x09000000 through 0x09FFFFFF
 
 Low bits from `mvendorid`.
