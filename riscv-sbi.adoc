@@ -27,7 +27,9 @@ This document describes a draft of version 0.2 of the RISC-V SBI specification.
 #### Changes Since Version 0.1
 
 * The entire v0.1 SBI has been moved to the legacy extension, which is now an
-  optional extension.  This is technically a backwards-incompatible change, 
+  optional extension.  This is technically a backwards-incompatible change
+  because the legacy extension is optional and v0.1 of the SBI doesn't allow
+  probing, but it's as good as we can do.
 
 ## Binary Encoding
 
@@ -63,7 +65,7 @@ returning an error code.  This is analogous to returning the C structure
 Standard SBI error codes are listed below
 
 | Error Type               | Value  |
-| -------------------------|:------:|
+|:------------------------:|:------:|
 |  SBI_SUCCESS             |  0     |
 |  SBI_ERR_FAILURE         | -1     |
 |  SBI_ERR_NOT_SUPPORTED   | -2     |
@@ -93,13 +95,13 @@ long sbi_get_sbi_impl_id(void);
 ```
 Returns the current SBI implementation ID, which is different for every SBI
 implementation.  It is intended that this implementation ID allows software to
-probe 
+probe for SBI implementation quirks.
 
 ````
 long sbi_get_sbi_impl_version(void);
 ````
 Returns the current SBI implementation version.  The encoding of this version
-number if specific to the SBI implementation.
+number is specific to the SBI implementation.
 
 ````
 long sbi_probe_extension(long extension_id);
@@ -108,7 +110,9 @@ Returns 0 if the given extension ID is not available, or an extension-specific
 non-zero value if it is available.
 
 ````
-long sbi_get_{mvendorid,marchid,mimpid}(void);
+long sbi_get_mvendorid(void);
+long sbi_get_marchid(void);
+long sbi_get_mimpid(void);
 ````
 Returns a value that is legal for the corresponding CSR.  0 is always a legal
 value for any of these CSRs.
@@ -116,7 +120,7 @@ value for any of these CSRs.
 ### Function IDs
 
 | Function Name                 | Function ID |
-|-------------------------------|:-----------:|
+|:-----------------------------:|:-----------:|
 | sbi_get_sbi_spec_version      |           0 |
 | sbi_get_sbi_impl_id           |           1 |
 | sbi_get_sbi_impl_version      |           2 |
@@ -139,7 +143,7 @@ extension IDs.  Each of these extension IDs must be probed for directly.  This
 extension is deprecated in favor of the following extensions:
 
 | Function Name             | Replacement Extension |
-|---------------------------|:---------------------:|
+|:-------------------------:|:---------------------:|
 | sbi_set_timer             |                   N/A |
 | sbi_console_putchar       |                   N/A |
 | sbi_console_getchar       |                   N/A |
@@ -153,7 +157,7 @@ extension is deprecated in favor of the following extensions:
 ### Extension IDs
 
 | Function Name             | Extension ID |
-|---------------------------|:------------:|
+|:-------------------------:|:------------:|
 | sbi_set_timer             |         0x00 |
 | sbi_console_putchar       |         0x01 |
 | sbi_console_getchar       |         0x02 |
