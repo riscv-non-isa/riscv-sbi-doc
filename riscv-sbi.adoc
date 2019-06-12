@@ -70,13 +70,14 @@ Standard SBI error codes are listed below
 
 [cols="<,>",options="header,compact"]
 |===
-|  Error Type              |Value
-|  SBI_SUCCESS             |  0
-|  SBI_ERR_FAILURE         | -1
-|  SBI_ERR_NOT_SUPPORTED   | -2
-|  SBI_ERR_INVALID_PARAM   | -3
-|  SBI_ERR_DENIED          | -4
-|  SBI_ERR_INVALID_ADDRESS | -5
+|  Error Type                |Value
+|  SBI_SUCCESS               |  0
+|  SBI_ERR_FAILED            | -1
+|  SBI_ERR_NOT_SUPPORTED     | -2
+|  SBI_ERR_INVALID_PARAM     | -3
+|  SBI_ERR_DENIED            | -4
+|  SBI_ERR_INVALID_ADDRESS   | -5
+|  SBI_ERR_ALREADY_AVAILABLE | -6
 |===
 
 == SBI Base Functionality, Extension ID 0x10
@@ -255,6 +256,84 @@ call doesn't return.
 | sbi_remote_sfence_vma_asid|           0 |         0x07 |                   N/A
 | sbi_shutdown              |           0 |         0x08 |                   N/A
 | *RESERVED*                |             |    0x09-0x0F |
+|===
+
+== Hart State Managment Extension, Extension ID: 0x48534D (HSM)
+
+The Hart State Management Extension introduces a set of functions that allow the
+supervisor software to request M-mode to start/stop harts running in supervisor mode.
+
+[source, C]
+----
+struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr, unsigned
+long priv)
+----
+
+Brings up *hartid* either during initial boot or after an `sbi_hart_stop` SBI
+call in supervisor mode. This will be an asynchronous call. That means the caller
+on the supervisor side need to verify if the cpu is really started or not.
+
+*start_addr* points to a runtime-specified physical address, where a hart can
+resume execution after its initialization/resume sequence.  Before jumping to
+*start_addr*, the hart MUST configure PMP if present and switch to Supervisor
+mode.
+
+*priv* is a pointer to a opaque data segment that the caller can use to pass
+information about execution context.
+
+*Returns* one of the following possible SBI error code thorugh sbiret.error.
+
+* SBI_SUCCESS
+* SBI_ERR_INVALID_ADDRESS
+* SBI_ERR_INVALID_PARAM
+* SBI_ERR_ALREADY_AVAILABLE
+* SBI_ERR_FAILED
+
+[source, C]
+----
+struct sbiret sbi_hart_stop()
+----
+
+Stop the calling hart and mark it unavailable to the supervisor mode software.
+A hart can only stop itself and can be only started again via the `sbi_hart_start`
+call. This is a synchronous call and is not expected to return if succeeds.
+
+*Returns* following SBI error code through sbiret.error only if it fails.
+
+* SBI_ERR_DENIED
+
+----
+struct sbiret sbi_hart_status(unsigned long hartid)
+----
+
+*Returns* the current status of *hartid* on sbiret.value, or an error through
+sbiret.error. The possible status values are shown on the table below.
+
+[cols="<,,>",options="header,compact"]
+|===
+| Name                 		| Value | Description
+| AVAILABLE                     |   0   | Already available
+| NOT AVAILABLE         	|   1   | Not available
+| START_REQUEST_PENDING       	|   2   | A start request pending
+| STOP_REQUEST_PENDING       	|   3   | A stop request pending
+|===
+
+Possible error code:
+
+* SBI_ERR_INVALID_PARAM
+
+The return value from this function also depend on any concurrent `sbi_hart_start` or
+`sbi_hart_stop` calls. That's why, it is not recommended to perform any critical
+operation based on the return value.
+
+=== HSM Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name                 | Function ID | Extension ID
+| sbi_hart_start      		|           0 |     0x48534D
+| sbi_hart_stop           	|           1 |     0x48534D
+| sbi_hart_get_status      	|           2 |     0x48534D
 |===
 
 == Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
