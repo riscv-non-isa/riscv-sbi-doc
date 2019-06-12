@@ -271,6 +271,61 @@ call doesn't return.
 | *RESERVED*                |    0x09-0x0F
 |===
 
+== Power Management Extension, Extension ID: 0x504D (PM)
+
+The Power Management Extension introduces a set of functions that allow the Supervisor to perform per-hart power management operations.
+
+[source, C]
+----
+struct sbiret sbi_pm_hart_up(unsigned long hartid, unsigned long start_addr, unsigned
+long priv)
+----
+
+Brings up *hartid* either during initial boot or after an sbi_hart_down/suspend
+SBI call.
+
+*start_addr* points to a runtime-specified physical address, where a hart can resume execution after its initialization/resume sequence. Before jumping to *start_addr*, the hart MUST configure PMP if present and switch to Supervisor mode.
+
+*priv* is a pointer to a opaque data segment that the caller can use to pass information about
+execution context.
+
+Returns an appropriate SBI error code on sbiret->error.
+
+[source, C]
+----
+struct sbiret sbi_pm_hart_down()
+----
+
+Powers off the calling hart. The hart can only be brought back up through the `sbi_hart_up()` call.
+
+Returns an appropriate SBI error code, through sbiret->error.
+
+[source, C]
+----
+struct sbiret sbi_pm_hart_suspend(u32 power_state, unsigned long resume_addr, unsigned
+long priv)
+----
+
+Suspends the calling hart to a particular *power_state*, which is a platform-specific value, outside the scope of this specification. Suspended hart may automatically wake-up based on some wakeup event or trough a call to `sbi_hart_up()`. After wake-up the hart will resume its operation on the physical address pointed out by *resume_addr* in case of a wakeup event, or on *start_addr* in case of `sbi_hart_up()`.
+
+*priv* is a private data the caller can use to pass information about execution context. The SBI implementation must save a copy so that caller can reuse while restoring hart from suspend.
+
+Returns an appropriate SBI error code, through sbiret->error.
+
+----
+struct sbiret sbi_pm_hart_status(unsigned long hartid)
+----
+
+Returns the current status of *hartid* on sbiret->value, or an error through sbiret->error. The possible status values are shown on the table below.
+
+[cols="<,>",options="header,compact"]
+|===
+| Return value | Description
+| 0 | Powered up & operational
+| 1 | Powered up but at reduced energy consumption
+| 2 | Powered off
+|===
+
 == Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
 
 No management.
