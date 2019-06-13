@@ -176,7 +176,7 @@ Send an inter-processor interrupt to all the harts defined in hart_mask.
 Interprocessor interrupts manifest at the receiving harts as Supervisor Software
 Interrupts.
 
-hart_mask is a physical address that points to a bit-vector of harts. The bit
+hart_mask is a virtual address that points to a bit-vector of harts. The bit
 vector is represented as a sequence of unsigned longs whose length equals the
 number of harts in the system divided by the number of bits in an unsigned long,
 rounded up to the next integer.
