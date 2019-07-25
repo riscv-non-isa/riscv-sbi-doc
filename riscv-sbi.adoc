@@ -55,14 +55,14 @@ In the name of compatibility, SBI extension IDs and SBI function IDs are
 encoded as signed 32-bit integers.  When passed in registers these follow the
 standard RISC-V calling convention rules.
 
-SBI functions generally return a pair of values in `a0` and `a1`, with `a1`
+SBI functions must return a pair of values in `a0` and `a1`, with `a0`
 returning an error code.  This is analogous to returning the C structure
 
 [source, C]
 ----
     struct sbiret {
-        long value;
         long error;
+        long value;
     };
 ----
 
@@ -89,7 +89,7 @@ are no error returns defined.
 
 [source, C]
 ----
-long sbi_get_sbi_spec_version(void);
+struct sbiret sbi_get_spec_version(void);
 ----
 Returns the current SBI specification version.  This function must always
 succeed.  The minor number of the SBI specification is encoded in the low 24
@@ -98,7 +98,7 @@ is reserved for future expansion.
 
 [source, C]
 ----
-long sbi_get_sbi_impl_id(void);
+struct sbiret sbi_get_impl_id(void);
 ----
 Returns the current SBI implementation ID, which is different for every SBI
 implementation.  It is intended that this implementation ID allows software to
@@ -106,23 +106,23 @@ probe for SBI implementation quirks.
 
 [source, C]
 ----
-long sbi_get_sbi_impl_version(void);
+struct sbiret sbi_get_impl_version(void);
 ----
 Returns the current SBI implementation version.  The encoding of this version
 number is specific to the SBI implementation.
 
 [source, C]
 ----
-long sbi_probe_extension(long extension_id);
+struct sbiret sbi_probe_extension(long extension_id);
 ----
 Returns 0 if the given extension ID is not available, or an extension-specific
 non-zero value if it is available.
 
 [source, C]
 ----
-long sbi_get_mvendorid(void);
-long sbi_get_marchid(void);
-long sbi_get_mimpid(void);
+struct sbiret sbi_get_mvendorid(void);
+struct sbiret sbi_get_marchid(void);
+struct sbiret sbi_get_mimpid(void);
 ----
 Return a value that is legal for the corresponding CSR.  0 is always a legal
 value for any of these CSRs.
