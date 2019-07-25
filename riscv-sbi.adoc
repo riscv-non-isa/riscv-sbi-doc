@@ -127,18 +127,18 @@ struct sbiret sbi_get_mimpid(void);
 Return a value that is legal for the corresponding CSR.  0 is always a legal
 value for any of these CSRs.
 
-=== Function IDs
+=== Function Listing
 
-[cols="<,>",options="header,compact"]
+[cols="<,,>",options="header,compact"]
 |===
-| Function Name                 | Function ID
-| sbi_get_sbi_spec_version      |           0
-| sbi_get_sbi_impl_id           |           1
-| sbi_get_sbi_impl_version      |           2
-| sbi_probe_extension           |           3
-| sbi_get_mvendorid             |           4
-| sbi_get_marchid               |           5
-| sbi_get_mimpid                |           6
+| Function Name                 | Function ID | Extension ID
+| sbi_get_sbi_spec_version      |           0 |         0x10
+| sbi_get_sbi_impl_id           |           1 |         0x10
+| sbi_get_sbi_impl_version      |           2 |         0x10
+| sbi_probe_extension           |           3 |         0x10
+| sbi_get_mvendorid             |           4 |         0x10
+| sbi_get_marchid               |           5 |         0x10
+| sbi_get_mimpid                |           6 |         0x10
 |===
 
 === SBI Implementation IDs
@@ -240,35 +240,21 @@ void sbi_shutdown(void)
 Puts all the harts to shut down state from supervisor point of view. This SBI
 call doesn't return.
 
-[cols="<,>",options="header,compact"]
-|===
-| Function Name             | Replacement Extension
-| sbi_set_timer             |                   N/A
-| sbi_console_putchar       |                   N/A
-| sbi_console_getchar       |                   N/A
-| sbi_clear_ipi             |                   N/A
-| sbi_send_ipi              |                   N/A
-| sbi_remote_fence_i        |                   N/A
-| sbi_remote_sfence_vma     |                   N/A
-| sbi_remote_sfence_vma_asid|                   N/A
-| sbi_shutdown              |                   N/A
-|===
+=== Function Listing
 
-=== Extension IDs
-
-[cols="<,>",options="header,compact"]
+[cols="<,,,>",options="header,compact"]
 |===
-| Function Name             | Extension ID
-| sbi_set_timer             |         0x00
-| sbi_console_putchar       |         0x01
-| sbi_console_getchar       |         0x02
-| sbi_clear_ipi             |         0x03
-| sbi_send_ipi              |         0x04
-| sbi_remote_fence_i        |         0x05
-| sbi_remote_sfence_vma     |         0x06
-| sbi_remote_sfence_vma_asid|         0x07
-| sbi_shutdown              |         0x08
-| *RESERVED*                |    0x09-0x0F
+| Function Name             | Function ID | Extension ID | Replacement Extension
+| sbi_set_timer             |           0 |         0x00 |                   N/A
+| sbi_console_putchar       |           0 |         0x01 |                   N/A
+| sbi_console_getchar       |           0 |         0x02 |                   N/A
+| sbi_clear_ipi             |           0 |         0x03 |                   N/A
+| sbi_send_ipi              |           0 |         0x04 |                   N/A
+| sbi_remote_fence_i        |           0 |         0x05 |                   N/A
+| sbi_remote_sfence_vma     |           0 |         0x06 |                   N/A
+| sbi_remote_sfence_vma_asid|           0 |         0x07 |                   N/A
+| sbi_shutdown              |           0 |         0x08 |                   N/A
+| *RESERVED*                |             |    0x09-0x0F |
 |===
 
 == Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
