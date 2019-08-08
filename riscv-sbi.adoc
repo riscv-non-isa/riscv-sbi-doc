@@ -7,7 +7,7 @@ This RISC-V SBI specification is
 
 [%hardbreaks]
 (C) 2019 Palmer Dabbelt <palmer@sifive.com>
-(C) 2019 Atish Parta <atish.parta@wdc.com>
+(C) 2019 Atish Patra <atish.patra@wdc.com>
 
 It is licensed under the Creative Commons Attribution 4.0 International
 License (CC-BY 4.0).  The full license text is available at
