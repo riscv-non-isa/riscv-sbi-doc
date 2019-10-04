@@ -80,6 +80,38 @@ Standard SBI error codes are listed below
 |  SBI_ERR_ALREADY_AVAILABLE | -6
 |===
 
+Every SBI function should prefer `unsigned long` as the data type. It keeps the
+specification simple and easily adaptable for all RISC-V ISA types (i.e. RV32,
+RV64 and RV128). In case the data is defined as 32bit wide, higher privilege
+software must ensure that it only uses 32 bit data only.
+
+If a SBI function needs to pass a list of harts to the higher privilege mode, it
+must use a hart mask as defined below. This is applicable to any extensions defined
+in or after v0.2.
+
+Any function, requiring a hart mask, need to pass following two arguments.
+
+* `unsigned long hart_mask` is a scalar bit-vector containing hartids
+* `unsigned long hart_mask_base` is the starting hartid from which bit-vector
+   must be computed.
+
+In a single SBI function call, maximum number harts that can be set is always XLEN.
+If a lower privilege mode needs to pass information about more than XLEN harts, it
+should invoke multiple instances of the SBI function call. `hart_mask_base` can
+be set to `-1` to indicate that `hart_mask` can be ignored and all available
+harts must be considered.
+
+Any function using hart mask may return following possible error value in addition
+to function specific error values.
+
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_ERR_INVALID_PARAM     | Either `hart_mask_base` or any of the hartid from `hart_mask`
+                              is not valid i.e. either the hartid is not enabled by the
+			      platform or is not available to the supervisor.
+|===
+
 == SBI Base Functionality, Extension ID 0x10
 
 The base of the supervisor binary interface is designed to be as small as
@@ -260,7 +292,205 @@ call doesn't return.
 | *RESERVED*                |             |    0x09-0x0F |
 |===
 
-== Hart State Managment Extension, Extension ID: 0x48534D (HSM)
+
+== Timer Extension, Extension ID: 0x54494D45 (TIME)
+This replaces legacy timer extension (0x00). It follows the new calling convention
+defined in v0.2.
+
+[source, C]
+----
+struct sbiret sbi_set_timer(uint64_t stime_value)
+----
+Programs the clock for next event after *stime_value* time. *stime_value* is in absolute
+time. This function must clear the pending timer interrupt bit as well.
+
+If the supervisor wishes to clear the timer interrupt without scheduling the next
+timer event, it can either request a timer interrupt infinitely far into the
+future (i.e., (uint64_t)-1), or it can instead mask the timer interrupt by
+clearing sie.STIE.
+
+== IPI Extension, Extension ID: 0x735049 (IPI)
+This extension replaces the legacy extension (0x03). All the functions follow
+the `hart_mask` defined in binary encoding section.
+
+[source, C]
+----
+struct sbiret sbi_send_ipi(unsigned long hart_mask, unsigned long hart_mask_base)
+----
+Send an inter-processor interrupt to all the harts defined in hart_mask.
+Interprocessor interrupts manifest at the receiving harts as the supervisor software
+interrupts.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+|===
+
+== RFENCE Extension, Extension ID: 0x52464E43 (RFNC)
+This extension defines all remote fence related functions and replaces the
+legacy extensions (0x05-0x07). All the functions follow the `hart_mask` as
+defined in binary encoding section. Any function wishes to use range of
+addresses (i.e. start_addr and size), have to abide by the below constraints
+on range parameters.
+
+The remote fence function acts as a full tlb flush if
+	* `start_addr` and `size` are both 0
+	* `size` is equal to 2^XLEN-1
+
+[source, C]
+----
+struct sbiret sbi_remote_fence_i(unsigned long hart_mask, unsigned long hart_mask_base)
+----
+Instructs remote harts to execute FENCE.I instruction.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+|===
+
+[source, C]
+----
+struct sbiret sbi_remote_sfence_vma(unsigned long hart_mask,
+				    unsigned long hart_mask_base,
+				    unsigned long start_addr,
+				    unsigned long size)
+----
+Instructs the remote harts to execute one or more SFENCE.VMA instructions,
+covering the range of virtual addresses between start and size.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+
+[source, C]
+----
+struct sbiret sbi_remote_sfence_vma_asid(unsigned long hart_mask,
+				unsigned long hart_mask_base,
+                                unsigned long start_addr, unsigned long size,
+                                unsigned long asid)
+----
+Instruct the remote harts to execute one or more SFENCE.VMA instructions,
+covering the range of virtual addresses between start and size. This covers
+only the given ASID.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_gvma_vmid(unsigned long hart_mask,
+				unsigned long hart_mask_base,
+                                unsigned long start_addr, unsigned long size,
+                                unsigned long vmid)
+----
+Instruct the remote harts to execute one or more HFENCE.GVMA instructions,
+covering the range of guest physical addresses between start and size only
+for the given VMID. This function call is only valid for harts implementing
+hypervisor extension.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
+			      one of the target hart doesn't support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_gvma(unsigned long hart_mask,
+				unsigned long hart_mask_base,
+                                unsigned long start_addr, unsigned long size)
+----
+Instruct the remote harts to execute one or more HFENCE.GVMA instructions,
+covering the range of guest physical addresses between start and size for all
+the guests. This function call is only valid for harts implementing hypervisor
+extension.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
+			      one of the target hart doesn't support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+ 
+[source, C]
+----
+struct sbiret sbi_remote_hfence_vvma_asid(unsigned long hart_mask,
+				unsigned long hart_mask_base,
+                                unsigned long start_addr, unsigned long size,
+                                unsigned long asid)
+----
+Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
+covering the range of guest virtual addresses between start and size for the
+given guest ASID. This function call is only valid for harts implementing
+hypervisor extension.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
+			      one of the target hart doesn't support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_vvma(unsigned long hart_mask,
+				unsigned long hart_mask_base,
+                                unsigned long start_addr, unsigned long size)
+----
+Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
+covering the range of guest virtual addresses between start and size for any
+process belonging to the current guest. This function call is only valid for
+harts implementing hypervisor extension.
+
+*Returns* following possible values via sbiret.
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
+			      one of the target hart doesn't support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+|===
+
+
+=== RFENCE Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name                 | Function ID | Extension ID
+| sbi_remote_fence_i            |           0 |   0x52464E43
+| sbi_remote_sfence_vma         |           1 |   0x52464E43
+| sbi_remote_sfence_vma_asid    |           2 |   0x52464E43
+| sbi_remote_hfence_gvma_vmid   |           3 |   0x52464E43
+| sbi_remote_hfence_gvma   	|           4 |   0x52464E43
+| sbi_remote_hfence_vvma_asid   |           5 |   0x52464E43
+| sbi_remote_hfence_vvma   	|           6 |   0x52464E43
+|===
+
+== Hart State Management Extension, Extension ID: 0x48534D (HSM)
 
 The Hart State Management Extension introduces a set of functions that allow the
 supervisor to request higher privilege mode to start/stop harts running
@@ -285,7 +515,7 @@ mode.
 *priv* is an XLEN-bit value.  Upon execution from `start_addr`, `a1` will
 contain this exact value.
 
-*Returns* one of the following possible SBI error codes thorugh sbiret.error.
+*Returns* one of the following possible SBI error codes through sbiret.error.
 
 [cols="<,>",options="header,compact"]
 |===
