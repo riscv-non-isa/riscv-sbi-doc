@@ -302,11 +302,9 @@ contain this exact value.
 struct sbiret sbi_hart_stop()
 ----
 
-Stop the calling hart by removing it from the list of harts that are currently running
-supervisor mode software. The stopped hart will no longer execute supervisor or user mode
-code, and will not respond to inbound supervisor or user IPIs.
-A hart can only stop itself and can be only started again via the `sbi_hart_start`
-call. This is a synchronous call and is not expected to return if succeeds.
+Returns ownership of the calling hart back to the SBI implementation.  This
+call is not expected to return under normal conditions.  `sbi_hart_stop()` must
+be called with supervisor and user interrupts disabled.
 
 *Returns* following SBI error code through sbiret.error only if it fails.
 
