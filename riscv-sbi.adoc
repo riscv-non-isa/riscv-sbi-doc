@@ -280,8 +280,8 @@ resume execution after its initialization/resume sequence.  Before jumping to
 *start_addr*, the hart MUST configure PMP if present and switch to Supervisor
 mode.
 
-*priv* is an opaque pointer to a opaque data segment that the caller can use to pass
-information about execution context.
+*priv* is an XLEN-bit value.  Upon execution from `start_addr`, `a2` will
+contain this exact value.
 
 *Returns* one of the following possible SBI error codes thorugh sbiret.error.
 
