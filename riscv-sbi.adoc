@@ -270,9 +270,10 @@ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr, uns
 long priv)
 ----
 
-Brings up *hartid* either during initial boot or after an `sbi_hart_stop` SBI
-call in supervisor mode. This will be an asynchronous call. That means the caller
-on the supervisor side needs to verify if the hart is really started or not.
+Informs the SBI implementation that the supervisor would like the given hart to
+begin execution.  This call is asynchronous -- more specifically,
+`sbi_hart_start()` may return before execution has actually begin as long as
+the SBI implementation is capable of ensuring the return code is accurate.
 
 *start_addr* points to a runtime-specified physical address, where a hart can
 resume execution after its initialization/resume sequence.  Before jumping to
