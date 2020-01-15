@@ -261,7 +261,7 @@ call doesn't return.
 == Hart State Managment Extension, Extension ID: 0x48534D (HSM)
 
 The Hart State Management Extension introduces a set of functions that allow the
-supervisor software to request higher privilege mode to start/stop harts running
+supervisor to request higher privilege mode to start/stop harts running
 in supervisor mode.
 
 [source, C]
