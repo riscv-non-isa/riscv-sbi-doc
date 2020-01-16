@@ -149,6 +149,8 @@ value for any of these CSRs.
 | Implementation ID | Name
 | 0                 | Berkeley Boot Loader (BBL)
 | 1                 | OpenSBI
+| 2                 | Xvisor
+| 3                 | KVM
 |===
 
 == Legacy SBI Extension, Extension IDs 0x00 through 0x0F
