@@ -282,7 +282,7 @@ resume execution after its initialization/resume sequence.  Before jumping to
 *start_addr*, the hart MUST configure PMP if present and switch to Supervisor
 mode.
 
-*priv* is an XLEN-bit value.  Upon execution from `start_addr`, `a2` will
+*priv* is an XLEN-bit value.  Upon execution from `start_addr`, `a1` will
 contain this exact value.
 
 *Returns* one of the following possible SBI error codes thorugh sbiret.error.
@@ -298,6 +298,20 @@ contain this exact value.
 | SBI_ERR_ALREADY_AVAILABLE | The given hartid is already started.
 | SBI_ERR_FAILED            | The start request failed for unknown reasons.
 |===
+
+The target hart jumps to higher privilege mode(S or VS mode) by executing at
+`start_addr` with following values in specific registers.
+
+[cols="<,>",options="header,compact"]
+|===
+|Register Name		|Value  |
+|satp			|  0    |
+|sstatus.sie		|  0    |
+|a0			|hartid |
+|a1			|priv   |
+|===
+
+All other registers remain in an undefined state.
 
 [source, C]
 ----
@@ -322,8 +336,8 @@ sbiret.error. The possible status values are shown on the table below.
 [cols="<,,>",options="header,compact"]
 |===
 | Name                 		| Value | Description
-| AVAILABLE                     |   0   | Already available
-| NOT_AVAILABLE         	|   1   | Not available
+| STARTED                     	|   0   | Already started
+| STOPPED         		|   1   | Stopped
 | START_REQUEST_PENDING       	|   2   | A start request pending
 | STOP_REQUEST_PENDING       	|   3   | A stop request pending
 |===
