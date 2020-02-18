@@ -534,11 +534,11 @@ The target hart jumps to higher privilege mode(S or VS mode) by executing at
 
 [cols="<,>",options="header,compact"]
 |===
-|Register Name		|Value  |
-|satp			|  0    |
-|sstatus.sie		|  0    |
-|a0			|hartid |
-|a1			|priv   |
+|Register Name		|Value
+|satp			|  0
+|sstatus.sie		|  0
+|a0			|hartid
+|a1			|priv
 |===
 
 All other registers remain in an undefined state.
