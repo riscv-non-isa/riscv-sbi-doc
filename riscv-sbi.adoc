@@ -336,6 +336,7 @@ addresses (i.e. start_addr and size), have to abide by the below constraints
 on range parameters.
 
 The remote fence function acts as a full tlb flush if
+
 	* `start_addr` and `size` are both 0
 	* `size` is equal to 2^XLEN-1
 
