@@ -255,7 +255,8 @@ only the given ASID.
 int sbi_console_getchar(void)
 ----
 Read a byte from debug console; returns the byte on success, or -1 for failure.
-Note. This is the only SBI call that has a non-void return type.
+Note. This is the only SBI call, in the legacy extension, that has a non-void
+return type.
 
 [source, C]
 ----
