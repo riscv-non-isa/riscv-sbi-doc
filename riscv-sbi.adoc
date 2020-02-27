@@ -574,7 +574,7 @@ sbiret.error. The possible status values are shown on the table below.
 
 Possible error code:
 
-* SBI_ERR_INVALID_PARAM
+* SBI_ERR_INVALID_PARAM: The given hartid is not valid
 
 Since harts may transition state at any time due to any concurrent `sbi_hart_start` or
 `sbi_hart_stop` calls, the return value from this function may not represent the actual
