@@ -592,6 +592,71 @@ state of the hart at the time of return value verification.
 | sbi_hart_get_status      	|           2 |     0x48534D
 |===
 
+== Physical Memory Protection Extension, Extension ID: 0x504D50 (PMP)
+The Physical Memory Protection Extension introduces a set of functions that
+allow the supervisor to request higher privilege mode to return information
+of the memory regions protected by the SBI firmware via the PMP unit.
+
+Every memory region protected by the SBI firmware can be described by a C
+structure (or descriptor) below:
+
+[source, C]
+----
+struct pmp_fw_prot_desc {
+	unsigned long base;
+	unsigned long size;
+};
+----
+
+If there are mutiple memory regions protected, multiple descriptors should
+be used with each one describing a single memory region.
+
+[source, C]
+----
+struct sbiret sbi_get_fw_prot_desc_size()
+----
+*Returns* the size of memory (in bytes) required to describe the protected
+memory regions by the SBI firmware via PMP through sbiret.value, or one of
+the following possible SBI error codes through sbiret.error.
+
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | The size of memory (in bytes) required to +
+                              describe the protected memory regions by the SBI +
+                              firmware via PMP is written to sbiret.value. +
+                              The size should be multiple of one descriptor +
+                              size, that is sizeof(struct pmp_fw_prot_desc). +
+                              If no memory region is protected, zero is set +
+                              to sbiret.value.
+| SBI_ERR_NOT_SUPPORTED     | PMP is not available on this platform.
+|===
+
+[source, C]
+----
+struct sbiret sbi_get_fw_prot_desc(struct pmp_fw_prot_desc *desc)
+----
+*Returns* one of the following possible SBI error codes through sbiret.error.
+
+[cols="<,>",options="header,compact"]
+|===
+| Error code                | Description
+| SBI_SUCCESS               | The physical address of RAM pointed by desc +
+                              where memory region information is to be written +
+                              are filled in by SBI firmware, one after another +
+                              if multiple memory regions are protected.
+| SBI_ERR_NOT_SUPPORTED     | PMP is not available on this platform.
+|===
+
+=== PMP Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name             | Function ID | Extension ID
+| sbi_get_fw_prot_desc_size |           0 |     0x504D50
+| sbi_get_fw_prot_desc      |           1 |     0x504D50
+|===
+
 == Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
 
 No management.
