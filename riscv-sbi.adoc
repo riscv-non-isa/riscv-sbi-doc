@@ -187,9 +187,15 @@ value for any of these CSRs.
 
 == Legacy SBI Extension, Extension IDs 0x00 through 0x0F
 
-The legacy SBI ignores the function ID field, instead being encoded as multiple
-extension IDs.  Each of these extension IDs must be probed for directly.  This
-extension is deprecated in favor of the following extensions:
+The legacy SBI extension ignores the function ID field,
+instead being encoded as multiple
+extension IDs.  Each of these extension IDs must be probed for directly.
+
+The legacy SBI extension is deprecated in favor of the other extensions
+listed below.
+The legacy console SBI functions
+(`sbi_console_getchar()` and `sbi_console_putchar ()`)
+are expected to be deprecated; they have no replacement.
 
 [source, C]
 ----
@@ -255,7 +261,7 @@ only the given ASID.
 int sbi_console_getchar(void)
 ----
 Read a byte from debug console; returns the byte on success, or -1 for failure.
-Note. This is the only SBI call, in the legacy extension, that has a non-void
+Note. This is the only SBI call in the legacy extension that has a non-void
 return type.
 
 [source, C]
@@ -310,6 +316,15 @@ timer event, it can either request a timer interrupt infinitely far into the
 future (i.e., (uint64_t)-1), or it can instead mask the timer interrupt by
 clearing sie.STIE.
 
+=== TIME Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name                 | Function ID | Extension ID
+| sbi_set_timer                 |           0 |   0x54494D45
+|===
+
+
 == IPI Extension, Extension ID: 0x735049 (IPI)
 This extension replaces the legacy extension (0x03). All the functions follow
 the `hart_mask` defined in binary encoding section.
@@ -329,6 +344,14 @@ interrupts.
 | SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
 |===
 
+=== IPI Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name                 | Function ID | Extension ID
+| sbi_send_ipi                  |           0 |     0x735049
+|===
+
 == RFENCE Extension, Extension ID: 0x52464E43 (RFNC)
 This extension defines all remote fence related functions and replaces the
 legacy extensions (0x05-0x07). All the functions follow the `hart_mask` as
@@ -336,7 +359,7 @@ defined in binary encoding section. Any function wishes to use range of
 addresses (i.e. start_addr and size), have to abide by the below constraints
 on range parameters.
 
-The remote fence function acts as a full tlb flush if
+The remote fence function acts as a full TLB flush if
 
 	* `start_addr` and `size` are both 0
 	* `size` is equal to 2^XLEN-1
