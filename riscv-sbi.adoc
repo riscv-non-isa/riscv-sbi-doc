@@ -153,6 +153,7 @@ non-zero value if it is available.
 
 [source, C]
 ----
+struct sbiret sbi_get_misa(void);
 struct sbiret sbi_get_mvendorid(void);
 struct sbiret sbi_get_marchid(void);
 struct sbiret sbi_get_mimpid(void);
@@ -172,6 +173,7 @@ value for any of these CSRs.
 | sbi_get_mvendorid             |           4 |         0x10
 | sbi_get_marchid               |           5 |         0x10
 | sbi_get_mimpid                |           6 |         0x10
+| sbi_get_misa                  |           7 |         0x10
 |===
 
 === SBI Implementation IDs
