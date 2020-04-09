@@ -615,7 +615,7 @@ state of the hart at the time of return value verification.
 | sbi_hart_get_status      	|           2 |     0x48534D
 |===
 
-== Experimental SBI Extension Space, Extension IDs 0x0800000 through 0x08FFFFFF
+== Experimental SBI Extension Space, Extension IDs 0x08000000 through 0x08FFFFFF
 
 No management.
 
