@@ -622,3 +622,10 @@ No management.
 == Vendor-Specific SBI Extension Space, Extension Ids 0x09000000 through 0x09FFFFFF
 
 Low bits from `mvendorid`.
+
+== Firmware Code Base Specific SBI Extension Space, Extension Ids 0x0A000000 through 0x0AFFFFFF
+
+Low bits is SBI implementation ID. The firmware code base SBI extension is the additional 
+SBI extensions to SBI implementation. That provides the firmware code base specific SBI functions
+which are defined in the external firmware specification.
+
