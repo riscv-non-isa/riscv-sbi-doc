@@ -223,7 +223,8 @@ rounded up to the next integer.
 void sbi_clear_ipi(void)
 ----
 Clears the pending IPIs if any. The IPI is cleared only in the hart for which
-this SBI call is invoked.
+this SBI call is invoked.  (`sbi_clear_ipi` is deprecated; S-mode code can
+clear `sip.SSIP` directly).
 
 [source, C]
 ----
