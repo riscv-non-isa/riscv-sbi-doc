@@ -1,0 +1,17 @@
+= RISC-V SBI specification
+
+SBI (Supervisor Binary Interface) is an interface between the Supervisor
+Execution Environment (SEE) and the supervisor. It allows the supervisor to
+execute some privileged operations by using the ecall instruction. Examples of
+SEE and supervisor are: M-Mode and S-Mode on Unix-class platforms, where SBI is
+the only interface between them, as well as the Hypervisor extended-Supervisor
+(HS) and Virtualized Supervisor (VS).
+
+Discussion of SBI occurs on the
+https://lists.riscv.org/g/tech-unixplatformspec[RISC-V Unix Platform Mailing
+list]. It is publicly readable but posting requires being a member of the
+RISC-V Foundation. Any new SBI extension needs to be discussed and approved
+there before being merged.
+
+https://github.com/riscv/opensbi[OpenSBI] is the reference implementation,
+but other implementations exist; see section "SBI Implementation IDs".
