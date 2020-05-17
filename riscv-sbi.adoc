@@ -66,7 +66,15 @@ returning an error code.  This is analogous to returning the C structure
     };
 ----
 
-Standard SBI error codes are listed below
+Every function defined in the specification has a set of error codes associated
+with a case in which they are returned. In the even of such a case, that error
+code must be returned. No other error code must be returned.
+
+Custom SBI calls defined in a vendor or firmware extension can return custom
+error codes, however it is recommended that they use the standard error codes
+when appropriate.
+
+The standard SBI error codes are listed below:
 
 [cols="<,>",options="header,compact"]
 |===
