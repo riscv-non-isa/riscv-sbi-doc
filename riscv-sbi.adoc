@@ -581,6 +581,7 @@ be called with supervisor and user interrupts disabled.
 
 * SBI_ERR_FAILED
 
+[source, C]
 ----
 struct sbiret sbi_hart_status(unsigned long hartid)
 ----
