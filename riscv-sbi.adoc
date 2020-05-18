@@ -466,8 +466,8 @@ struct sbiret sbi_remote_hfence_vvma_asid(unsigned long hart_mask,
 ----
 Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
 covering the range of guest virtual addresses between start and size for the
-given guest ASID. This function call is only valid for harts implementing
-hypervisor extension.
+given ASID and current VMID (in HGATP CSR) of calling hart. This function call
+is only valid for harts implementing hypervisor extension.
 
 *Returns* following possible values via sbiret.
 [cols="<,>",options="header,compact"]
@@ -486,9 +486,9 @@ struct sbiret sbi_remote_hfence_vvma(unsigned long hart_mask,
                                 unsigned long start_addr, unsigned long size)
 ----
 Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
-covering the range of guest virtual addresses between start and size for any
-process belonging to the current guest. This function call is only valid for
-harts implementing hypervisor extension.
+covering the range of guest virtual addresses between start and size for
+current VMID (in HGATP CSR) of calling hart. This function call is only valid
+for harts implementing hypervisor extension.
 
 *Returns* following possible values via sbiret.
 [cols="<,>",options="header,compact"]
