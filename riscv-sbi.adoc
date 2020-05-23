@@ -325,7 +325,7 @@ clearing sie.STIE.
 |===
 
 
-== IPI Extension, Extension ID: 0x735049 (IPI)
+== IPI Extension, Extension ID: 0x735049 (sPI: s-mode IPI)
 This extension replaces the legacy extension (0x03). All the functions follow
 the `hart_mask` defined in binary encoding section.
 
