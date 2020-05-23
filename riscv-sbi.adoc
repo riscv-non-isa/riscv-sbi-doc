@@ -227,7 +227,8 @@ rounded up to the next integer.
 void sbi_clear_ipi(void)
 ----
 Clears the pending IPIs if any. The IPI is cleared only in the hart for which
-this SBI call is invoked.
+this SBI call is invoked.  `sbi_clear_ipi` is deprecated because S-mode code can
+clear `sip.SSIP` directly.
 
 [source, C]
 ----
@@ -326,8 +327,9 @@ clearing sie.STIE.
 
 
 == IPI Extension, Extension ID: 0x735049 (sPI: s-mode IPI)
-This extension replaces the legacy extension (0x03). All the functions follow
-the `hart_mask` defined in binary encoding section.
+This extension replaces the legacy extension (0x04). The other IPI related
+legacy extension(0x3) is deprecated now. All the functions in this extension
+follow the `hart_mask` as defined in the binary encoding section.
 
 [source, C]
 ----
