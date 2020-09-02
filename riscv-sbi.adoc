@@ -183,6 +183,7 @@ value for any of these CSRs.
 | 1                 | OpenSBI
 | 2                 | Xvisor
 | 3                 | KVM
+| 4                 | Diosix
 |===
 
 == Legacy SBI Extension, Extension IDs 0x00 through 0x0F
