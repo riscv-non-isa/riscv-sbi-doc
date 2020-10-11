@@ -32,6 +32,25 @@ This document describes a draft of version 0.2 of the RISC-V SBI specification.
   because the legacy extension is optional and v0.1 of the SBI doesn't allow
   probing, but it's as good as we can do.
 
+=== Terminology
+
+Should, Shall, May, and Must::
+These terms are defined in link:https://tools.ietf.org/html/rfc2119[RFC 2119].
+In particular, they may be used without ALL CAPS.
+
+Hart and Execution environment interface::
+These terms are defined in the
+link:https://riscv.org/technical/specifications/[RISC-V ISA specification, volume 1, section 1.2].
+The RISC-V SBI specification specifies some components of an execution
+environment interface.
+
+Valid **hartid**s::
+A *hartid* is valid if it identifies a hart within the execution environment. In
+addition, if the <<hsm-extension>> is enabled, **hartid**s identifying harts
+which can be managed or queried are also valid. The set of harts which can be
+managed or queried may change over time. Valid **hartid**s should correspond to
+the value of the `mhartid` CSR on particular harts.
+
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
