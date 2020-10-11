@@ -56,6 +56,23 @@ the value of the `mhartid` CSR on particular harts.
 All harts in the execution environment must comply with the
 link:https://riscv.org/technical/specifications/[RISC-V ISA specification].
 
+== Initial State
+
+If a hart supports supervisor mode, then it should begin execution in (virtual)
+supervisor mode. Otherwise, harts shall begin execution in (virtual) user mode.
+The entry point is unspecified, but must be the same for all harts in the
+execution environment.
+
+If a hart begins execution in supervisor mode, then the `satp` CSR must be set
+to 0, and the `sie` bit of the `sstatus` CSR must be cleared. If a hart begins
+execution in supervisor mode, then the `uie` bit of the `ustatus` CSR must be
+cleared. In both cases, the `a0` register must be set to the *hartid*
+identifying the hart. The state of all other registers is unspecified.
+
+If the <<hsm-extension>> is present, all harts in the execution environment
+must have a status of `STARTED` or `START_REQUEST_PENDING` (as returned by
+`sbi_hart_status()`) when any hart first retires an instruction.
+
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
