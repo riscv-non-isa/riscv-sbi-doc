@@ -51,6 +51,11 @@ which can be managed or queried are also valid. The set of harts which can be
 managed or queried may change over time. Valid **hartid**s should correspond to
 the value of the `mhartid` CSR on particular harts.
 
+== Instruction Set
+
+All harts in the execution environment must comply with the
+link:https://riscv.org/technical/specifications/[RISC-V ISA specification].
+
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
