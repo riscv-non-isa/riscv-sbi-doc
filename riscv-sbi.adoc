@@ -10,14 +10,14 @@ This RISC-V SBI specification is
 (C) 2019 Atish Patra <atish.patra@wdc.com>
 
 It is licensed under the Creative Commons Attribution 4.0 International
-License (CC-BY 4.0).  The full license text is available at
+License (CC-BY 4.0). The full license text is available at
 https://creativecommons.org/licenses/by/4.0/.
 
 == Introduction
 
 This specification describes the RISC-V Supervisor Binary Interface, known from
-here on as SBI.  This interface allows supervisor-mode software to be written
-that is portable to all RISC-V implementations.  The design of the SBI follows
+here on as SBI. This interface allows supervisor-mode software to be written
+that is portable to all RISC-V implementations. The design of the SBI follows
 the general RISC-V philosophy of having a small core along with a set of
 optional modular extensions.
 
@@ -28,16 +28,16 @@ This document describes a draft of version 0.2 of the RISC-V SBI specification.
 ==== Changes Since Version 0.1
 
 * The entire v0.1 SBI has been moved to the legacy extension, which is now an
-  optional extension.  This is technically a backwards-incompatible change
+  optional extension. This is technically a backwards-incompatible change
   because the legacy extension is optional and v0.1 of the SBI doesn't allow
   probing, but it's as good as we can do.
 
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
-of SBI extensions.  This binary encoding matches the standard RISC-V UNIX
+of SBI extensions. This binary encoding matches the standard RISC-V UNIX
 syscall ABI, which itself is based on the calling convention defined in the
-RISC-V ELF psABI.  In other words, SBI calls are exactly the same as standard
+RISC-V ELF psABI. In other words, SBI calls are exactly the same as standard
 RISC-V function calls except that:
 
 * An `ecall` is used as the control transfer instruction instead of a `call`
@@ -52,11 +52,11 @@ This allows SBI extensions to encode multiple functions within the space of a
 single extension.
 
 In the name of compatibility, SBI extension IDs and SBI function IDs are
-encoded as signed 32-bit integers.  When passed in registers these follow the
+encoded as signed 32-bit integers. When passed in registers these follow the
 standard RISC-V calling convention rules.
 
 SBI functions must return a pair of values in `a0` and `a1`, with `a0`
-returning an error code.  This is analogous to returning the C structure
+returning an error code. This is analogous to returning the C structure
 
 [source, C]
 ----
@@ -115,8 +115,8 @@ to function specific error values.
 == SBI Base Functionality, Extension ID 0x10
 
 The base of the supervisor binary interface is designed to be as small as
-possible.  As such, it only contains functionality for probing which SBI
-extensions are available and for querying the version of the SBI.  All
+possible. As such, it only contains functionality for probing which SBI
+extensions are available and for querying the version of the SBI. All
 functions in the base must be supported by all SBI implementations, so there
 are no error returns defined.
 
@@ -124,9 +124,9 @@ are no error returns defined.
 ----
 struct sbiret sbi_get_spec_version(void);
 ----
-Returns the current SBI specification version.  This function must always
-succeed.  The minor number of the SBI specification is encoded in the low 24
-bits, with the major number encoded in the next 7 bits.  Bit 31 must be 0 and
+Returns the current SBI specification version. This function must always
+succeed. The minor number of the SBI specification is encoded in the low 24
+bits, with the major number encoded in the next 7 bits. Bit 31 must be 0 and
 is reserved for future expansion.
 
 [source, C]
@@ -134,14 +134,14 @@ is reserved for future expansion.
 struct sbiret sbi_get_impl_id(void);
 ----
 Returns the current SBI implementation ID, which is different for every SBI
-implementation.  It is intended that this implementation ID allows software to
+implementation. It is intended that this implementation ID allows software to
 probe for SBI implementation quirks.
 
 [source, C]
 ----
 struct sbiret sbi_get_impl_version(void);
 ----
-Returns the current SBI implementation version.  The encoding of this version
+Returns the current SBI implementation version. The encoding of this version
 number is specific to the SBI implementation.
 
 [source, C]
@@ -157,7 +157,7 @@ struct sbiret sbi_get_mvendorid(void);
 struct sbiret sbi_get_marchid(void);
 struct sbiret sbi_get_mimpid(void);
 ----
-Return a value that is legal for the corresponding CSR.  0 is always a legal
+Return a value that is legal for the corresponding CSR. 0 is always a legal
 value for any of these CSRs.
 
 === Function Listing
@@ -189,7 +189,7 @@ value for any of these CSRs.
 
 The legacy SBI extension ignores the function ID field,
 instead being encoded as multiple
-extension IDs.  Each of these extension IDs must be probed for directly.
+extension IDs. Each of these extension IDs must be probed for directly.
 
 The legacy SBI extension is deprecated in favor of the other extensions
 listed below.
@@ -227,7 +227,7 @@ rounded up to the next integer.
 void sbi_clear_ipi(void)
 ----
 Clears the pending IPIs if any. The IPI is cleared only in the hart for which
-this SBI call is invoked.  `sbi_clear_ipi` is deprecated because S-mode code can
+this SBI call is invoked. `sbi_clear_ipi` is deprecated because S-mode code can
 clear `sip.SSIP` directly.
 
 [source, C]
@@ -254,7 +254,7 @@ void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
                                 unsigned long asid)
 ----
 Instruct the remote harts to execute one or more SFENCE.VMA instructions,
-covering the range of virtual addresses between start and size.  This covers
+covering the range of virtual addresses between start and size. This covers
 only the given ASID.
 
 [source, C]
@@ -530,16 +530,16 @@ long priv)
 ----
 
 Informs the SBI implementation that the supervisor would like the given hart to
-begin execution.  This call is asynchronous -- more specifically,
+begin execution. This call is asynchronous -- more specifically,
 `sbi_hart_start()` may return before execution has actually begin as long as
 the SBI implementation is capable of ensuring the return code is accurate.
 
 *start_addr* points to a runtime-specified physical address, where a hart can
-resume execution after its initialization/resume sequence.  Before jumping to
+resume execution after its initialization/resume sequence. Before jumping to
 *start_addr*, the hart MUST configure PMP if present and switch to Supervisor
 mode.
 
-*priv* is an XLEN-bit value.  Upon execution from `start_addr`, `a1` will
+*priv* is an XLEN-bit value. Upon execution from `start_addr`, `a1` will
 contain this exact value.
 
 *Returns* one of the following possible SBI error codes through sbiret.error.
@@ -572,11 +572,11 @@ All other registers remain in an undefined state.
 
 [source, C]
 ----
-struct sbiret sbi_hart_stop()
+struct sbiret sbi_hart_stop(void)
 ----
 
-Returns ownership of the calling hart back to the SBI implementation.  This
-call is not expected to return under normal conditions.  `sbi_hart_stop()` must
+Returns ownership of the calling hart back to the SBI implementation. This
+call is not expected to return under normal conditions. `sbi_hart_stop()` must
 be called with supervisor and user interrupts disabled.
 
 *Returns* following SBI error code through sbiret.error only if it fails.
