@@ -618,6 +618,42 @@ state of the hart at the time of return value verification.
 | sbi_hart_get_status      	|           2 |     0x48534D
 |===
 
+== Hart Discovery Extension, Extension ID: 0x4844 (HD)
+
+The Hart Discovery Extension introduces a set of functions that allow the
+supervisor to discover which harts are valid. Since the set of valid **hartid**s may
+change at any time, the return values of these functions may not represent the
+actual valid **hartid**s at the time of return value verification.
+
+[source, C]
+----
+struct sbiret sbi_get_max_hartid(void)
+----
+
+*Returns* the maximum possible valid *hartid*. This must include **hartid**s
+which are currently invalid but may become valid in the future.
+
+[source, C]
+----
+struct sbiret sbi_get_valid_harts(unsigned long hart_mask_base)
+----
+
+*Returns* a scalar bit-vector containing all valid **hartid**s starting at
+*hart_mask_base*.
+
+Possible error code:
+
+* SBI_ERR_INVALID_PARAM: A *hart_mask_base* of `-1` is invalid for this function.
+
+=== HD Function Listing
+
+[cols="<,,>",options="header,compact"]
+|===
+| Function Name                 | Function ID | Extension ID
+| sbi_get_max_hartid      	|           0 |       0x4844
+| sbi_get_valid_harts     	|           1 |       0x4844
+|===
+
 == Experimental SBI Extension Space, Extension IDs 0x08000000 through 0x08FFFFFF
 
 No management.
