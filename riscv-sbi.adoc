@@ -517,6 +517,7 @@ for harts implementing hypervisor extension.
 | sbi_remote_hfence_vvma   	|           6 |   0x52464E43
 |===
 
+[[hsm-extension,Hart State Management Extension (HSM)]]
 == Hart State Management Extension, Extension ID: 0x48534D (HSM)
 
 The Hart State Management Extension introduces a set of functions that allow the
