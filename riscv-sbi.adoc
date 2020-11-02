@@ -184,6 +184,7 @@ value for any of these CSRs.
 | 2                 | Xvisor
 | 3                 | KVM
 | 4                 | RustSBI
+| 5                 | Diosix
 |===
 
 == Legacy SBI Extension, Extension IDs 0x00 through 0x0F
