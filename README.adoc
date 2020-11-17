@@ -15,3 +15,16 @@ there before being merged.
 
 https://github.com/riscv/opensbi[OpenSBI] is the reference implementation,
 but other implementations exist; see section "SBI Implementation IDs".
+
+= Licensing
+
+The files in this repository are licensed under the Creative Commons
+Attribution 4.0 International License (CC-BY 4.0).  The full license
+text is available at https://creativecommons.org/licenses/by/4.0/.
+
+= Building Documents
+
+The final specification in form of PDF and HTML can be generated using
+`make` command. The `makefile` internally uses asciidoctor so the packages
+required by the `makefile` need to be installed on the build system using
+`make install-debs` or `make install-rpms`.
