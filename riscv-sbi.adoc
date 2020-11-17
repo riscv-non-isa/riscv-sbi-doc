@@ -1,6 +1,16 @@
+// SPDX-License-Identifier: CC-BY-4.0
 
 = RISC-V Supervisor Binary Interface Specification
+:author: RISC-V Platform Specification Task Group
+:email: tech-unixplatformspec@lists.riscv.org
+:revnumber: 0.3-rc0
+:sectnums:
+:toc: macro
 
+// table of contents
+toc::[]
+
+[preface]
 == Copyright and license information
 
 This RISC-V SBI specification is
@@ -13,24 +23,27 @@ It is licensed under the Creative Commons Attribution 4.0 International
 License (CC-BY 4.0). The full license text is available at
 https://creativecommons.org/licenses/by/4.0/.
 
-== Introduction
+[preface]
+== Change Log
 
-This specification describes the RISC-V Supervisor Binary Interface, known from
-here on as SBI. This interface allows supervisor-mode software to be written
-that is portable to all RISC-V implementations. The design of the SBI follows
-the general RISC-V philosophy of having a small core along with a set of
-optional modular extensions.
+=== Version 0.3-rc0
 
-=== Versioning and History
+* Added SBI system reset extension
 
-This document describes a draft of version 0.2 of the RISC-V SBI specification.
+=== Version 0.2
 
-==== Changes Since Version 0.1
-
-* The entire v0.1 SBI has been moved to the legacy extension, which is now an
-  optional extension. This is technically a backwards-incompatible change
+* The entire v0.1 SBI has been moved to the legacy extension, which is now
+  an optional extension. This is technically a backwards-incompatible change
   because the legacy extension is optional and v0.1 of the SBI doesn't allow
   probing, but it's as good as we can do.
+
+== Introduction
+
+This specification describes the RISC-V Supervisor Binary Interface, known
+from here on as SBI. This interface allows supervisor-mode software to be
+written that is portable to all RISC-V implementations. The design of the
+SBI follows the general RISC-V philosophy of having a small core along with
+a set of optional modular extensions.
 
 == Binary Encoding
 
@@ -40,19 +53,19 @@ which itself is based on the calling convention defined in the RISC-V ELF
 psABI. In other words, SBI calls are exactly the same as standard RISC-V
 function calls except that:
 
-* An `ecall` is used as the control transfer instruction instead of a `call`
+* An `ECALL` is used as the control transfer instruction instead of a `CALL`
   instruction.
-* `a7` (or `t0` on RV32E-based systems) encodes the SBI extension ID, which
-  matches how the system call ID is encoded in the Linux system call ABI.
+* `a7` (or `t0` on RV32E-based systems) encodes the SBI extension ID (*EID*),
+  which matches how the system call ID is encoded in Linux system call ABI.
 
-Many SBI extensions also chose to encode an additional function ID in `a6`,
-a scheme similar to the `ioctl()` system call on many UNIX operating systems.
-This allows SBI extensions to encode multiple functions within the space of a
-single extension.
+Many SBI extensions also chose to encode an additional SBI function ID (*FID*)
+in `a6`, a scheme similar to the `ioctl()` system call on many UNIX operating
+systems. This allows SBI extensions to encode multiple functions within the
+space of a single extension.
 
-In the name of compatibility, SBI extension IDs and SBI function IDs are
-encoded as signed 32-bit integers. When passed in registers these follow the
-standard RISC-V calling convention rules.
+In the name of compatibility, SBI extension IDs (*EIDs*) and SBI function IDs
+(*FIDs*) are encoded as signed 32-bit integers. When passed in registers these
+follow the standard RISC-V calling convention rules.
 
 SBI functions must return a pair of values in `a0` and `a1`, with `a0`
 returning an error code. This is analogous to returning the C structure
@@ -67,7 +80,7 @@ returning an error code. This is analogous to returning the C structure
 
 Standard SBI error codes are listed below
 
-[cols="<,>",options="header,compact"]
+[cols="2,1", width=50%, align="center", options="header"]
 |===
 |  Error Type                |Value
 |  SBI_SUCCESS               |  0
@@ -79,14 +92,14 @@ Standard SBI error codes are listed below
 |  SBI_ERR_ALREADY_AVAILABLE | -6
 |===
 
-Every SBI function should prefer `unsigned long` as the data type. It keeps the
-specification simple and easily adaptable for all RISC-V ISA types (i.e. RV32,
-RV64 and RV128). In case the data is defined as 32bit wide, higher privilege
-software must ensure that it only uses 32 bit data only.
+Every SBI function should prefer `unsigned long` as the data type. It keeps
+the specification simple and easily adaptable for all RISC-V ISA types (i.e.
+RV32, RV64 and RV128). In case the data is defined as 32bit wide, higher
+privilege software must ensure that it only uses 32 bit data only.
 
-If a SBI function needs to pass a list of harts to the higher privilege mode, it
-must use a hart mask as defined below. This is applicable to any extensions defined
-in or after v0.2.
+If a SBI function needs to pass a list of harts to the higher privilege mode,
+it must use a hart mask as defined below. This is applicable to any extensions
+defined in or after v0.2.
 
 Any function, requiring a hart mask, need to pass following two arguments.
 
@@ -94,88 +107,121 @@ Any function, requiring a hart mask, need to pass following two arguments.
 * `unsigned long hart_mask_base` is the starting hartid from which bit-vector
    must be computed.
 
-In a single SBI function call, maximum number harts that can be set is always XLEN.
-If a lower privilege mode needs to pass information about more than XLEN harts, it
-should invoke multiple instances of the SBI function call. `hart_mask_base` can
-be set to `-1` to indicate that `hart_mask` can be ignored and all available
-harts must be considered.
+In a single SBI function call, maximum number harts that can be set is
+always XLEN. If a lower privilege mode needs to pass information about more
+than XLEN harts, it should invoke multiple instances of the SBI function
+call. `hart_mask_base` can be set to `-1` to indicate that `hart_mask` can
+be ignored and all available harts must be considered.
 
-Any function using hart mask may return following possible error value in addition
-to function specific error values.
+Any function using hart mask may return following possible error value in
+addition to function specific error values.
 
-[cols="<,>",options="header,compact"]
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_ERR_INVALID_PARAM     | Either `hart_mask_base` or any of the hartid from `hart_mask`
-                              is not valid i.e. either the hartid is not enabled by the
-			      platform or is not available to the supervisor.
+| Error code            | Description
+| SBI_ERR_INVALID_PARAM | Either `hart_mask_base` or any of the hartid from
+                          `hart_mask` is not valid i.e. either the hartid is
+                           not enabled by the platform or is not available to
+                          the supervisor.
 |===
 
-== SBI Base Functionality, Extension ID 0x10
+== Base Extension (EID #0x10)
 
-The base of the supervisor binary interface is designed to be as small as
-possible. As such, it only contains functionality for probing which SBI
-extensions are available and for querying the version of the SBI. All
-functions in the base must be supported by all SBI implementations, so there
-are no error returns defined.
+The base extension is designed to be as small as possible. As such, it only
+contains functionality for probing which SBI extensions are available and for
+querying the version of the SBI. All functions in the base extension must be
+supported by all SBI implementations, so there are no error returns defined.
+
+=== Function: Get SBI specification version (FID #0)
 
 [source, C]
 ----
 struct sbiret sbi_get_spec_version(void);
 ----
+
 Returns the current SBI specification version. This function must always
 succeed. The minor number of the SBI specification is encoded in the low 24
 bits, with the major number encoded in the next 7 bits. Bit 31 must be 0 and
 is reserved for future expansion.
 
+=== Function: Get SBI implementation ID (FID #1)
+
 [source, C]
 ----
 struct sbiret sbi_get_impl_id(void);
 ----
+
 Returns the current SBI implementation ID, which is different for every SBI
 implementation. It is intended that this implementation ID allows software to
 probe for SBI implementation quirks.
+
+=== Function: Get SBI implementation version (FID #2)
 
 [source, C]
 ----
 struct sbiret sbi_get_impl_version(void);
 ----
+
 Returns the current SBI implementation version. The encoding of this version
 number is specific to the SBI implementation.
+
+=== Function: Probe SBI extension (FID #3)
 
 [source, C]
 ----
 struct sbiret sbi_probe_extension(long extension_id);
 ----
-Returns 0 if the given extension ID is not available, or an extension-specific
-non-zero value if it is available.
+
+Returns 0 if the given SBI extension ID (*EID*) is not available, or an
+extension-specific non-zero value if it is available.
+
+=== Function: Get machine vendor ID (FID #4)
 
 [source, C]
 ----
 struct sbiret sbi_get_mvendorid(void);
+----
+
+Return a value that is legal for the `mvendorid` CSR and 0 is always a legal
+value for this CSR.
+
+=== Function: Get machine architecture ID (FID #5)
+
+[source, C]
+----
 struct sbiret sbi_get_marchid(void);
+----
+
+Return a value that is legal for the `marchid` CSR and 0 is always a legal
+value for this CSR.
+
+=== Function: Get machine implementation ID (FID #6)
+
+[source, C]
+----
 struct sbiret sbi_get_mimpid(void);
 ----
-Return a value that is legal for the corresponding CSR. 0 is always a legal
-value for any of these CSRs.
+
+Return a value that is legal for the `mimpid` CSR and 0 is always a legal
+value for this CSR.
 
 === Function Listing
 
-[cols="<,,>",options="header,compact"]
+[cols="3,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name                 | Function ID | Extension ID
-| sbi_get_sbi_spec_version      |           0 |         0x10
-| sbi_get_sbi_impl_id           |           1 |         0x10
-| sbi_get_sbi_impl_version      |           2 |         0x10
-| sbi_probe_extension           |           3 |         0x10
-| sbi_get_mvendorid             |           4 |         0x10
-| sbi_get_marchid               |           5 |         0x10
-| sbi_get_mimpid                |           6 |         0x10
+| Function Name                 | FID | EID
+| sbi_get_sbi_spec_version      |   0 | 0x10
+| sbi_get_sbi_impl_id           |   1 | 0x10
+| sbi_get_sbi_impl_version      |   2 | 0x10
+| sbi_probe_extension           |   3 | 0x10
+| sbi_get_mvendorid             |   4 | 0x10
+| sbi_get_marchid               |   5 | 0x10
+| sbi_get_mimpid                |   6 | 0x10
 |===
 
 === SBI Implementation IDs
 
-[cols="<,>",options="header,compact"]
+[cols="1,2", width=70%, align="center", options="header"]
 |===
 | Implementation ID | Name
 | 0                 | Berkeley Boot Loader (BBL)
@@ -186,57 +232,95 @@ value for any of these CSRs.
 | 5                 | Diosix
 |===
 
-== Legacy SBI Extension, Extension IDs 0x00 through 0x0F
+== Legacy Extensions (EIDs #0x00 - #0x0F)
 
-The legacy SBI extension ignores the function ID field,
-instead being encoded as multiple
-extension IDs. Each of these extension IDs must be probed for directly.
+The legacy SBI extensions ignores the SBI function ID field, instead being
+encoded as multiple SBI extension IDs. Each of these extension IDs must be
+probed for directly.
 
-The legacy SBI extension is deprecated in favor of the other extensions
-listed below.
-The legacy console SBI functions
-(`sbi_console_getchar()` and `sbi_console_putchar ()`)
-are expected to be deprecated; they have no replacement.
+The legacy SBI extensions is deprecated in favor of the other extensions
+listed below. The legacy console SBI functions (`sbi_console_getchar()`
+and `sbi_console_putchar()`) are expected to be deprecated; they have
+no replacement.
+
+=== Extension: Set Timer (EID #0x00)
 
 [source, C]
 ----
 void sbi_set_timer(uint64_t stime_value)
 ----
-Programs the clock for next event after *stime_value* time. This function also
-clears the pending timer interrupt bit.
 
-If the supervisor wishes to clear the timer interrupt without scheduling the next
-timer event, it can either request a timer interrupt infinitely far into the
-future (i.e., (uint64_t)-1), or it can instead mask the timer interrupt by
-clearing sie.STIE.
+Programs the clock for next event after *stime_value* time. This function
+also clears the pending timer interrupt bit.
+
+If the supervisor wishes to clear the timer interrupt without scheduling
+the next timer event, it can either request a timer interrupt infinitely
+far into the future (i.e., (uint64_t)-1), or it can instead mask the timer
+interrupt by clearing `sie.STIE` CSR bit.
+
+=== Extension: Console Putchar (EID #0x01)
 
 [source, C]
 ----
-void sbi_send_ipi(const unsigned long *hart_mask)
+void sbi_console_putchar(int ch)
 ----
-Send an inter-processor interrupt to all the harts defined in hart_mask.
-Interprocessor interrupts manifest at the receiving harts as Supervisor Software
-Interrupts.
 
-hart_mask is a virtual address that points to a bit-vector of harts. The bit
-vector is represented as a sequence of unsigned longs whose length equals the
-number of harts in the system divided by the number of bits in an unsigned long,
-rounded up to the next integer.
+Write data present in *ch* to debug console.
+
+Unlike `sbi_console_getchar()`, this SBI call **will block** if there remain
+any pending characters to be transmitted or if the receiving terminal is not
+yet ready to receive the byte. However, if the console doesn't exist at all,
+then the character is thrown away.
+
+=== Extension: Console Getchar (EID #0x02)
+
+[source, C]
+----
+int sbi_console_getchar(void)
+----
+
+Read a byte from debug console; returns the byte on success, or -1 for
+failure. Note. This is the only SBI call in the legacy extension that has
+a non-void return type.
+
+=== Extension: Clear IPI (EID #0x03)
 
 [source, C]
 ----
 void sbi_clear_ipi(void)
 ----
-Clears the pending IPIs if any. The IPI is cleared only in the hart for which
-this SBI call is invoked. `sbi_clear_ipi` is deprecated because S-mode code can
-clear `sip.SSIP` directly.
+
+Clears the pending IPIs if any. The IPI is cleared only in the hart for
+which this SBI call is invoked. `sbi_clear_ipi()` is deprecated because
+S-mode code can clear `sip.SSIP` CSR bit directly.
+
+=== Extension: Send IPI (EID #0x04)
+
+[source, C]
+----
+void sbi_send_ipi(const unsigned long *hart_mask)
+----
+
+Send an inter-processor interrupt to all the harts defined in hart_mask.
+Interprocessor interrupts manifest at the receiving harts as Supervisor
+Software Interrupts.
+
+hart_mask is a virtual address that points to a bit-vector of harts. The
+bit vector is represented as a sequence of unsigned longs whose length
+equals the number of harts in the system divided by the number of bits
+in an unsigned long, rounded up to the next integer.
+
+=== Extension: Remote FENCE.I (EID #0x05)
 
 [source, C]
 ----
 void sbi_remote_fence_i(const unsigned long *hart_mask)
 ----
-Instructs remote harts to execute FENCE.I instruction.
-N.B. hart_mask is as described in sbi_send_ipi.
+
+Instructs remote harts to execute `FENCE.I` instruction. The `hart_mask`
+is same as described in `sbi_send_ipi()`.
+
+=== Extension: Remote SFENCE.VMA (EID #0x06)
 
 [source, C]
 ----
@@ -244,8 +328,11 @@ void sbi_remote_sfence_vma(const unsigned long *hart_mask,
                            unsigned long start,
                            unsigned long size)
 ----
-Instructs the remote harts to execute one or more SFENCE.VMA instructions,
+
+Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size.
+
+=== Extension: Remote SFENCE.VMA with ASID (EID #0x07)
 
 [source, C]
 ----
@@ -254,284 +341,324 @@ void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
                                 unsigned long size,
                                 unsigned long asid)
 ----
-Instruct the remote harts to execute one or more SFENCE.VMA instructions,
+
+Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size. This covers
-only the given ASID.
+only the given `ASID`.
 
-[source, C]
-----
-int sbi_console_getchar(void)
-----
-Read a byte from debug console; returns the byte on success, or -1 for failure.
-Note. This is the only SBI call in the legacy extension that has a non-void
-return type.
-
-[source, C]
-----
-void sbi_console_putchar(int ch)
-----
-Write data present in *ch* to debug console.
-
-Unlike `sbi_console_getchar`, this SBI call **will block** if there
-remain any pending characters to be transmitted or if the receiving terminal
-is not yet ready to receive the byte. However, if the console doesn't exist
-at all, then the character is thrown away.
+=== Extension: System Shutdown (EID #0x08)
 
 [source, C]
 ----
 void sbi_shutdown(void)
 ----
-Puts all the harts to shut down state from supervisor point of view. This SBI
+
+Puts all the harts to shutdown state from supervisor point of view. This SBI
 call doesn't return.
 
 === Function Listing
 
-[cols="<,,,>",options="header,compact"]
+[cols="3,1,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name             | Function ID | Extension ID | Replacement Extension
-| sbi_set_timer             |           0 |         0x00 |                   N/A
-| sbi_console_putchar       |           0 |         0x01 |                   N/A
-| sbi_console_getchar       |           0 |         0x02 |                   N/A
-| sbi_clear_ipi             |           0 |         0x03 |                   N/A
-| sbi_send_ipi              |           0 |         0x04 |                   N/A
-| sbi_remote_fence_i        |           0 |         0x05 |                   N/A
-| sbi_remote_sfence_vma     |           0 |         0x06 |                   N/A
-| sbi_remote_sfence_vma_asid|           0 |         0x07 |                   N/A
-| sbi_shutdown              |           0 |         0x08 |                   N/A
-| *RESERVED*                |             |    0x09-0x0F |
+| Function Name             | FID | EID       | Replacement EID
+| sbi_set_timer             |   0 | 0x00      | 0x54494D45
+| sbi_console_putchar       |   0 | 0x01      | N/A
+| sbi_console_getchar       |   0 | 0x02      | N/A
+| sbi_clear_ipi             |   0 | 0x03      | N/A
+| sbi_send_ipi              |   0 | 0x04      | 0x735049
+| sbi_remote_fence_i        |   0 | 0x05      | 0x52464E43
+| sbi_remote_sfence_vma     |   0 | 0x06      | 0x52464E43
+| sbi_remote_sfence_vma_asid|   0 | 0x07      | 0x52464E43
+| sbi_shutdown              |   0 | 0x08      | 0x53525354
+| *RESERVED*                |     | 0x09-0x0F |
 |===
 
+== Timer Extension (EID #0x54494D45 "TIME")
 
-== Timer Extension, Extension ID: 0x54494D45 (TIME)
-This replaces legacy timer extension (0x00). It follows the new calling convention
-defined in v0.2.
+This replaces legacy timer extension (EID #0x00). It follows the new calling
+convention defined in v0.2.
+
+=== Function: Set Timer (FID #0)
 
 [source, C]
 ----
 struct sbiret sbi_set_timer(uint64_t stime_value)
 ----
-Programs the clock for next event after *stime_value* time. *stime_value* is in absolute
-time. This function must clear the pending timer interrupt bit as well.
 
-If the supervisor wishes to clear the timer interrupt without scheduling the next
-timer event, it can either request a timer interrupt infinitely far into the
-future (i.e., (uint64_t)-1), or it can instead mask the timer interrupt by
-clearing sie.STIE.
+Programs the clock for next event after *stime_value* time. *stime_value*
+is in absolute time. This function must clear the pending timer interrupt
+bit as well.
 
-=== TIME Function Listing
+If the supervisor wishes to clear the timer interrupt without scheduling
+the next timer event, it can either request a timer interrupt infinitely
+far into the future (i.e., (uint64_t)-1), or it can instead mask the timer
+interrupt by clearing `sie.STIE` CSR bit.
 
-[cols="<,,>",options="header,compact"]
+=== Function Listing
+
+[cols="3,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name                 | Function ID | Extension ID
-| sbi_set_timer                 |           0 |   0x54494D45
+| Function Name | FID | EID
+| sbi_set_timer |   0 | 0x54494D45
 |===
 
+== IPI Extension (EID #0x735049 "sPI: s-mode IPI")
 
-== IPI Extension, Extension ID: 0x735049 (sPI: s-mode IPI)
-This extension replaces the legacy extension (0x04). The other IPI related
+This extension replaces the legacy extension (EID #0x04). The other IPI related
 legacy extension(0x3) is deprecated now. All the functions in this extension
 follow the `hart_mask` as defined in the binary encoding section.
 
+=== Function: Send IPI (FID #0)
+
 [source, C]
 ----
-struct sbiret sbi_send_ipi(unsigned long hart_mask, unsigned long hart_mask_base)
+struct sbiret sbi_send_ipi(unsigned long hart_mask,
+                           unsigned long hart_mask_base)
 ----
+
 Send an inter-processor interrupt to all the harts defined in hart_mask.
-Interprocessor interrupts manifest at the receiving harts as the supervisor software
-interrupts.
+Interprocessor interrupts manifest at the receiving harts as the supervisor
+software interrupts.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=80%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| Error code  | Description
+| SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
 |===
 
-=== IPI Function Listing
+=== Function Listing
 
-[cols="<,,>",options="header,compact"]
+[cols="3,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name                 | Function ID | Extension ID
-| sbi_send_ipi                  |           0 |     0x735049
+| Function Name | FID | EID
+| sbi_send_ipi  |   0 | 0x735049
 |===
 
-== RFENCE Extension, Extension ID: 0x52464E43 (RFNC)
-This extension defines all remote fence related functions and replaces the
-legacy extensions (0x05-0x07). All the functions follow the `hart_mask` as
-defined in binary encoding section. Any function wishes to use range of
-addresses (i.e. start_addr and size), have to abide by the below constraints
-on range parameters.
+== RFENCE Extension (EID #0x52464E43 "RFNC")
+
+This extension defines all remote fence related functions and replaces
+the legacy extensions (EIDs #0x05 - #0x07). All the functions follow the
+`hart_mask` as defined in binary encoding section. Any function wishes
+to use range of addresses (i.e. start_addr and size), have to abide by
+the below constraints on range parameters.
 
 The remote fence function acts as a full TLB flush if
 
-	* `start_addr` and `size` are both 0
-	* `size` is equal to 2^XLEN-1
+* `start_addr` and `size` are both 0
+* `size` is equal to 2^XLEN-1
+
+=== Function: Remote FENCE.I (FID #0)
 
 [source, C]
 ----
-struct sbiret sbi_remote_fence_i(unsigned long hart_mask, unsigned long hart_mask_base)
+struct sbiret sbi_remote_fence_i(unsigned long hart_mask,
+                                 unsigned long hart_mask_base)
 ----
-Instructs remote harts to execute FENCE.I instruction.
+Instructs remote harts to execute `FENCE.I` instruction.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=80%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
+| Error code  | Description
+| SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
 |===
+
+=== Function: Remote SFENCE.VMA (FID #1)
 
 [source, C]
 ----
 struct sbiret sbi_remote_sfence_vma(unsigned long hart_mask,
-				    unsigned long hart_mask_base,
-				    unsigned long start_addr,
-				    unsigned long size)
+                                    unsigned long hart_mask_base,
+                                    unsigned long start_addr,
+                                    unsigned long size)
 ----
-Instructs the remote harts to execute one or more SFENCE.VMA instructions,
+
+Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
+
+=== Function: Remote SFENCE.VMA with ASID (FID #2)
 
 [source, C]
 ----
 struct sbiret sbi_remote_sfence_vma_asid(unsigned long hart_mask,
-				unsigned long hart_mask_base,
-                                unsigned long start_addr, unsigned long size,
-                                unsigned long asid)
+                                         unsigned long hart_mask_base,
+                                         unsigned long start_addr,
+                                         unsigned long size,
+                                         unsigned long asid)
 ----
-Instruct the remote harts to execute one or more SFENCE.VMA instructions,
+
+Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size. This covers
-only the given ASID.
+only the given `ASID`.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
+
+=== Function: Remote HFENCE.GVMA with VMID (FID #3)
 
 [source, C]
 ----
 struct sbiret sbi_remote_hfence_gvma_vmid(unsigned long hart_mask,
-				unsigned long hart_mask_base,
-                                unsigned long start_addr, unsigned long size,
-                                unsigned long vmid)
+                                          unsigned long hart_mask_base,
+                                          unsigned long start_addr,
+                                          unsigned long size,
+                                          unsigned long vmid)
 ----
-Instruct the remote harts to execute one or more HFENCE.GVMA instructions,
+
+Instruct the remote harts to execute one or more `HFENCE.GVMA` instructions,
 covering the range of guest physical addresses between start and size only
-for the given VMID. This function call is only valid for harts implementing
+for the given `VMID`. This function call is only valid for harts implementing
 hypervisor extension.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
-			      one of the target hart doesn't support hypervisor extension.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
+
+=== Function: Remote HFENCE.GVMA (FID #4)
 
 [source, C]
 ----
 struct sbiret sbi_remote_hfence_gvma(unsigned long hart_mask,
-				unsigned long hart_mask_base,
-                                unsigned long start_addr, unsigned long size)
+                                     unsigned long hart_mask_base,
+                                     unsigned long start_addr,
+                                     unsigned long size)
 ----
-Instruct the remote harts to execute one or more HFENCE.GVMA instructions,
+
+Instruct the remote harts to execute one or more `HFENCE.GVMA` instructions,
 covering the range of guest physical addresses between start and size for all
 the guests. This function call is only valid for harts implementing hypervisor
 extension.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
-			      one of the target hart doesn't support hypervisor extension.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
- 
+
+=== Function: Remote HFENCE.VVMA with ASID (FID #5)
+
 [source, C]
 ----
 struct sbiret sbi_remote_hfence_vvma_asid(unsigned long hart_mask,
-				unsigned long hart_mask_base,
-                                unsigned long start_addr, unsigned long size,
-                                unsigned long asid)
+                                          unsigned long hart_mask_base,
+                                          unsigned long start_addr,
+                                          unsigned long size,
+                                          unsigned long asid)
 ----
-Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
+
+Instruct the remote harts to execute one or more `HFENCE.VVMA` instructions,
 covering the range of guest virtual addresses between start and size for the
-given ASID and current VMID (in HGATP CSR) of calling hart. This function call
-is only valid for harts implementing hypervisor extension.
+given `ASID` and current `VMID` (in `hgatp` CSR) of calling hart. This function
+call is only valid for harts implementing hypervisor extension.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
+
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
-			      one of the target hart doesn't support hypervisor extension.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
+
+=== Function: Remote HFENCE.VVMA (FID #6)
 
 [source, C]
 ----
 struct sbiret sbi_remote_hfence_vvma(unsigned long hart_mask,
-				unsigned long hart_mask_base,
-                                unsigned long start_addr, unsigned long size)
+                                     unsigned long hart_mask_base,
+                                     unsigned long start_addr,
+                                     unsigned long size)
 ----
-Instruct the remote harts to execute one or more HFENCE.VVMA instructions,
+
+Instruct the remote harts to execute one or more `HFENCE.VVMA` instructions,
 covering the range of guest virtual addresses between start and size for
-current VMID (in HGATP CSR) of calling hart. This function call is only valid
-for harts implementing hypervisor extension.
+current `VMID` (in `hgatp` CSR) of calling hart. This function call is only
+valid for harts implementing hypervisor extension.
 
 *Returns* following possible values via sbiret.
-[cols="<,>",options="header,compact"]
-|===
-| Error code                | Description
-| SBI_SUCCESS               | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_NOT_SUPPORTED	    | This function is not supported as it is not implemented or
-			      one of the target hart doesn't support hypervisor extension.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` or `size` is not valid.
-|===
 
-
-=== RFENCE Function Listing
-
-[cols="<,,>",options="header,compact"]
+[cols="1,2", width=90%, align="center", options="header"]
 |===
-| Function Name                 | Function ID | Extension ID
-| sbi_remote_fence_i            |           0 |   0x52464E43
-| sbi_remote_sfence_vma         |           1 |   0x52464E43
-| sbi_remote_sfence_vma_asid    |           2 |   0x52464E43
-| sbi_remote_hfence_gvma_vmid   |           3 |   0x52464E43
-| sbi_remote_hfence_gvma   	|           4 |   0x52464E43
-| sbi_remote_hfence_vvma_asid   |           5 |   0x52464E43
-| sbi_remote_hfence_vvma   	|           6 |   0x52464E43
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
 |===
 
-== Hart State Management Extension, Extension ID: 0x48534D (HSM)
+=== Function Listing
 
-The Hart State Management Extension introduces a set of functions that allow the
-supervisor to request higher privilege mode to start/stop harts running
+[cols="3,1,1", width=70%, align="center", options="header"]
+|===
+| Function Name               | FID | EID
+| sbi_remote_fence_i          |   0 | 0x52464E43
+| sbi_remote_sfence_vma       |   1 | 0x52464E43
+| sbi_remote_sfence_vma_asid  |   2 | 0x52464E43
+| sbi_remote_hfence_gvma_vmid |   3 | 0x52464E43
+| sbi_remote_hfence_gvma      |   4 | 0x52464E43
+| sbi_remote_hfence_vvma_asid |   5 | 0x52464E43
+| sbi_remote_hfence_vvma      |   6 | 0x52464E43
+|===
+
+== Hart State Management Extension (EID #0x48534D "HSM")
+
+The Hart State Management Extension introduces a set of functions that allow
+the supervisor to request higher privilege mode to start/stop harts running
 in supervisor mode.
+
+=== Function: HART start (FID #0)
 
 [source, C]
 ----
-struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr, unsigned
-long priv)
+struct sbiret sbi_hart_start(unsigned long hartid,
+                             unsigned long start_addr,
+                             unsigned long priv)
 ----
 
-Informs the SBI implementation that the supervisor would like the given hart to
-begin execution. This call is asynchronous -- more specifically,
+Informs the SBI implementation that the supervisor would like the given hart
+to begin execution. This call is asynchronous -- more specifically,
 `sbi_hart_start()` may return before execution has actually begin as long as
 the SBI implementation is capable of ensuring the return code is accurate.
 
@@ -545,31 +672,37 @@ contain this exact value.
 
 *Returns* one of the following possible SBI error codes through sbiret.error.
 
-[cols="<,>",options="header,compact"]
+[cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code                | Description
-| SBI_SUCCESS               | Hart was previously in stopped state. It will start executing from `start_addr`.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid possibly due to following reasons. +
+| SBI_SUCCESS               | Hart was previously in stopped state. It will
+                              start executing from `start_addr`.
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid possibly due to
+                              following reasons: +
                               * it is not a valid physical address. +
-                              * The address is prohibited by PMP to run in supervisor mode +
-| SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as corresponding hart cannot started in supervisor mode.
+                              * The address is prohibited by PMP to run in
+                                supervisor mode.
+| SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as corresponding
+                              hart cannot started in supervisor mode.
 | SBI_ERR_ALREADY_AVAILABLE | The given hartid is already started.
 | SBI_ERR_FAILED            | The start request failed for unknown reasons.
 |===
 
-The target hart jumps to higher privilege mode(S or VS mode) by executing at
-`start_addr` with following values in specific registers.
+The target hart jumps to higher privilege mode (S-mode or VS-mode) by
+executing at `start_addr` with following values in specific registers.
 
-[cols="<,>",options="header,compact"]
+[cols=",", width=50%, align="center", options="header"]
 |===
-|Register Name		|Value
-|satp			|  0
-|sstatus.sie		|  0
-|a0			|hartid
-|a1			|priv
+|Register Name | Register Value
+|satp          | 0
+|sstatus.SIE   | 0
+|a0            | hartid
+|a1            | priv
 |===
 
 All other registers remain in an undefined state.
+
+=== Function: HART stop (FID #1)
 
 [source, C]
 ----
@@ -577,60 +710,64 @@ struct sbiret sbi_hart_stop(void)
 ----
 
 Returns ownership of the calling hart back to the SBI implementation. This
-call is not expected to return under normal conditions. `sbi_hart_stop()` must
-be called with supervisor and user interrupts disabled.
+call is not expected to return under normal conditions. `sbi_hart_stop()`
+must be called with supervisor and user interrupts disabled.
 
 *Returns* following SBI error code through sbiret.error only if it fails.
 
 * SBI_ERR_FAILED
 
+=== Function: HART get status (FID #2)
+
 [source, C]
 ----
-struct sbiret sbi_hart_status(unsigned long hartid)
+struct sbiret sbi_hart_get_status(unsigned long hartid)
 ----
 
 *Returns* the current status of *hartid* in sbiret.value, or an error through
 sbiret.error. The possible status values are shown on the table below.
 
-[cols="<,,>",options="header,compact"]
+[cols="2,1,2", width=80%, align="center", options="header"]
 |===
-| Name                 		| Value | Description
-| STARTED                     	|   0   | Already started
-| STOPPED         		|   1   | Stopped
-| START_REQUEST_PENDING       	|   2   | A start request pending
-| STOP_REQUEST_PENDING       	|   3   | A stop request pending
+| Name                  | Value | Description
+| STARTED               |   0   | Already started
+| STOPPED               |   1   | Stopped
+| START_REQUEST_PENDING |   2   | A start request pending
+| STOP_REQUEST_PENDING  |   3   | A stop request pending
 |===
 
 Possible error code:
 
 * SBI_ERR_INVALID_PARAM: The given hartid is not valid
 
-Since harts may transition state at any time due to any concurrent `sbi_hart_start` or
-`sbi_hart_stop` calls, the return value from this function may not represent the actual
-state of the hart at the time of return value verification.
+Since harts may transition state at any time due to any concurrent
+`sbi_hart_start` or `sbi_hart_stop` calls, the return value from this
+function may not represent the actual state of the hart at the time of
+return value verification.
 
-=== HSM Function Listing
+=== Function Listing
 
-[cols="<,,>",options="header,compact"]
+[cols="3,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name                 | Function ID | Extension ID
-| sbi_hart_start      		|           0 |     0x48534D
-| sbi_hart_stop           	|           1 |     0x48534D
-| sbi_hart_get_status      	|           2 |     0x48534D
+| Function Name       | FID | EID
+| sbi_hart_start      |   0 | 0x48534D
+| sbi_hart_stop       |   1 | 0x48534D
+| sbi_hart_get_status |   2 | 0x48534D
 |===
 
-== System Reset Extension, Extension ID: 0x53525354 (SRST)
+== System Reset Extension (EID #0x53525354 "SRST")
 
 The System Reset Extension provides a function that allow the supervisor
 software to request system-level reboot or shutdown. The term "system"
 refers to the world-view of supervisor software and the underlying SBI
 implementation could be machine mode firmware or hypervisor.
 
-=== Function: System reset (ID #0)
+=== Function: System reset (FID #0)
 
 [source, C]
 ----
-struct sbiret sbi_system_reset(unsigned long reset_type, unsigned long reset_reason)
+struct sbiret sbi_system_reset(unsigned long reset_type,
+                               unsigned long reset_reason)
 ----
 
 Reset the system based on provided `reset_type` and `reset_reason`. This is
@@ -639,7 +776,7 @@ a synchronous call and does not return if it succeeds.
 The `reset_type` parameter is 32 bits wide and has the following possible
 values:
 
-[cols=",", options="header,autowidth"]
+[cols="1,2", width=90%, align="center", options="header"]
 |===
 | Value                   | Description
 | 0x00000000              | Shutdown
@@ -654,7 +791,7 @@ The `reset_reason` is an optional parameter representing the reason for
 system reset. This parameter is 32 bits wide and has the following possible
 values:
 
-[cols=",", options="header,autowidth"]
+[cols="1,2", width=90%, align="center", options="header"]
 |===
 | Value                   | Description
 | 0x00000000              | No reason
@@ -682,7 +819,7 @@ in any physical power changes.
 *Returns* one of the following possible SBI error codes through sbiret.error
 upon failure.
 
-[cols=",",options="header,autowidth"]
+[cols="1,2", width=90%, align="center", options="header"]
 |===
 | Error code            | Description
 | SBI_ERR_INVALID_PARAM | `reset_type` or `reset_reason` is not valid.
@@ -692,23 +829,22 @@ upon failure.
 
 === Function Listing
 
-[cols=",,",options="header,autowidth"]
+[cols="3,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name    | Function ID | Extension ID
-| sbi_system_reset |           0 |   0x53525354
+| Function Name    | FID | EID
+| sbi_system_reset |   0 | 0x53525354
 |===
 
-== Experimental SBI Extension Space, Extension IDs 0x08000000 through 0x08FFFFFF
+== Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
 
 No management.
 
-== Vendor-Specific SBI Extension Space, Extension Ids 0x09000000 through 0x09FFFFFF
+== Vendor-Specific SBI Extension Space (EIDs #0x09000000 - #0x09FFFFFF)
 
 Low bits from `mvendorid`.
 
-== Firmware Code Base Specific SBI Extension Space, Extension Ids 0x0A000000 through 0x0AFFFFFF
+== Firmware Specific SBI Extension Space (EIDs #0x0A000000 - #0x0AFFFFFF)
 
-Low bits is SBI implementation ID. The firmware code base SBI extension is the additional 
-SBI extensions to SBI implementation. That provides the firmware code base specific SBI functions
-which are defined in the external firmware specification.
-
+Low bits is SBI implementation ID. The firmware specific SBI extensions are
+for SBI implementations. It provides firmware specific SBI functions which
+are defined in the external firmware specification.
