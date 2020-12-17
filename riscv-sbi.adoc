@@ -35,16 +35,15 @@ This document describes a draft of version 0.2 of the RISC-V SBI specification.
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
-of SBI extensions. This binary encoding matches the standard RISC-V UNIX
-syscall ABI, which itself is based on the calling convention defined in the
-RISC-V ELF psABI. In other words, SBI calls are exactly the same as standard
-RISC-V function calls except that:
+of SBI extensions. This binary encoding matches the RISC-V Linux syscall ABI,
+which itself is based on the calling convention defined in the RISC-V ELF
+psABI. In other words, SBI calls are exactly the same as standard RISC-V
+function calls except that:
 
 * An `ecall` is used as the control transfer instruction instead of a `call`
   instruction.
 * `a7` (or `t0` on RV32E-based systems) encodes the SBI extension ID, which
-  matches how the system call ID is encoded in the standard UNIX system call
-  ABI.
+  matches how the system call ID is encoded in the Linux system call ABI.
 
 Many SBI extensions also chose to encode an additional function ID in `a6`,
 a scheme similar to the `ioctl()` system call on many UNIX operating systems.
