@@ -32,6 +32,7 @@ https://creativecommons.org/licenses/by/4.0/.
 * Improved document styling and naming conventions
 * Added SBI system reset extension
 * Improved SBI introduction secion
+* Improved documentation of SBI hart state managment extension
 
 === Version 0.2
 
@@ -663,9 +664,30 @@ valid for harts implementing hypervisor extension.
 
 == Hart State Management Extension (EID #0x48534D "HSM")
 
-The Hart State Management Extension introduces a set of functions that allow
-the supervisor to request higher privilege mode to start/stop harts running
-in supervisor mode.
+The Hart State Management (HSM) Extension introduces a set hart states and a
+set of functions which allow the supervisor-mode software to request a hart
+state change.
+
+The possible hart states are as follows:
+
+* **STOPPED:** The hart is not executing in supervisor-mode or any lower
+  privilege mode. It is probably powered-down by the SBI implementation
+  if the underlying platform has a mechanism to physically power-down harts.
+* **STARTED:** The hart is physically powered-up and executing normally.
+* **START_PENDING:** Some other hart has requested to start (or power-up)
+  the hart from the **STOPPED** state and the SBI implementation is still
+  working to get the hart in the **STARTED** state.
+* **STOP_PENDING:** The hart has requested to stop (or power-down) itself
+  from the **STARTED** state and the SBI implementation is still working
+  to get the hart in the **STOPPED** state.
+
+At any point in time, a hart should be in one of the above mentioned hart
+states. The hart state transitions by the SBI implementation should follow
+the state machine shown below in the figure <<fig_hsm>>.
+
+[#fig_hsm]
+.SBI HSM State Machine
+image::riscv-sbi-hsm.png[]
 
 === Function: HART start (FID #0)
 
@@ -673,23 +695,27 @@ in supervisor mode.
 ----
 struct sbiret sbi_hart_start(unsigned long hartid,
                              unsigned long start_addr,
-                             unsigned long priv)
+                             unsigned long opaque)
 ----
 
-Informs the SBI implementation that the supervisor would like the given hart
-to begin execution. This call is asynchronous -- more specifically,
-`sbi_hart_start()` may return before execution has actually begin as long as
-the SBI implementation is capable of ensuring the return code is accurate.
+Request the SBI implementation to start executing the given hart at specified
+address in supervisor-mode. This call is asynchronous -- more specifically,
+the `sbi_hart_start()` may return before target hart starts executing as long
+as the SBI implemenation is capable of ensuring the return code is accurate.
+It is recommended that if the SBI implementation is a platform runtime
+firmware executing in machine-mode (M-mode) then it MUST configure PMP and
+other the M-mode state before executing in supervisor-mode.
 
-*start_addr* points to a runtime-specified physical address, where a hart can
-resume execution after its initialization/resume sequence. Before jumping to
-*start_addr*, the hart MUST configure PMP if present and switch to Supervisor
-mode.
+The `hartid` parameter specifies the target hart which is to be started.
 
-*priv* is an XLEN-bit value. Upon execution from `start_addr`, `a1` will
-contain this exact value.
+The `start_addr` parameter points to a runtime-specified physical address,
+where the hart can start executing in supervisor-mode.
 
-*Returns* one of the following possible SBI error codes through sbiret.error.
+The `opaque` parameter is a XLEN-bit value which will be set in the `a1`
+register when the hart starts executing at `start_addr`.
+
+The possible error codes returned in `sbiret.error` are shown in the
+table below:
 
 [cols="1,2", width=100%, align="center", options="header"]
 |===
@@ -698,7 +724,7 @@ contain this exact value.
                               start executing from `start_addr`.
 | SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid possibly due to
                               following reasons: +
-                              * it is not a valid physical address. +
+                              * It is not a valid physical address. +
                               * The address is prohibited by PMP to run in
                                 supervisor mode.
 | SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as corresponding
@@ -707,8 +733,8 @@ contain this exact value.
 | SBI_ERR_FAILED            | The start request failed for unknown reasons.
 |===
 
-The target hart jumps to higher privilege mode (S-mode or VS-mode) by
-executing at `start_addr` with following values in specific registers.
+The target hart jumps to supervisor-mode at address specified by `start_addr`
+with following values in specific registers.
 
 [cols=",", width=50%, align="center", options="header"]
 |===
@@ -716,7 +742,7 @@ executing at `start_addr` with following values in specific registers.
 |satp          | 0
 |sstatus.SIE   | 0
 |a0            | hartid
-|a1            | priv
+|a1            | opaque
 |===
 
 All other registers remain in an undefined state.
@@ -728,13 +754,20 @@ All other registers remain in an undefined state.
 struct sbiret sbi_hart_stop(void)
 ----
 
-Returns ownership of the calling hart back to the SBI implementation. This
-call is not expected to return under normal conditions. `sbi_hart_stop()`
-must be called with supervisor and user interrupts disabled.
+Request the SBI implementation to stop executing the calling hart in
+supervisor-mode and return it's ownership to the SBI implementation.
+This call is not expected to return under normal conditions. The
+`sbi_hart_stop()` must be called with the supervisor-mode interrupts
+disabled.
 
-*Returns* following SBI error code through sbiret.error only if it fails.
+The possible error codes returned in `sbiret.error` are shown in the
+table below:
 
-* SBI_ERR_FAILED
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code     | Description
+| SBI_ERR_FAILED | Failed to stop execution of the current hart
+|===
 
 === Function: HART get status (FID #2)
 
@@ -743,23 +776,33 @@ must be called with supervisor and user interrupts disabled.
 struct sbiret sbi_hart_get_status(unsigned long hartid)
 ----
 
-*Returns* the current status of *hartid* in sbiret.value, or an error through
-sbiret.error. The possible status values are shown on the table below.
+Get the current status (or HSM state) of the given hart in `sbiret.value`,
+or an error through `sbiret.error`.
+
+The `hartid` parameter specifies the target hart which is to be started.
+
+The possible status values returned in `sbiret.value` are shown in the
+table below:
 
 [cols="2,1,2", width=80%, align="center", options="header"]
 |===
-| Name                  | Value | Description
-| STARTED               |   0   | Already started
-| STOPPED               |   1   | Stopped
-| START_REQUEST_PENDING |   2   | A start request pending
-| STOP_REQUEST_PENDING  |   3   | A stop request pending
+| Name          | Value | Description
+| STARTED       |   0   | Hart Started
+| STOPPED       |   1   | Hart Stopped
+| START_PENDING |   2   | Hart start request pending
+| STOP_PENDING  |   3   | Hart stop request pending
 |===
 
-Possible error code:
+The possible error codes returned in `sbiret.error` are shown in the
+table below:
 
-* SBI_ERR_INVALID_PARAM: The given hartid is not valid
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_ERR_INVALID_PARAM | The given `hartid` or `start_addr` is not valid
+|===
 
-Since harts may transition state at any time due to any concurrent
+The harts may transition HSM states at any time due to any concurrent
 `sbi_hart_start` or `sbi_hart_stop` calls, the return value from this
 function may not represent the actual state of the hart at the time of
 return value verification.
