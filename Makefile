@@ -6,6 +6,7 @@ ASCIIDOCTOR = asciidoctor
 DITAA = ditaa
 IMAGES = riscv-sbi-intro1.png
 IMAGES += riscv-sbi-intro2.png
+IMAGES += riscv-sbi-hsm.png
 TARGETS = riscv-sbi.pdf
 TARGETS += riscv-sbi.html
 
