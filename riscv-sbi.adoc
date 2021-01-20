@@ -671,26 +671,45 @@ The Hart State Management (HSM) Extension introduces a set hart states and a
 set of functions which allow the supervisor-mode software to request a hart
 state change.
 
-The possible hart states are as follows:
+The <<table_hsm_states>> shown below describes all possible **HSM states**
+along with a unique **HSM state id** for each state:
 
-* **STOPPED:** The hart is not executing in supervisor-mode or any lower
-  privilege mode. It is probably powered-down by the SBI implementation
-  if the underlying platform has a mechanism to physically power-down harts.
-* **STARTED:** The hart is physically powered-up and executing normally.
-* **START_PENDING:** Some other hart has requested to start (or power-up)
-  the hart from the **STOPPED** state and the SBI implementation is still
-  working to get the hart in the **STARTED** state.
-* **STOP_PENDING:** The hart has requested to stop (or power-down) itself
-  from the **STARTED** state and the SBI implementation is still working
-  to get the hart in the **STOPPED** state.
+[#table_hsm_states]
+.HSM Hart States
+[cols="1,2,4", width=100%, align="center", options="header"]
+|===
+| State ID | State Name      | Description
+| 0        | STARTED         | The hart is physically powered-up and executing
+                               normally.
+| 1        | STOPPED         | The hart is not executing in supervisor-mode
+                               or any lower privilege mode. It is probably
+                               powered-down by the SBI implementation if the
+                               underlying platform has a mechanism to
+                               physically power-down harts.
+| 2        | START_PENDING   | Some other hart has requested to start (or
+                               power-up) the hart from the **STOPPED** state
+                               and the SBI implementation is still working to
+                               get the hart in the **STARTED** state.
+| 3        | STOP_PENDING    | The hart has requested to stop (or power-down)
+                               itself from the **STARTED** state and the SBI
+                               implementation is still working to get the hart
+                               in the **STOPPED** state.
+|===
 
 At any point in time, a hart should be in one of the above mentioned hart
 states. The hart state transitions by the SBI implementation should follow
-the state machine shown below in the figure <<fig_hsm>>.
+the state machine shown below in the <<figure_hsm>>.
 
-[#fig_hsm]
+[#figure_hsm]
 .SBI HSM State Machine
 image::riscv-sbi-hsm.png[]
+
+A platform can have multiple harts grouped into a cluster with separate power
+and clock. The HSM states are only hart level states and does not imply any
+thing about the cluster level states. The SBI implementation can incorporate
+a plaform specific cluster level state transitions but SBI implementation
+must ensure that there is no impact on hart level state transition latency
+due to implicit cluster level state transitions.
 
 === Function: HART start (FID #0)
 
@@ -701,13 +720,29 @@ struct sbiret sbi_hart_start(unsigned long hartid,
                              unsigned long opaque)
 ----
 
-Request the SBI implementation to start executing the given hart at specified
-address in supervisor-mode. This call is asynchronous -- more specifically,
-the `sbi_hart_start()` may return before target hart starts executing as long
-as the SBI implemenation is capable of ensuring the return code is accurate.
-It is recommended that if the SBI implementation is a platform runtime
-firmware executing in machine-mode (M-mode) then it MUST configure PMP and
-other the M-mode state before executing in supervisor-mode.
+Request the SBI implementation to start executing the target hart in
+supervisor-mode at address specified by `start_addr` parameter with
+specific registers values described in the <<table_hsm_hart_start_regs>>
+below.
+
+[#table_hsm_hart_start_regs]
+.HSM Hart Start Register State
+[cols=",", width=80%, align="center", options="header"]
+|===
+|Register Name | Register Value
+|satp          | 0
+|sstatus.SIE   | 0
+|a0            | hartid
+|a1            | `opaque` parameter
+2+|All other registers remain in an undefined state.
+|===
+
+This call is asynchronous -- more specifically, the `sbi_hart_start()` may
+return before target hart starts executing as long as the SBI implemenation
+is capable of ensuring the return code is accurate. It is recommended that
+if the SBI implementation is a platform runtime firmware executing in
+machine-mode (M-mode) then it MUST configure PMP and other the M-mode
+state before executing in supervisor-mode.
 
 The `hartid` parameter specifies the target hart which is to be started.
 
@@ -718,8 +753,10 @@ The `opaque` parameter is a XLEN-bit value which will be set in the `a1`
 register when the hart starts executing at `start_addr`.
 
 The possible error codes returned in `sbiret.error` are shown in the
-table below:
+<<table_hsm_hart_start_errors>> below.
 
+[#table_hsm_hart_start_errors]
+.HSM Hart Start Errors
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code                | Description
@@ -736,20 +773,6 @@ table below:
 | SBI_ERR_FAILED            | The start request failed for unknown reasons.
 |===
 
-The target hart jumps to supervisor-mode at address specified by `start_addr`
-with following values in specific registers.
-
-[cols=",", width=50%, align="center", options="header"]
-|===
-|Register Name | Register Value
-|satp          | 0
-|sstatus.SIE   | 0
-|a0            | hartid
-|a1            | opaque
-|===
-
-All other registers remain in an undefined state.
-
 === Function: HART stop (FID #1)
 
 [source, C]
@@ -764,8 +787,10 @@ This call is not expected to return under normal conditions. The
 disabled.
 
 The possible error codes returned in `sbiret.error` are shown in the
-table below:
+<<table_hsm_hart_stop_errors>> below.
 
+[#table_hsm_hart_stop_errors]
+.HSM Hart Stop Errors
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code     | Description
@@ -779,26 +804,19 @@ table below:
 struct sbiret sbi_hart_get_status(unsigned long hartid)
 ----
 
-Get the current status (or HSM state) of the given hart in `sbiret.value`,
+Get the current status (or HSM state id) of the given hart in `sbiret.value`,
 or an error through `sbiret.error`.
 
 The `hartid` parameter specifies the target hart which is to be started.
 
-The possible status values returned in `sbiret.value` are shown in the
-table below:
-
-[cols="2,1,2", width=80%, align="center", options="header"]
-|===
-| Name          | Value | Description
-| STARTED       |   0   | Hart Started
-| STOPPED       |   1   | Hart Stopped
-| START_PENDING |   2   | Hart start request pending
-| STOP_PENDING  |   3   | Hart stop request pending
-|===
+The possible status (or HSM state id) values returned in `sbiret.value`
+are described in <<table_hsm_states>>.
 
 The possible error codes returned in `sbiret.error` are shown in the
-table below:
+<<table_hsm_hart_get_status_errors>> below.
 
+[#table_hsm_hart_get_status_errors]
+.HSM Hart Get Status Errors
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code            | Description
@@ -806,18 +824,20 @@ table below:
 |===
 
 The harts may transition HSM states at any time due to any concurrent
-`sbi_hart_start` or `sbi_hart_stop` calls, the return value from this
+`sbi_hart_start()` or `sbi_hart_stop()` calls, the return value from this
 function may not represent the actual state of the hart at the time of
 return value verification.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_hsm_function_list]
+.HSM Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name       | FID | EID
-| sbi_hart_start      |   0 | 0x48534D
-| sbi_hart_stop       |   1 | 0x48534D
-| sbi_hart_get_status |   2 | 0x48534D
+| Function Name       | SBI Version | FID | EID
+| sbi_hart_start      | 0.2         |  0  | 0x48534D
+| sbi_hart_stop       | 0.2         |  1  | 0x48534D
+| sbi_hart_get_status | 0.2         |  2  | 0x48534D
 |===
 
 == System Reset Extension (EID #0x53525354 "SRST")
