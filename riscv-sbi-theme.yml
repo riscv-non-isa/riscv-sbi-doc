@@ -3,3 +3,6 @@ image:
   align: center
 caption:
   align: center
+table:
+  caption:
+    side: bottom
