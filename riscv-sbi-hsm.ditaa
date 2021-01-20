@@ -1,19 +1,31 @@
-                              +-----------------+
-                              |                 |
-                  /---------->|cF78 STOPPED     |-----------\
-                  |           |                 |           |
-                  |           +-----------------+           |sbi_hart_start()
-SBI implementation|                                         |called by some
+                             +-------------------+
+                             |                   |
+                  /--------->|cF78  STOPPED      |----------\
+                  |          |                   |          |sbi_hart_start()
+SBI implementation|          +-------------------+          |called by some
      stopping hart|                                         |other hart
                   |                                         v
-      +-----------------------+                  +-----------------------+
-      |cCCC STOP_PENDING      |                  |cCCC START_PENDING     |
-      +-----------------------+                  +-----------------------+
++     +-------------------------+                +-------------------------+
++     |cCCC  STOP_PENDING       |                |cCCC  START_PENDING      |
++     +-------------------------+                +-------------------------+
                   ^                                         |
    sbi_hart_stop()|                                         |SBI implementation
          called by|                                         |starting hart
-       hart itself|           +-----------------+           |
-                  |           |                 |           |
-                  \-----------|c0DB STARTED     |<----------/
-                              |                 |
-                              +-----------------+
+       hart itself|          +-------------------+          |
+                  \----------|                   |<---------/
+                             |c0DB  STARTED      |
+                  /--------->|                   |----------\
+                  |          +-------------------+          |sbi_hart_suspend()
+SBI implementation|                                         |called by
+     resuming hart|                                         |hart itself
+                  |                                         v
+     +-------------------------+                +-------------------------+
+     |cCCC RESUME_PENDING      |                |cCCC SUSPEND_PENDING     |
+     +-------------------------+                +-------------------------+
+                  ^                                         |
+     Hart recieved|                                         |SBI implementation
+   an interrupt or|          +-------------------+          |suspending hart
+    platform event|          |                   |          |
+                  \----------|c1CF SUSPENDED     |<---------/
+                             |                   |
+                             +-------------------+
