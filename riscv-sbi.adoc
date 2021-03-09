@@ -112,6 +112,9 @@ Standard SBI error codes are listed below
 |  SBI_ERR_ALREADY_AVAILABLE | -6
 |===
 
+An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
+function ID (*FID*) must return the error code `SBI_ERR_NOT_SUPPORTED`.
+
 Every SBI function should prefer `unsigned long` as the data type. It keeps
 the specification simple and easily adaptable for all RISC-V ISA types (i.e.
 RV32, RV64 and RV128). In case the data is defined as 32bit wide, higher
