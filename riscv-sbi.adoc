@@ -99,9 +99,12 @@ returning an error code. This is analogous to returning the C structure
     };
 ----
 
-Standard SBI error codes are listed below
+The <<table_standard_sbi_errors>> below provides a list of Standard SBI
+error codes.
 
-[cols="2,1", width=50%, align="center", options="header"]
+[#table_standard_sbi_errors]
+.Standard SBI Errors
+[cols="4,1", width=70%, align="center", options="header"]
 |===
 |  Error Type                |Value
 |  SBI_SUCCESS               |  0
@@ -137,9 +140,12 @@ than XLEN harts, it should invoke multiple instances of the SBI function
 call. `hart_mask_base` can be set to `-1` to indicate that `hart_mask` can
 be ignored and all available harts must be considered.
 
-Any function using hart mask may return following possible error value in
-addition to function specific error values.
+Any function using hart mask may return error values listed in the
+<<table_hart_mask_errors>> below which are in addition to function
+specific error values.
 
+[#table_hart_mask_errors]
+.HART Mask Errors
 [cols="1,2", width=90%, align="center", options="header"]
 |===
 | Error code            | Description
@@ -231,20 +237,24 @@ value for this CSR.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_base_function_list]
+.Base Function List
+[cols="3,2,1,1", width=70%, align="center", options="header"]
 |===
-| Function Name                 | FID | EID
-| sbi_get_sbi_spec_version      |   0 | 0x10
-| sbi_get_sbi_impl_id           |   1 | 0x10
-| sbi_get_sbi_impl_version      |   2 | 0x10
-| sbi_probe_extension           |   3 | 0x10
-| sbi_get_mvendorid             |   4 | 0x10
-| sbi_get_marchid               |   5 | 0x10
-| sbi_get_mimpid                |   6 | 0x10
+| Function Name            | SBI Version | FID | EID
+| sbi_get_sbi_spec_version | 0.2         |   0 | 0x10
+| sbi_get_sbi_impl_id      | 0.2         |   1 | 0x10
+| sbi_get_sbi_impl_version | 0.2         |   2 | 0x10
+| sbi_probe_extension      | 0.2         |   3 | 0x10
+| sbi_get_mvendorid        | 0.2         |   4 | 0x10
+| sbi_get_marchid          | 0.2         |   5 | 0x10
+| sbi_get_mimpid           | 0.2         |   6 | 0x10
 |===
 
 === SBI Implementation IDs
 
+[#table_sbi_implementation_ids]
+.SBI Implementation IDs
 [cols="1,2", width=70%, align="center", options="header"]
 |===
 | Implementation ID | Name
@@ -383,18 +393,22 @@ call doesn't return.
 === Function Listing
 
 [cols="3,1,1,2", width=80%, align="center", options="header"]
+
+[#table_legacy_function_list]
+.Legacy Function List
+[cols="4,2,1,2,3", width=100%, align="center", options="header"]
 |===
-| Function Name             | FID | EID       | Replacement EID
-| sbi_set_timer             |   0 | 0x00      | 0x54494D45
-| sbi_console_putchar       |   0 | 0x01      | N/A
-| sbi_console_getchar       |   0 | 0x02      | N/A
-| sbi_clear_ipi             |   0 | 0x03      | N/A
-| sbi_send_ipi              |   0 | 0x04      | 0x735049
-| sbi_remote_fence_i        |   0 | 0x05      | 0x52464E43
-| sbi_remote_sfence_vma     |   0 | 0x06      | 0x52464E43
-| sbi_remote_sfence_vma_asid|   0 | 0x07      | 0x52464E43
-| sbi_shutdown              |   0 | 0x08      | 0x53525354
-| *RESERVED*                |     | 0x09-0x0F |
+| Function Name             | SBI Version | FID | EID       | Replacement EID
+| sbi_set_timer             | 0.1         |   0 | 0x00      | 0x54494D45
+| sbi_console_putchar       | 0.1         |   0 | 0x01      | N/A
+| sbi_console_getchar       | 0.1         |   0 | 0x02      | N/A
+| sbi_clear_ipi             | 0.1         |   0 | 0x03      | N/A
+| sbi_send_ipi              | 0.1         |   0 | 0x04      | 0x735049
+| sbi_remote_fence_i        | 0.1         |   0 | 0x05      | 0x52464E43
+| sbi_remote_sfence_vma     | 0.1         |   0 | 0x06      | 0x52464E43
+| sbi_remote_sfence_vma_asid| 0.1         |   0 | 0x07      | 0x52464E43
+| sbi_shutdown              | 0.1         |   0 | 0x08      | 0x53525354
+| *RESERVED*                |             |     | 0x09-0x0F |
 |===
 
 == Timer Extension (EID #0x54494D45 "TIME")
@@ -420,10 +434,12 @@ interrupt by clearing `sie.STIE` CSR bit.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_time_function_list]
+.TIME Function List
+[cols="4,2,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name | FID | EID
-| sbi_set_timer |   0 | 0x54494D45
+| Function Name | SBI Version | FID | EID
+| sbi_set_timer | 0.2         | 0   | 0x54494D45
 |===
 
 == IPI Extension (EID #0x735049 "sPI: s-mode IPI")
@@ -444,9 +460,12 @@ Send an inter-processor interrupt to all the harts defined in hart_mask.
 Interprocessor interrupts manifest at the receiving harts as the supervisor
 software interrupts.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_ipi_send_errors>> below.
 
-[cols="1,2", width=80%, align="center", options="header"]
+[#table_ipi_send_errors]
+.IPI Send Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code  | Description
 | SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
@@ -454,10 +473,12 @@ software interrupts.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_ipi_function_list]
+.IPI Function List
+[cols="4,2,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name | FID | EID
-| sbi_send_ipi  |   0 | 0x735049
+| Function Name | SBI Version | FID | EID
+| sbi_send_ipi  | 0.2         | 0   | 0x735049
 |===
 
 == RFENCE Extension (EID #0x52464E43 "RFNC")
@@ -482,9 +503,12 @@ struct sbiret sbi_remote_fence_i(unsigned long hart_mask,
 ----
 Instructs remote harts to execute `FENCE.I` instruction.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_fence_i_errors>> below.
 
-[cols="1,2", width=80%, align="center", options="header"]
+[#table_rfence_remote_fence_i_errors]
+.RFENCE Remote FENCE.I Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code  | Description
 | SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
@@ -503,9 +527,12 @@ struct sbiret sbi_remote_sfence_vma(unsigned long hart_mask,
 Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_sfence_vma_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_sfence_vma_errors]
+.RFENCE Remote SFENCE.VMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -528,9 +555,12 @@ Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
 covering the range of virtual addresses between start and size. This covers
 only the given `ASID`.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_sfence_vma_asid_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_sfence_vma_asid_errors]
+.RFENCE Remote SFENCE.VMA with ASID Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -554,9 +584,12 @@ covering the range of guest physical addresses between start and size only
 for the given `VMID`. This function call is only valid for harts implementing
 hypervisor extension.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_gvma_vmid_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_hfence_gvma_vmid_errors]
+.RFENCE Remote HFENCE.GVMA with VMID Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -582,9 +615,12 @@ covering the range of guest physical addresses between start and size for all
 the guests. This function call is only valid for harts implementing hypervisor
 extension.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_gvma_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_hfence_gvma_errors]
+.RFENCE Remote HFENCE.GVMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -611,9 +647,12 @@ covering the range of guest virtual addresses between start and size for the
 given `ASID` and current `VMID` (in `hgatp` CSR) of calling hart. This function
 call is only valid for harts implementing hypervisor extension.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_vvma_asid_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_hfence_vvma_asid_errors]
+.RFENCE Remote HFENCE.VVMA with ASID Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -639,9 +678,12 @@ covering the range of guest virtual addresses between start and size for
 current `VMID` (in `hgatp` CSR) of calling hart. This function call is only
 valid for harts implementing hypervisor extension.
 
-*Returns* following possible values via sbiret.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_vvma_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_rfence_remote_hfence_vvma_errors]
+.RFENCE Remote HFENCE.VVMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
@@ -654,16 +696,18 @@ valid for harts implementing hypervisor extension.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_rfence_function_list]
+.RFENCE Function List
+[cols="4,2,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name               | FID | EID
-| sbi_remote_fence_i          |   0 | 0x52464E43
-| sbi_remote_sfence_vma       |   1 | 0x52464E43
-| sbi_remote_sfence_vma_asid  |   2 | 0x52464E43
-| sbi_remote_hfence_gvma_vmid |   3 | 0x52464E43
-| sbi_remote_hfence_gvma      |   4 | 0x52464E43
-| sbi_remote_hfence_vvma_asid |   5 | 0x52464E43
-| sbi_remote_hfence_vvma      |   6 | 0x52464E43
+| Function Name               | SBI Version | FID | EID
+| sbi_remote_fence_i          | 0.2         | 0   | 0x52464E43
+| sbi_remote_sfence_vma       | 0.2         | 1   | 0x52464E43
+| sbi_remote_sfence_vma_asid  | 0.2         | 2   | 0x52464E43
+| sbi_remote_hfence_gvma_vmid | 0.2         | 3   | 0x52464E43
+| sbi_remote_hfence_gvma      | 0.2         | 4   | 0x52464E43
+| sbi_remote_hfence_vvma_asid | 0.2         | 5   | 0x52464E43
+| sbi_remote_hfence_vvma      | 0.2         | 6   | 0x52464E43
 |===
 
 == Hart State Management Extension (EID #0x48534D "HSM")
