@@ -972,16 +972,17 @@ implementation could be machine mode firmware or hypervisor.
 
 [source, C]
 ----
-struct sbiret sbi_system_reset(unsigned long reset_type,
-                               unsigned long reset_reason)
+struct sbiret sbi_system_reset(uint32_t reset_type, uint32_t reset_reason)
 ----
 
 Reset the system based on provided `reset_type` and `reset_reason`. This is
 a synchronous call and does not return if it succeeds.
 
-The `reset_type` parameter is 32 bits wide and has the following possible
-values:
+The `reset_type` parameter is 32 bits wide and it's possible values are shown
+in the <<table_srst_system_reset_types>> below.
 
+[#table_srst_system_reset_types]
+.SRST System Reset Types
 [cols="1,2", width=90%, align="center", options="header"]
 |===
 | Value                   | Description
@@ -994,9 +995,11 @@ values:
 |===
 
 The `reset_reason` is an optional parameter representing the reason for
-system reset. This parameter is 32 bits wide and has the following possible
-values:
+system reset. This parameter is 32 bits wide with possible values shown
+in the <<table_srst_system_reset_reasons>> below
 
+[#table_srst_system_reset_reasons]
+.SRST System Reset Reasons
 [cols="1,2", width=90%, align="center", options="header"]
 |===
 | Value                   | Description
@@ -1022,10 +1025,12 @@ implementation is a hypervisor. The shutdown, cold reboot and warm reboot
 will behave functionally the same as the native case but might not result
 in any physical power changes.
 
-*Returns* one of the following possible SBI error codes through sbiret.error
-upon failure.
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_srst_system_reset_errors>> below.
 
-[cols="1,2", width=90%, align="center", options="header"]
+[#table_srst_system_reset_errors]
+.SRST System Reset Errors
+[cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code            | Description
 | SBI_ERR_INVALID_PARAM | `reset_type` or `reset_reason` is not valid.
@@ -1035,10 +1040,12 @@ upon failure.
 
 === Function Listing
 
-[cols="3,1,1", width=70%, align="center", options="header"]
+[#table_srst_function_list]
+.SRST Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
 |===
-| Function Name    | FID | EID
-| sbi_system_reset |   0 | 0x53525354
+| Function Name       | SBI Version | FID | EID
+| sbi_system_reset    | 0.3         |   0 | 0x53525354
 |===
 
 == Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
