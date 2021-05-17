@@ -898,7 +898,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code            | Description
-| SBI_ERR_INVALID_PARAM | The given `hartid` or `start_addr` is not valid
+| SBI_ERR_INVALID_PARAM | The given `hartid` is not valid
 |===
 
 The harts may transition HSM states at any time due to any concurrent
