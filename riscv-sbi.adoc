@@ -52,8 +52,8 @@ of the SBI follows the general RISC-V philosophy of having a small core along
 with a set of optional modular extensions.
 
 The higher privilege software providing SBI interface to the supervisor-mode
-software is referred to as a SBI implemenation or Supervisor Execution
-Environment (SEE). A SBI implementation (or SEE) can be platform runtime
+software is referred to as an SBI implemenation or Supervisor Execution
+Environment (SEE). An SBI implementation (or SEE) can be platform runtime
 firmware executing in machine-mode (M-mode) (see below <<fig_intro1>>) or
 it can be some hypervisor executing in hypervisor-mode (HS-mode) (see below
 <<fig_intro2>>).
@@ -124,7 +124,7 @@ the specification simple and easily adaptable for all RISC-V ISA types (i.e.
 RV32, RV64 and RV128). In case the data is defined as 32bit wide, higher
 privilege software must ensure that it only uses 32 bit data only.
 
-If a SBI function needs to pass a list of harts to the higher privilege mode,
+If an SBI function needs to pass a list of harts to the higher privilege mode,
 it must use a hart mask as defined below. This is applicable to any extensions
 defined in or after v0.2.
 
@@ -765,13 +765,13 @@ A platform can have multiple harts grouped into a hierarchical topology
 groups (namely cores, clusters, nodes, etc) with separate platform specific
 low-power states for each hierarchical group. These platform specific
 low-power states of hierarchial topology groups can be represented as
-platform specific suspend states of a hart. A SBI implementation can
+platform specific suspend states of a hart. An SBI implementation can
 utilize the suspend states of higher topology groups using one of the
 following approaches:
 
 . *Platform-coordinated:* In this approach, when a hart becomes idle the
   supervisor-mode power-managment software will request deepest suspend
-  state for the hart and higher topology groups. A SBI implementation
+  state for the hart and higher topology groups. An SBI implementation
   should choose a suspend state at higher topology group which is:
 .. Not deeper than the specified suspend state
 .. Wake-up latency is not higher than the wake-up latency of the
@@ -782,7 +782,7 @@ following approaches:
   the supervisor-mode power-managment software will always select suspend
   state for the hart itself but it will select a suspend state for a higher
   topology group only if the hart is the last running hart in the group.
-  A SBI implementation should:
+  An SBI implementation should:
 .. Never choose a suspend state for higher topology group different from
    the specified suspend state
 .. Always prefer most recent suspend state requested for higher topology
