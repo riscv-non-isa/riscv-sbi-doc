@@ -3,7 +3,7 @@
 = RISC-V Supervisor Binary Interface Specification
 :author: RISC-V Platform Specification Task Group
 :email: tech-unixplatformspec@lists.riscv.org
-:revnumber: 0.3-rc0
+:revnumber: 0.3-rc1
 :sectnums:
 :xrefstyle: short
 :toc: macro
@@ -27,7 +27,7 @@ https://creativecommons.org/licenses/by/4.0/.
 [preface]
 == Change Log
 
-=== Version 0.3-rc0
+=== Version 0.3-rc1
 
 * Improved document styling and naming conventions
 * Added SBI system reset extension
