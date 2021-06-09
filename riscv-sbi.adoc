@@ -721,7 +721,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 
 == Hart State Management Extension (EID #0x48534D "HSM")
 
-The Hart State Management (HSM) Extension introduces a set hart states and a
+The Hart State Management (HSM) Extension introduces a set of hart states and a
 set of functions which allow the supervisor-mode software to request a hart
 state change.
 
