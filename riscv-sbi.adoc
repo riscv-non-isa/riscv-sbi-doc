@@ -824,7 +824,7 @@ below.
 |===
 
 This call is asynchronous -- more specifically, the `sbi_hart_start()` may
-return before target hart starts executing as long as the SBI implemenation
+return before the target hart starts executing as long as the SBI implemenation
 is capable of ensuring the return code is accurate. It is recommended that
 if the SBI implementation is a platform runtime firmware executing in
 machine-mode (M-mode) then it MUST configure PMP and other M-mode state
