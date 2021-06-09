@@ -828,7 +828,7 @@ return before the target hart starts executing as long as the SBI implemenation
 is capable of ensuring the return code is accurate.
 If the SBI implementation is a platform runtime firmware executing in
 machine-mode (M-mode) then it MUST configure PMP and other M-mode state
-before executing in supervisor-mode.
+before transferring control to supervisor-mode software.
 
 The `hartid` parameter specifies the target hart which is to be started.
 
