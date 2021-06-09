@@ -55,8 +55,8 @@ with a set of optional modular extensions.
 
 SBI extensions as whole are optional but they shall not be partially
 implemented. If sbi_probe_extension() signals that an extension is available,
-all functions conforming to the SBI version reported by sbi_get_spec_version()
-must be implemented in total.
+all functions present in the SBI version reported by sbi_get_spec_version()
+must conform to that version of the SBI specification.
 
 The higher privilege software providing SBI interface to the supervisor-mode
 software is referred to as an SBI implemenation or Supervisor Execution
