@@ -936,7 +936,7 @@ suspend state will not preserve hart register and CSR values.
 
 Resuming from a retentive suspend state is straight forward and the
 supervisor-mode software will see SBI suspend call return without any
-failures.
+failures.  The `resume_addr` parameter is unused during retentive suspend.
 
 Resuming from a non-retentive suspend state is relatively more involved and
 requires software to restore various hart registers and CSRs for all privilege
