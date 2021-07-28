@@ -280,6 +280,7 @@ value for this CSR.
 | 3                 | KVM
 | 4                 | RustSBI
 | 5                 | Diosix
+| 6                 | Coffer
 |===
 
 == Legacy Extensions (EIDs #0x00 - #0x0F)
