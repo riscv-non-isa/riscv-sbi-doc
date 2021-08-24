@@ -1452,7 +1452,7 @@ struct sbiret sbi_pmu_counter_start(unsigned long counter_idx_base,
 				    uint64_t initial_value)
 ----
 
-Start or enable a sef of counters on the calling HART with the specified
+Start or enable a set of counters on the calling HART with the specified
 initial value. The `counter_idx_base` and `counter_idx_mask` parameters
 represent the set of counters whereas the `initial_value` parameter
 specifies the initial value of the counter.
