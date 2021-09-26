@@ -778,7 +778,7 @@ the state machine shown below in the <<figure_hsm>>.
 .SBI HSM State Machine
 image::riscv-sbi-hsm.png[]
 
-A platform can have multiple harts grouped into a hierarchical topology
+A platform can have multiple harts grouped into hierarchical topology
 groups (namely cores, clusters, nodes, etc) with separate platform specific
 low-power states for each hierarchical group. These platform specific
 low-power states of hierarchical topology groups can be represented as
