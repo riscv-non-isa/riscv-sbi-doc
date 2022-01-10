@@ -3,10 +3,12 @@
 #
 
 ASCIIDOCTOR = asciidoctor
+ASCIIDOCTOR_PDF = $(ASCIIDOCTOR)-pdf
 DITAA = ditaa
-IMAGES = riscv-sbi-intro1.png
-IMAGES += riscv-sbi-intro2.png
-IMAGES += riscv-sbi-hsm.png
+IMAGE_DIR = images/
+IMAGES = $(IMAGE_DIR)/riscv-sbi-intro1.png
+IMAGES += $(IMAGE_DIR)/riscv-sbi-intro2.png
+IMAGES += $(IMAGE_DIR)/riscv-sbi-hsm.png
 TARGETS = riscv-sbi.pdf
 TARGETS += riscv-sbi.html
 
@@ -20,8 +22,13 @@ all: $(IMAGES) $(TARGETS)
 %.html: %.adoc $(IMAGES)
 	$(ASCIIDOCTOR) -d book -b html $<
 
-%.pdf: %.adoc $(IMAGES) riscv-sbi-theme.yml
-	$(ASCIIDOCTOR) -d book -r asciidoctor-pdf -a pdf-style=riscv-sbi-theme.yml -b pdf $<
+%.pdf: %.adoc $(IMAGES) docs-resources/themes/riscv-pdf.yml
+	$(ASCIIDOCTOR_PDF) \
+	-a toc \
+	-a compress \
+	-a pdf-style=docs-resources/themes/riscv-pdf.yml \
+	-a pdf-fontsdir=docs-resources/fonts \
+	-o $@ $<
 
 .PHONY: clean
 clean:
