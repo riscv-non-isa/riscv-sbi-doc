@@ -2,8 +2,8 @@
 [[riscv-doc-template]]
 :description: RISC-V SBI definition specification
 :company: RISC-V
-:revdate:  January 10, 2022
-:revnumber: 0.3-rc1
+:revdate:  January 11, 2022
+:revnumber: 1.0-rc2
 :revremark: This document is in Development state.  Change should be expected.
 :url-riscv: http://riscv.org
 :doctype: book
@@ -66,13 +66,23 @@ https://creativecommons.org/licenses/by/4.0/.
 [preface]
 == Change Log
 
+=== Version 1.0-rc2
+* Update to RISC-V formatting
+
+=== Version 1.0-rc1
+* A typo fix
+
+=== Version 0.3.0
+* Few typo fixes
+* Updated the LICENSE with detailed text instead of a hyperlink
+
 === Version 0.3-rc1
 
 * Improved document styling and naming conventions
 * Added SBI system reset extension
-* Improved SBI introduction secion
-* Improved documentation of SBI hart state managment extension
-* Added suspend function to SBI hart state managment extension
+* Improved SBI introduction section
+* Improved documentation of SBI hart state management extension
+* Added suspend function to SBI hart state management extension
 * Added performance monitoring unit extension
 * Clarified that an SBI extension shall not be partially implemented
 
@@ -94,11 +104,11 @@ with a set of optional modular extensions.
 
 SBI extensions as whole are optional but they shall not be partially
 implemented. If sbi_probe_extension() signals that an extension is available,
-all functions conforming to the SBI version reported by sbi_get_spec_version()
-must be implemented in total.
+all functions present in the SBI version reported by sbi_get_spec_version()
+must conform to that version of the SBI specification.
 
 The higher privilege software providing SBI interface to the supervisor-mode
-software is referred to as an SBI implemenation or Supervisor Execution
+software is referred as an SBI implementation or Supervisor Execution
 Environment (SEE). An SBI implementation (or SEE) can be platform runtime
 firmware executing in machine-mode (M-mode) (see below <<fig_intro1>>) or
 it can be some hypervisor executing in hypervisor-mode (HS-mode) (see below
@@ -760,7 +770,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 
 == Hart State Management Extension (EID #0x48534D "HSM")
 
-The Hart State Management (HSM) Extension introduces a set hart states and a
+The Hart State Management (HSM) Extension introduces a set of hart states and a
 set of functions which allow the supervisor-mode software to request a hart
 state change.
 
@@ -789,7 +799,7 @@ along with a unique **HSM state id** for each state:
                                in the **STOPPED** state.
 | 4        | SUSPENDED       | This hart is in a platform specific suspend
                                (or low power) state.
-| 5        | SUSPEND_PENDING | The hart has requestd to put itself in a
+| 5        | SUSPEND_PENDING | The hart has requested to put itself in a
                                platform specific low power state from the
                                **STARTED** state and the SBI implementation
                                is still working to get the hart in the
@@ -812,7 +822,7 @@ image::riscv-sbi-hsm.png[]
 A platform can have multiple harts grouped into a hierarchical topology
 groups (namely cores, clusters, nodes, etc) with separate platform specific
 low-power states for each hierarchical group. These platform specific
-low-power states of hierarchial topology groups can be represented as
+low-power states of hierarchical topology groups can be represented as
 platform specific suspend states of a hart. An SBI implementation can
 utilize the suspend states of higher topology groups using one of the
 following approaches:
@@ -863,11 +873,11 @@ below.
 |===
 
 This call is asynchronous -- more specifically, the `sbi_hart_start()` may
-return before target hart starts executing as long as the SBI implemenation
-is capable of ensuring the return code is accurate. It is recommended that
-if the SBI implementation is a platform runtime firmware executing in
+return before the target hart starts executing as long as the SBI implementation
+is capable of ensuring the return code is accurate.
+If the SBI implementation is a platform runtime firmware executing in
 machine-mode (M-mode) then it MUST configure PMP and other M-mode state
-before executing in supervisor-mode.
+before transferring control to supervisor-mode software.
 
 The `hartid` parameter specifies the target hart which is to be started.
 
@@ -963,19 +973,19 @@ struct sbiret sbi_hart_suspend(uint32_t suspend_type,
                                unsigned long opaque)
 ----
 
-Request the SBI implementation to put the calling hart in a platform specfic
+Request the SBI implementation to put the calling hart in a platform specific
 suspend (or low power) state specified by the `suspend_type` parameter. The
 hart will automatically come out of suspended state and resume normal
-execution when it recieves an interrupt or platform specific hardware event.
+execution when it receives an interrupt or platform specific hardware event.
 
 The platform specific suspend states for a hart can be either retentive
-or non-rententive in nature. A retentive suspend state will preserve hart
+or non-retentive in nature. A retentive suspend state will preserve hart
 register and CSR values for all privilege modes whereas a non-retentive
 suspend state will not preserve hart register and CSR values.
 
 Resuming from a retentive suspend state is straight forward and the
 supervisor-mode software will see SBI suspend call return without any
-failures.
+failures.  The `resume_addr` parameter is unused during retentive suspend.
 
 Resuming from a non-retentive suspend state is relatively more involved and
 requires software to restore various hart registers and CSRs for all privilege
@@ -1017,7 +1027,7 @@ where the hart can resume execution in supervisor-mode after a non-retentive
 suspend.
 
 The `opaque` parameter is a XLEN-bit value which will be set in the `a1`
-register when the hart resumes exectution at `resume_addr` after a
+register when the hart resumes execution at `resume_addr` after a
 non-retentive suspend.
 
 The possible error codes returned in `sbiret.error` are shown in the
@@ -1298,7 +1308,7 @@ in the `mhpmeventX` CSR.
 On RISC-V platform with 64 bits wide `mhpmeventX` CSRs, the `event_data`
 configuration (or parameter) should have the 48-bit value to to be programmed
 in the lower 48-bits of `mhpmeventX` CSR and the SBI implementation shall
-determine the value to be progammed in the upper 16 bits of `mhpmeventX`
+determine the value to be programmed in the upper 16 bits of `mhpmeventX`
 CSR.
 
 *Note:* The RISC-V platform hardware implementation may choose to define
@@ -1310,7 +1320,7 @@ value for simplicity.
 === Event: Firmware events (Type #15)
 
 The `event_idx.type` (i.e. *event type*) should be `0xf` for all firmware
-events and each firmware event is identified by an unqiue `event_idx.code`
+events and each firmware event is identified by an unique `event_idx.code`
 (i.e. *event code*) described in the <<table_pmu_firmware_events>> below.
 
 [#table_pmu_firmware_events]
@@ -1424,7 +1434,7 @@ the `event_idx` represent the event to be monitored and `event_data`
 represents any additional event configuration.
 
 The `config_flags` parameter represent additional counter configuration
-and filter flags. The bit defintions of the `config_flags` parameter are
+and filter flags. The bit definitions of the `config_flags` parameter are
 shown in the <<table_pmu_counter_cfg_match_flags>> below.
 
 [#table_pmu_counter_cfg_match_flags]
@@ -1452,14 +1462,14 @@ shown in the <<table_pmu_counter_cfg_match_flags>> below.
 |===
 
 *NOTE:* When *SBI_PMU_CFG_FLAG_SKIP_MATCH* is set in `config_flags`, the
-SBI implementation will unconditionaly select the first counter from the
+SBI implementation will unconditionally select the first counter from the
 set of counters specified by the `counter_idx_base` and `counter_idx_mask`.
 
 *NOTE:* The *SBI_PMU_CFG_FLAG_AUTO_START* flag in `config_flags` has no
 impact on the counter value.
 
 *NOTE:* The `config_flags[3:7]` bits are event filtering hints so these
-can be ignored or overriden by the SBI implemenation for security concerns
+can be ignored or overridden by the SBI implementation for security concerns
 or due to lack of event filtering support in the underlying RISC-V platform.
 
 *Returns* the `counter_idx` in `sbiret.value` upon success.
@@ -1487,12 +1497,12 @@ struct sbiret sbi_pmu_counter_start(unsigned long counter_idx_base,
 				    uint64_t initial_value)
 ----
 
-Start or enable a sef of counters on the calling HART with the specified
+Start or enable a set of counters on the calling HART with the specified
 initial value. The `counter_idx_base` and `counter_idx_mask` parameters
 represent the set of counters whereas the `initial_value` parameter
 specifies the initial value of the counter.
 
-The bit defintions of the `start_flags` parameter are shown in the
+The bit definitions of the `start_flags` parameter are shown in the
 <<table_pmu_counter_start_flags>> below.
 
 [#table_pmu_counter_start_flags]
@@ -1537,7 +1547,7 @@ struct sbiret sbi_pmu_counter_stop(unsigned long counter_idx_base,
 
 Stop or disable a set of counters on the calling HART. The `counter_idx_base`
 and `counter_idx_mask` parameters represent the set of counters. The bit
-defintions of the `stop_flags` parameter are shown in the
+definitions of the `stop_flags` parameter are shown in the
 <<table_pmu_counter_stop_flags>> below.
 
 [#table_pmu_counter_stop_flags]
