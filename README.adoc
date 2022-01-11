@@ -28,3 +28,26 @@ The final specification in form of PDF and HTML can be generated using
 `make` command. The `makefile` internally uses asciidoctor so the packages
 required by the `makefile` need to be installed on the build system using
 `make install-debs` or `make install-rpms`.
+
+= Cloning the Project
+
+This project uses https://git-scm.com/book/en/v2/Git-Tools-Submodules[GitHub Submodules]
+to include the https://github.com/riscv/docs-resources[RISC-V docs-resources project]
+to achieve a common look and feel.
+
+When cloning this repository for the first time, you must either use 
+`git clone --recurse-submodules` or execute `git submodule init` and `git submodule update` after the clone to populate the docs-resources directory.  Failure to clone the submodule, will result
+in the PDF build fail with an error message like the following:
+
+    $ make
+    asciidoctor-pdf \
+    -a toc \
+    -a compress \
+    -a pdf-style=docs-resources/themes/riscv-pdf.yml \
+    -a pdf-fontsdir=docs-resources/fonts \
+    --failure-level=ERROR \
+    -o riscv-sbi.pdf riscv-sbi.adoc
+    asciidoctor: ERROR: could not locate or load the built-in pdf theme `docs-resources/themes/riscv-pdf.yml'; reverting to default theme
+    No such file or directory - notoserif-regular-subset.ttf not found in docs-resources/fonts
+      Use --trace for backtrace
+    make: *** [Makefile:7: profiles.pdf] Error 1 
