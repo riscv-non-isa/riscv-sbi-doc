@@ -84,9 +84,10 @@ image::riscv-sbi-intro2.png[width=800,height=350]
 
 All SBI functions share a single binary encoding, which facilitates the mixing
 of SBI extensions. This binary encoding matches the RISC-V Linux syscall ABI,
-which itself is based on the calling convention defined in the RISC-V ELF
-psABI. In other words, SBI calls are exactly the same as standard RISC-V
-function calls except that:
+which itself is based on the calling convention defined in the
+https://github.com/riscv/riscv-elf-psabi-doc[RISC-V ELF psABI Specification].
+In other words, SBI calls are exactly the same as standard RISC-V function calls
+except that:
 
 * An `ECALL` is used as the control transfer instruction instead of a `CALL`
   instruction.
