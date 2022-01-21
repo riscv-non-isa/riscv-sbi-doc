@@ -114,6 +114,8 @@ returning an error code. This is analogous to returning the C structure
     };
 ----
 
+Where RV64 uses the LP64 integer model that defines `long` to be 64 bit.
+
 The <<table_standard_sbi_errors>> below provides a list of Standard SBI
 error codes.
 
