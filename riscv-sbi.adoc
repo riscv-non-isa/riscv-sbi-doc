@@ -90,7 +90,7 @@ function calls except that:
 
 * An `ECALL` is used as the control transfer instruction instead of a `CALL`
   instruction.
-* `a7` (or `t0` on RV32E-based systems) encodes the SBI extension ID (*EID*),
+* `a7` encodes the SBI extension ID (*EID*),
   which matches how the system call ID is encoded in Linux system call ABI.
 
 Many SBI extensions also chose to encode an additional SBI function ID (*FID*)
@@ -136,9 +136,9 @@ An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
 function ID (*FID*) must return the error code `SBI_ERR_NOT_SUPPORTED`.
 
 Every SBI function should prefer `unsigned long` as the data type. It keeps
-the specification simple and easily adaptable for all RISC-V ISA types (i.e.
-RV32, RV64 and RV128). In case the data is defined as 32bit wide, higher
-privilege software must ensure that it only uses 32 bit data only.
+the specification simple and easily adaptable for all RISC-V ISA types.
+In case the data is defined as 32bit wide, higher privilege software must
+ensure that it only uses 32 bit data only.
 
 If an SBI function needs to pass a list of harts to the higher privilege mode,
 it must use a hart mask as defined below. This is applicable to any extensions
@@ -977,7 +977,7 @@ shown in <<table_hsm_hart_suspend_types>> below.
 | 0x80000000              | Default non-retentive suspend
 | 0x80000001 - 0x8FFFFFFF | Reserved for future use
 | 0x90000000 - 0xFFFFFFFF | Platform specific non-retentive suspend
-| > 0xFFFFFFFF            | Reserved (and non-existent on RV32)
+| > 0xFFFFFFFF            | Reserved
 |===
 
 The `resume_addr` parameter points to a runtime-specified physical address,
@@ -1051,7 +1051,7 @@ in the <<table_srst_system_reset_types>> below.
 | 0x00000002              | Warm reboot
 | 0x00000003 - 0xEFFFFFFF | Reserved for future use
 | 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset type
-| > 0xFFFFFFFF            | Reserved (and non-existent on RV32)
+| > 0xFFFFFFFF            | Reserved
 |===
 
 The `reset_reason` is an optional parameter representing the reason for
@@ -1068,7 +1068,7 @@ in the <<table_srst_system_reset_reasons>> below
 | 0x00000002 - 0xDFFFFFFF | Reserved for future use
 | 0xE0000000 - 0xEFFFFFFF | SBI implementation specific reset reason
 | 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset reason
-| > 0xFFFFFFFF            | Reserved (and non-existent on RV32)
+| > 0xFFFFFFFF            | Reserved
 |===
 
 When supervisor software is running natively, the SBI implementation is
