@@ -1,12 +1,49 @@
 // SPDX-License-Identifier: CC-BY-4.0
+[[riscv-doc-template]]
+:description: RISC-V SBI definition specification
+:company: RISC-V
+:revdate:  January 11, 2022
+:revnumber: 1.0-rc2
+:revremark: This document is in Development state.  Change should be expected.
+:url-riscv: http://riscv.org
+:doctype: book
+:preface-title: Preamble
+:colophon:
+:appendix-caption: Appendix
+:title-logo-image: image:docs-resources/images/risc-v_logo.svg[pdfwidth=3.25in,align=center]
+// Settings:
+:experimental:
+:reproducible:
+:WaveDromEditorApp: wavedrom-cli
+:icons: font
+:lang: en
+:listing-caption: Listing
+:sectnums:
+:sectnumlevels: 5
+:toclevels: 5
+:toc: left
+:source-highlighter: pygments
+ifdef::backend-pdf[]
+:source-highlighter: coderay
+endif::[]
+:data-uri:
+:hide-uri-scheme:
+:stem: latexmath
+:footnote:
+:xrefstyle: short 
 
 = RISC-V Supervisor Binary Interface Specification
 :author: RISC-V Platform Specification Task Group
 :email: tech-unixplatformspec@lists.riscv.org
-:revnumber: 1.0-rc1
-:sectnums:
-:xrefstyle: short
-:toc: macro
+
+// Preamble
+[WARNING]
+.This document is in the link:http://riscv.org/spec-state[Development state]
+====
+Assume everything can change. This draft specification will change before 
+being accepted as standard, so implementations made to this draft specification 
+will likely not conform to the future standard.
+====
 
 // table of contents
 toc::[]
@@ -26,6 +63,9 @@ https://creativecommons.org/licenses/by/4.0/.
 
 [preface]
 == Change Log
+
+=== Version 1.0-rc2
+* Update to RISC-V formatting
 
 === Version 1.0-rc1
 * A typo fix
