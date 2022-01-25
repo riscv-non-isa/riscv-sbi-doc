@@ -22,6 +22,39 @@ The files in this repository are licensed under the Creative Commons
 Attribution 4.0 International License (CC-BY 4.0).  The full license
 text is available at https://creativecommons.org/licenses/by/4.0/.
 
+= Dependencies
+The PDF built in this project uses AsciiDoctor (Ruby). For more information 
+on AsciiDoctor, specification guidelines, or building locally, see the 
+https://github.com/riscv/docs-dev-guide[RISC-V Documentation Developer Guide].
+
+= Cloning the Project
+This project uses 
+https://git-scm.com/book/en/v2/Git-Tools-Submodules[GitHub Submodules] to 
+include the RISC-V 
+https://github.com/riscv/docs-resources[docs-resources project] 
+to achieve a common look and feel.
+
+When cloning this repository for the first time, you must either use 
+`git clone --recurse-submodules` or execute `git submodule init` and 
+`git submodule update` after the clone to populate the `docs-resources` 
+directory. Failure to clone the submodule, will result in the PDF build 
+fail with an error message like the following:
+
+....
+$ make
+asciidoctor-pdf \
+-a toc \
+-a compress \
+-a pdf-style=docs-resources/themes/riscv-pdf.yml \
+-a pdf-fontsdir=docs-resources/fonts \
+--failure-level=ERROR \
+-o profiles.pdf profiles.adoc
+asciidoctor: ERROR: could not locate or load the built-in pdf theme `docs-resources/themes/riscv-pdf.yml'; reverting to default theme
+No such file or directory - notoserif-regular-subset.ttf not found in docs-resources/fonts
+  Use --trace for backtrace
+make: *** [Makefile:7: profiles.pdf] Error 1
+....
+
 = Building Documents
 
 The final specification in form of PDF and HTML can be generated using
