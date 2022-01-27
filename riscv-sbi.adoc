@@ -1195,11 +1195,11 @@ are not counted when the CPU clock is halted.
 
 *NOTE:* The *SBI_PMU_HW_REF_CPU_CYCLES* counts fixed-frequency clock
 cycles while the CPU clock is not halted. The fixed-frequency of counting
-might, for example, be the same frequency at which the `mtime` CSR counts.
+might, for example, be the same frequency at which the `time` CSR counts.
 
 *NOTE:* The *SBI_PMU_HW_BUS_CYCLES* counts fixed-frequency clock cycles.
 The fixed-frequency of counting might be the same frequency at which the
-`mtime` CSR counts, or may be the frequency of the clock at the boundary
+`time` CSR counts, or may be the frequency of the clock at the boundary
 between the HART (and it's private caches) and the rest of the system.
 
 === Event: Hardware cache events (Type #1)
