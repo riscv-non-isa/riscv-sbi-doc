@@ -80,6 +80,10 @@ image::riscv-sbi-intro1.png[width=524,height=218]
 .RISC-V System with H-extension
 image::riscv-sbi-intro2.png[width=800,height=350]
 
+The SBI specification doesn’t specify any method for hardware discovery.
+The supervisor software must rely on the other industry standard hardware
+discovery methods (i.e. Device Tree or ACPI) for that.
+
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
