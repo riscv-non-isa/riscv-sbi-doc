@@ -222,8 +222,8 @@ number is specific to the SBI implementation.
 struct sbiret sbi_probe_extension(long extension_id);
 ----
 
-Returns 0 if the given SBI extension ID (*EID*) is not available, or an
-extension-specific non-zero value if it is available.
+Returns 0 if the given SBI extension ID (EID) is not available, or 1 if it is
+available unless defined as any other non-zero value by the implementation.
 
 === Function: Get machine vendor ID (FID #4)
 
