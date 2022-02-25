@@ -127,6 +127,25 @@ The SBI specification doesn’t specify any method for hardware discovery.
 The supervisor software must rely on the other industry standard hardware
 discovery methods (i.e. Device Tree or ACPI) for that.
 
+== Terms and Abbreviations
+
+This specification uses the following terms and abbreviations:
+
+[width=80%]
+|===
+| Term  | Meaning
+
+| SBI   | Supervisor Binary Interface
+| SEE   | Supervisor Execution Environment
+| EID   | Extension ID
+| FID   | Function ID
+| HSM   | Hart State Management
+| PMU   | Performance Monitoring Unit
+| IPI   | Inter Processor Interrupt
+| ASID  | Address Space Identifier
+| VMID  | Virtual Machine Identifier
+|===
+
 == Binary Encoding
 
 All SBI functions share a single binary encoding, which facilitates the mixing
