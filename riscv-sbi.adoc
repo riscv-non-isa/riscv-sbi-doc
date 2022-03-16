@@ -2,8 +2,8 @@
 [[riscv-doc-template]]
 :description: RISC-V SBI definition specification
 :company: RISC-V
-:revdate:  February 4, 2022
-:revnumber: 1.0-rc2
+:revdate:  March 15, 2022
+:revnumber: 1.0-rc3
 :revremark: This document is in Frozen state. Change is extremely unlikely.
 :url-riscv: http://riscv.org
 :doctype: book
@@ -64,6 +64,11 @@ https://creativecommons.org/licenses/by/4.0/.
 
 [preface]
 == Change Log
+
+=== Version 1.0-rc3
+* Updated the calling convention
+* Fixed a typo in PMU extension
+* Added a abbreviation table
 
 === Version 1.0-rc2
 * Update to RISC-V formatting
