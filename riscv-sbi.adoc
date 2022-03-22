@@ -2,9 +2,9 @@
 [[riscv-doc-template]]
 :description: RISC-V SBI definition specification
 :company: RISC-V
-:revdate:  March 15, 2022
-:revnumber: 1.0-rc3
-:revremark: This document is in Frozen state. Change is extremely unlikely.
+:revdate:  March 22, 2022
+:revnumber: 1.0.0
+:revremark: Ratified
 :url-riscv: http://riscv.org
 :doctype: book
 :preface-title: Preamble
@@ -38,12 +38,11 @@ endif::[]
 
 // Preamble
 [WARNING]
-.This document is in the link:http://riscv.org/spec-state[Frozen state]
+.This document is in the link:http://riscv.org/spec-state[Ratified state]
 ====
-Change is extremely unlikely. A high threshold will be used, and a change
-will only occur because of some truly critical issue being identified during
-the public review cycle. Any other desired or needed changes can be the subject
-of a follow-on new extension.
+No changes are allowed. Any desired or needed changes can be the subject of
+a follow-on document with a revised version number consistent with the RISC-V
+versioning policy.
 ====
 
 // table of contents
@@ -64,6 +63,9 @@ https://creativecommons.org/licenses/by/4.0/.
 
 [preface]
 == Change Log
+
+=== Version 1.0.0
+* Updated the version for ratification
 
 === Version 1.0-rc3
 * Updated the calling convention
