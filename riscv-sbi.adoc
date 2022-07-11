@@ -882,7 +882,7 @@ the state machine shown below in the <<figure_hsm>>.
 image::riscv-sbi-hsm.png[]
 
 A platform can have multiple harts grouped into hierarchical topology
-groups (namely cores, clusters, nodes, etc) with separate platform specific
+groups (namely cores, clusters, nodes, etc.) with separate platform specific
 low-power states for each hierarchical group. These platform specific
 low-power states of hierarchical topology groups can be represented as
 platform specific suspend states of a hart. An SBI implementation can
@@ -946,7 +946,7 @@ The `hartid` parameter specifies the target hart which is to be started.
 The `start_addr` parameter points to a runtime-specified physical address,
 where the hart can start executing in supervisor-mode.
 
-The `opaque` parameter is a XLEN-bit value which will be set in the `a1`
+The `opaque` parameter is an XLEN-bit value which will be set in the `a1`
 register when the hart starts executing at `start_addr`.
 
 The possible error codes returned in `sbiret.error` are shown in the
@@ -964,8 +964,9 @@ The possible error codes returned in `sbiret.error` are shown in the
                               * It is not a valid physical address. +
                               * The address is prohibited by PMP to run in
                                 supervisor mode.
-| SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as corresponding
-                              hart cannot started in supervisor mode.
+| SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as the
+                              corresponding hart cannot be started in supervisor
+                              mode.
 | SBI_ERR_ALREADY_AVAILABLE | The given hartid is already started.
 | SBI_ERR_FAILED            | The start request failed for unknown reasons.
 |===
@@ -978,10 +979,9 @@ struct sbiret sbi_hart_stop(void)
 ----
 
 Request the SBI implementation to stop executing the calling hart in
-supervisor-mode and return it's ownership to the SBI implementation.
+supervisor-mode and return its ownership to the SBI implementation.
 This call is not expected to return under normal conditions. The
-`sbi_hart_stop()` must be called with the supervisor-mode interrupts
-disabled.
+`sbi_hart_stop()` must be called with supervisor-mode interrupts disabled.
 
 The possible error codes returned in `sbiret.error` are shown in the
 <<table_hsm_hart_stop_errors>> below.
@@ -1088,7 +1088,7 @@ The `resume_addr` parameter points to a runtime-specified physical address,
 where the hart can resume execution in supervisor-mode after a non-retentive
 suspend.
 
-The `opaque` parameter is a XLEN-bit value which will be set in the `a1`
+The `opaque` parameter is an XLEN-bit value which will be set in the `a1`
 register when the hart resumes execution at `resume_addr` after a
 non-retentive suspend.
 
