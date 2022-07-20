@@ -1492,10 +1492,10 @@ struct sbiret sbi_pmu_counter_config_matching(unsigned long counter_idx_base,
 Find and configure a counter from a set of counters which is not started
 (or enabled) and can monitor the specified event. The `counter_idx_base`
 and `counter_idx_mask` parameters represent the set of counters whereas
-the `event_idx` represent the event to be monitored and `event_data`
+`event_idx` represents the event to be monitored and `event_data`
 represents any additional event configuration.
 
-The `config_flags` parameter represent additional counter configuration
+The `config_flags` parameter represents additional counter configuration
 and filter flags. The bit definitions of the `config_flags` parameter are
 shown in the <<table_pmu_counter_cfg_match_flags>> below.
 
@@ -1545,8 +1545,8 @@ shown in the <<table_pmu_counter_cfg_match_errors>> below.
 |===
 | Error code            | Description
 | SBI_SUCCESS           | counter found and configured successfully.
-| SBI_ERR_INVALID_PARAM | set of counters has an invalid counter.
-| SBI_ERR_NOT_SUPPORTED | none of the counters can monitor specified event.
+| SBI_ERR_INVALID_PARAM | set of counters has at least one invalid counter.
+| SBI_ERR_NOT_SUPPORTED | none of the counters can monitor the specified event.
 |===
 
 === Function: Start a set of counters (FID #3)
@@ -1592,10 +1592,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code              | Description
 | SBI_SUCCESS             | counter started successfully.
-| SBI_ERR_INVALID_PARAM   | some of the counters specified in parameters
-                            are invalid.
-| SBI_ERR_ALREADY_STARTED | some of the counters specified in parameters
-                            are already started.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_ALREADY_STARTED | set of counters includes at least one counter which
+                            is already started.
 |===
 
 === Function: Stop a set of counters (FID #4)
@@ -1631,10 +1630,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code              | Description
 | SBI_SUCCESS             | counter stopped successfully.
-| SBI_ERR_INVALID_PARAM   | some of the counters specified in parameters
-                            are invalid.
-| SBI_ERR_ALREADY_STOPPED | some of the counters specified in parameters
-                            are already stopped.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_ALREADY_STOPPED | set of counters includes at least one counter which
+                            is already stopped.
 |===
 
 === Function: Read a firmware counter (FID #5)
