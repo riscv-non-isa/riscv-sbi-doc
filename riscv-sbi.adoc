@@ -246,9 +246,9 @@ specific error values.
 [cols="1,2", width=90%, align="center", options="header"]
 |===
 | Error code            | Description
-| SBI_ERR_INVALID_PARAM | Either `hart_mask_base` or any of the hartid from
-                          `hart_mask` is not valid i.e. either the hartid is
-                           not enabled by the platform or is not available to
+| SBI_ERR_INVALID_PARAM | Either `hart_mask_base`, or at least one hartid from
+                          `hart_mask`, is not valid, i.e. either the hartid is
+                          not enabled by the platform or is not available to
                           the supervisor.
 |===
 
@@ -999,14 +999,15 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid, possibly due to the
                               following reasons: +
                               * It is not a valid physical address. +
-                              * The address is prohibited by a physical memory
-                                protection mechanism or H-extension G-stage to
-                                run in supervisor-mode.
+                              * Executable access to the address is prohibited
+                                by a physical memory protection mechanism or
+                                H-extension G-stage for supervisor-mode.
 | SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as the
                               corresponding hart cannot be started in supervisor
                               mode.
 | SBI_ERR_ALREADY_AVAILABLE | The given hartid is already started.
-| SBI_ERR_FAILED            | The start request failed for unknown reasons.
+| SBI_ERR_FAILED            | The start request failed for unspecified or
+                              unknown other reasons.
 |===
 
 === Function: HART stop (FID #1)
@@ -1056,7 +1057,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code            | Description
-| SBI_ERR_INVALID_PARAM | The given `hartid` is not valid
+| SBI_ERR_INVALID_PARAM | The given `hartid` is not valid.
 |===
 
 The harts may transition HSM states at any time due to any concurrent
@@ -1144,15 +1145,17 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code              | Description
 | SBI_SUCCESS             | Hart has suspended and resumed back successfully
                             from a retentive suspend state.
-| SBI_ERR_INVALID_PARAM   | `suspend_type` is not valid.
-| SBI_ERR_NOT_SUPPORTED   | `suspend_type` is valid but not implemented.
+| SBI_ERR_INVALID_PARAM   | `suspend_type` is reserved.
+| SBI_ERR_NOT_SUPPORTED   | `suspend_type` is not reserved but the platform
+                            does not support it.
 | SBI_ERR_INVALID_ADDRESS | `resume_addr` is not valid, possibly due to the
                             following reasons: +
                             * It is not a valid physical address. +
-                            * The address is prohibited by a physical memory
-                              protection mechanism or H-extension G-stage to
-                              run in supervisor-mode.
-| SBI_ERR_FAILED          | The suspend request failed for unknown reasons.
+                            * Executable access to the address is prohibited
+                              by a physical memory protection mechanism or
+                              H-extension G-stage for supervisor-mode.
+| SBI_ERR_FAILED          | The suspend request failed for unspecified or
+                            unknown other reasons.
 |===
 
 === Function Listing
@@ -1173,7 +1176,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 The System Reset Extension provides a function that allow the supervisor
 software to request system-level reboot or shutdown. The term "system"
 refers to the world-view of supervisor software and the underlying SBI
-implementation could be machine mode firmware or hypervisor.
+implementation could be provided by machine mode firmware or a hypervisor.
 
 === Function: System reset (FID #0)
 
@@ -1219,18 +1222,18 @@ in the <<table_srst_system_reset_reasons>> below
 |===
 
 When supervisor software is running natively, the SBI implementation is
-machine mode firmware. In this case, shutdown is equivalent to physical
-power down of the entire system and cold reboot is equivalent to physical
-power cycle of the entire system. Further, warm reboot is equivalent to
-a power cycle of main processor and parts of the system but not the entire
-system. For example, on a server class system with a BMC (board management
-controller), a warm reboot will not power cycle the BMC whereas a cold
-reboot will definitely power cycle the BMC.
+provided by machine mode firmware. In this case, shutdown is equivalent to
+a physical power down of the entire system and cold reboot is equivalent to
+a physical power cycle of the entire system. Further, warm reboot is equivalent
+to a power cycle of the main processor and parts of the system, but not the
+entire system. For example, on a server class system with a BMC (board
+management controller), a warm reboot will not power cycle the BMC whereas a
+cold reboot will definitely power cycle the BMC.
 
 When supervisor software is running inside a virtual machine, the SBI
-implementation is a hypervisor. The shutdown, cold reboot and warm reboot
-will behave functionally the same as the native case but might not result
-in any physical power changes.
+implementation is provided by a hypervisor. Shutdown, cold reboot and warm
+reboot will behave functionally the same as the native case, but might not
+result in any physical power changes.
 
 The possible error codes returned in `sbiret.error` are shown in the
 <<table_srst_system_reset_errors>> below.
@@ -1240,9 +1243,11 @@ The possible error codes returned in `sbiret.error` are shown in the
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code            | Description
-| SBI_ERR_INVALID_PARAM | `reset_type` or `reset_reason` is not valid.
-| SBI_ERR_NOT_SUPPORTED | `reset_type` is valid but not implemented.
-| SBI_ERR_FAILED        | Reset request failed for unknown reasons.
+| SBI_ERR_INVALID_PARAM | `reset_type` or `reset_reason` is reserved.
+| SBI_ERR_NOT_SUPPORTED | `reset_type` is not reserved but the platform
+                          does not support it.
+| SBI_ERR_FAILED        | The reset request failed for unspecified or
+                          unknown other reasons.
 |===
 
 === Function Listing
