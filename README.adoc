@@ -13,8 +13,8 @@ list]. It is publicly readable but posting requires being a member of the
 RISC-V Foundation. Any new SBI extension needs to be discussed and approved
 there before being merged.
 
-https://github.com/riscv/opensbi[OpenSBI] is the reference implementation,
-but other implementations exist; see section "SBI Implementation IDs".
+A list of implementations introduces SBI to M-Mode and HS-Mode software.
+See section "SBI Implementation IDs"
 
 = Licensing
 
