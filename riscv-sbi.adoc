@@ -33,8 +33,8 @@ endif::[]
 :xrefstyle: short 
 
 = RISC-V Supervisor Binary Interface Specification
-:author: RISC-V Platform Specification Task Group
-:email: tech-unixplatformspec@lists.riscv.org
+:author: RISC-V Platform Runtime Services Task Group
+:email: tech-prs@lists.riscv.org
 
 // Preamble
 [WARNING]
