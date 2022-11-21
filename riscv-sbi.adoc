@@ -959,8 +959,8 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid possibly due to
                               following reasons: +
                               * It is not a valid physical address. +
-                              * The address is prohibited by PMP to run in
-                                supervisor mode.
+                              * The address is prohibited by PMP or
+                                H-extension G-stage to run in supervisor-mode.
 | SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as the
                               corresponding hart cannot be started in supervisor
                               mode.
@@ -1104,8 +1104,8 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_INVALID_ADDRESS | `resume_addr` is not valid possibly due to
                             following reasons: +
                             * It is not a valid physical address. +
-                            * The address is prohibited by PMP to run in
-                              supervisor mode.
+                            * The address is prohibited by PMP or H-extension
+                              G-stage to run in supervisor-mode.
 | SBI_ERR_FAILED          | The suspend request failed for unknown reasons.
 |===
 
