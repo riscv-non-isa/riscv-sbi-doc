@@ -206,6 +206,8 @@ the specification simple and easily adaptable for all RISC-V ISA types.
 In case the data is defined as 32bit wide, higher privilege software must
 ensure that it only uses 32 bit data only.
 
+=== HART list parameter
+
 If an SBI function needs to pass a list of harts to the higher privilege mode,
 it must use a hart mask as defined below. This is applicable to any extensions
 defined in or after v0.2.
