@@ -1682,3 +1682,106 @@ Low bits from `mvendorid`.
 Low bits is SBI implementation ID. The firmware specific SBI extensions are
 for SBI implementations. It provides firmware specific SBI functions which
 are defined in the external firmware specification.
+
+== Trusted Execution Environment SBI Extension Space (EID #0x544545 "TEE")
+The Trusted Execution Environment Unit Extension divides cpu Execution
+Environment into two parts: REE (Rich Execution Environment) and TEE
+(Trusted execution environment), As shown in the picture below <<fig_tee1>>.
+To enable some applications to perform security-related services,
+which are placed in TEE.
+
+[#fig_tee1]
+.SBI TEE extensions runtimes
+image::riscv-sbi-tee1.png[width=1007,height=464]
+
+Well, one option is REE runs linux, TEE runs optee-os.
+When starting a security service, REE needs to convey 8 parameters
+to TEE according to optee-os standard,
+and TEE needs to return 4 parameters to REE when TEE is finished.
+So linux needs to pass 10 parameters to opensbi. I use the a0-a7,
+t0, t1 register. the newly added correlation parameters,
+one conveying 0x544545 indicating that this is a TEE extension,
+and the other conveying the caller status indicating
+it is from REE or from TEE. Unlike other SBI extensions contexts saved,
+In the tee process, not only sbi_trap_regs but also CSRs of S mode
+should be saved including all calls from REE and some calls from TEE.
+
+I added a new structure sbi_save_context, It contains sbi_trap_regs
+structure and the csr registers that TEE OS uses in S mode.
+[source, C]
+----
+    struct sbi_save_context {
+        struct sbi_trap_regs regs;
+        unsigned long sepc;
+        unsigned long satp;
+        unsigned long sstatus;
+        unsigned long sie;
+        unsigned long stvec;
+        unsigned long sscratch;
+        unsigned long scounteren;
+        unsigned long scause;
+        unsigned long stval;
+        unsigned long sip;
+    };
+----
+The design needs to define context-saved arrays based on the number of cores.
+[source, C]
+----
+        struct sbi_save_context nsec_cpu_context[OPTEED_CORE_COUNT];
+        struct sbi_save_context sec_cpu_context[OPTEED_CORE_COUNT];
+----
+nsec_cpu_context holds the context of REE and sec_cpu_context holds the context of TEE.
+When REE is called to TEE, opensbi needs to populate the corresponding
+nsec_cpu_context structure based on the register value, It then fills registers
+according to the sec_cpu_context structure value and enters optee os via the mret instruction.
+The optee os calls the ecall instruction to access opensbi after completing its own job.
+When TEE is called to REE, opensbi needs to restore the linux context with
+the value of the nsec_cpu_context structure. In this case, there is no need
+to save the optee os context, which is saved when the startup phase returns.
+In addition, the entry to optee os is returned on startup.
+optee-os has designed nine entry points, three of which have been implemented so far,
+and others may be implemented in the future, Therefore, in opensbi also
+need to define such a structure and determine which entry to use based on the parameters
+[source, C]
+----
+typedef uint32_t optee_vector_isn_t;
+typedef struct optee_vectors {
+        optee_vector_isn_t yield_smc_entry;
+        optee_vector_isn_t fast_smc_entry;
+        optee_vector_isn_t cpu_on_entry;
+        optee_vector_isn_t cpu_off_entry;
+        optee_vector_isn_t cpu_resume_entry;
+        optee_vector_isn_t cpu_suspend_entry;
+        optee_vector_isn_t fiq_entry;
+        optee_vector_isn_t system_off_entry;
+        optee_vector_isn_t system_reset_entry;
+} optee_vectors_t;
+----
+
+yield_smc_entry means that this function entry optee os will start the thread function
+and enter the user state of TEE. It may also switch back to REE with RPC function,
+and then return to TEE after REE completes the corresponding function.
+For the REE process that sent you this call, it may cause sleep.
+
+fast_smc_entry indicates that this is a quick function that returns after
+the optee-os does something, and that it does not cause the caller to sleep.
+
+fiq_entry indicates that a TEE interrupt occurs in the REE environment,
+and the TEE needs to be running.
+
+Other entries are not implemented currently.
+
+REE S mode CSRs is derived from linux, and TEE S mode CSRs is derived
+from optee os initialization. Upon startup, opensbi will add
+a tee_os_init function before sbi_hart_switch_mode.
+tee_os_init will jump to optee os for initialization.
+The startup address of optee os is configured using configuration items.
+After the initialization is complete, it returns to opensbi.
+The return parameter holds the optee os entry address of the runtime,
+and it gets TEE S mode CSRs. Then go back to the previous execution process
+to start linux. The same function is used to boot the secondary hart.
+The following figure(<<fig_tee2>>) shows the startup process.
+
+[#fig_tee2]
+.SBI TEE extensions boot flow
+image::riscv-sbi-tee2.png[width=975,height=527]
