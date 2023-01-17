@@ -63,6 +63,7 @@ https://creativecommons.org/licenses/by/4.0/.
 
 * Added common description for shared memory physical address range parameter
 * Added SBI debug console extension
+* Relaxed the counter width requirement on SBI PMU firmware counters
 
 === Version 1.0.0
 
@@ -1267,7 +1268,8 @@ using a limited number of hardware performance counters which are up to
 64 bits wide. In addition, a SBI implementation can also provide firmware
 performance counters which can monitor firmware events such as number of
 misaligned load/store instructions, number of RFENCEs, number of IPIs, etc.
-The firmware counters are always 64 bits wide.
+All firmware counters must have same number of bits and can be up to 64
+bits wide.
 
 The SBI PMU extension provides:
 
