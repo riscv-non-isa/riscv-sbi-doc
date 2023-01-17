@@ -65,6 +65,7 @@ https://creativecommons.org/licenses/by/4.0/.
 * Added SBI debug console extension
 * Relaxed the counter width requirement on SBI PMU firmware counters
 * Added sbi_pmu_counter_fw_read_hi() in SBI PMU extension
+* Reserved space for SBI implementation specific firmware events
 
 === Version 1.0.0
 
@@ -1427,7 +1428,7 @@ events and each firmware event is identified by an unique `event_idx.code`
 
 [#table_pmu_firmware_events]
 .PMU Firmware Events
-[cols="6,1,4", width=95%, align="center", options="header"]
+[cols="8,2,5", width=95%, align="center", options="header"]
 |===
 | Firmware Event Name                  | Code | Description
 | SBI_PMU_FW_MISALIGNED_LOAD           |    0 | Misaligned load trap event
@@ -1467,10 +1468,19 @@ events and each firmware event is identified by an unique `event_idx.code`
                                                 request to other HART event
 | SBI_PMU_FW_HFENCE_VVMA_ASID_RECEIVED |   21 | Received HFENCE.VVMA with ASID
                                                 request from other HART event
+| Reserved                             | 22 - 255 | Reserved for future use
+| Implementation specific events       | 256 - 65534 | SBI implementation
+                                                       specific firmware events
+| SBI_PMU_FW_PLATFORM                  | 65535 | RISC-V platform specific
+                                                 firmware events, where the
+                                                 `event_data` configuration
+                                                 (or parameter) contains
+                                                 the event encoding.
 |===
 
-*NOTE:* the `event_data` (i.e. *event data*) is unused for firmware events
-and all non-zero values of `event_data` are reserved for future use.
+*NOTE:* For all firmware events except SBI_PMU_FW_PLATFORM, the `event_data`
+configuration (or parameter) is unused and all non-zero values of `event_data`
+are reserved for future use.
 
 === Function: Get number of counters (FID #0)
 
