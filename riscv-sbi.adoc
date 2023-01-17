@@ -64,6 +64,7 @@ https://creativecommons.org/licenses/by/4.0/.
 * Added common description for shared memory physical address range parameter
 * Added SBI debug console extension
 * Relaxed the counter width requirement on SBI PMU firmware counters
+* Added sbi_pmu_counter_fw_read_hi() in SBI PMU extension
 
 === Version 1.0.0
 
@@ -1681,7 +1682,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 struct sbiret sbi_pmu_counter_fw_read(unsigned long counter_idx)
 ----
 
-Provide the current value of a firmware counter in `sbiret.value`.
+Provide the current firmware counter value in `sbiret.value`. On RV32 systems,
+the `sbiret.value` will only contain the lower 32 bits of the current firmware
+counter value.
 
 The possible error codes returned in `sbiret.error` are shown in the
 <<table_pmu_counter_fw_read_errors>> below.
@@ -1692,6 +1695,30 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code            | Description
 | SBI_SUCCESS           | firmware counter read successfully.
+| SBI_ERR_INVALID_PARAM | `counter_idx` points to a hardware counter
+                          or an invalid counter.
+|===
+
+=== Function: Read a firmware counter high bits (FID #6)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_fw_read_hi(unsigned long counter_idx)
+----
+
+Provide the upper 32 bits of the current firmware counter value in
+`sbiret.value`. This function always returns zero in `sbiret.value`
+for RV64 (or higher) systems.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_pmu_counter_fw_read_hi_errors>> below.
+
+[#table_pmu_counter_fw_read_hi_errors]
+.PMU Counter Firmware Read High Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Firmware counter read successfully.
 | SBI_ERR_INVALID_PARAM | `counter_idx` points to a hardware counter
                           or an invalid counter.
 |===
@@ -1709,6 +1736,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 | sbi_pmu_counter_start           | 0.3         | 3   | 0x504D55
 | sbi_pmu_counter_stop            | 0.3         | 4   | 0x504D55
 | sbi_pmu_counter_fw_read         | 0.3         | 5   | 0x504D55
+| sbi_pmu_counter_fw_read_hi      | 2.0         | 6   | 0x504D55
 |===
 
 == Debug Console Extension (EID #0x4442434E "DBCN")
