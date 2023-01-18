@@ -956,7 +956,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code                | Description
 | SBI_SUCCESS               | Hart was previously in stopped state. It will
                               start executing from `start_addr`.
-| SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid possibly due to
+| SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid, possibly due to the
                               following reasons: +
                               * It is not a valid physical address. +
                               * The address is prohibited by PMP or
@@ -1101,7 +1101,7 @@ The possible error codes returned in `sbiret.error` are shown in the
                             from a retentive suspend state.
 | SBI_ERR_INVALID_PARAM   | `suspend_type` is not valid.
 | SBI_ERR_NOT_SUPPORTED   | `suspend_type` is valid but not implemented.
-| SBI_ERR_INVALID_ADDRESS | `resume_addr` is not valid possibly due to
+| SBI_ERR_INVALID_ADDRESS | `resume_addr` is not valid, possibly due to the
                             following reasons: +
                             * It is not a valid physical address. +
                             * The address is prohibited by PMP or H-extension
