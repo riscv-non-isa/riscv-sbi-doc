@@ -974,8 +974,9 @@ This call is asynchronous -- more specifically, the `sbi_hart_start()` may
 return before the target hart starts executing as long as the SBI implementation
 is capable of ensuring the return code is accurate.
 If the SBI implementation is a platform runtime firmware executing in
-machine-mode (M-mode) then it MUST configure PMP and other M-mode state
-before transferring control to supervisor-mode software.
+machine-mode (M-mode), then it MUST configure any physical memory protection
+it supports, such as that defined by PMP, and other M-mode state, before
+transferring control to supervisor-mode software.
 
 The `hartid` parameter specifies the target hart which is to be started.
 
@@ -998,8 +999,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_INVALID_ADDRESS   | `start_addr` is not valid, possibly due to the
                               following reasons: +
                               * It is not a valid physical address. +
-                              * The address is prohibited by PMP or
-                                H-extension G-stage to run in supervisor-mode.
+                              * The address is prohibited by a physical memory
+                                protection mechanism or H-extension G-stage to
+                                run in supervisor-mode.
 | SBI_ERR_INVALID_PARAM     | `hartid` is not a valid hartid as the
                               corresponding hart cannot be started in supervisor
                               mode.
@@ -1147,8 +1149,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_INVALID_ADDRESS | `resume_addr` is not valid, possibly due to the
                             following reasons: +
                             * It is not a valid physical address. +
-                            * The address is prohibited by PMP or H-extension
-                              G-stage to run in supervisor-mode.
+                            * The address is prohibited by a physical memory
+                              protection mechanism or H-extension G-stage to
+                              run in supervisor-mode.
 | SBI_ERR_FAILED          | The suspend request failed for unknown reasons.
 |===
 
