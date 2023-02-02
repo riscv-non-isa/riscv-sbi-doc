@@ -62,6 +62,7 @@ https://creativecommons.org/licenses/by/4.0/.
 === Version 2.0-rc1
 
 * Added common description for shared memory physical address range parameter
+* Added SBI debug console extension
 
 === Version 1.0.0
 
@@ -1706,6 +1707,137 @@ The possible error codes returned in `sbiret.error` are shown in the
 | sbi_pmu_counter_start           | 0.3         | 3   | 0x504D55
 | sbi_pmu_counter_stop            | 0.3         | 4   | 0x504D55
 | sbi_pmu_counter_fw_read         | 0.3         | 5   | 0x504D55
+|===
+
+== Debug Console Extension (EID #0x4442434E "DBCN")
+
+The debug console extension defines a generic mechanism for debugging
+and boot-time early prints from supervisor-mode software.
+
+This extension replaces the legacy console putchar (EID #0x01) and
+console getchar (EID #0x02) extensions. The debug console extension
+allows supervisor-mode software to write or read multiple bytes in
+a single SBI call.
+
+If the underlying physical console has extra bits for error checking
+(or correction) then these extra bits should be handled by the SBI
+implementation.
+
+*NOTE:* It is recommended that bytes sent/received using the debug
+console extension follow UTF-8 character encoding.
+
+=== Function: Console Write (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_debug_console_write(unsigned long num_bytes,
+                                      unsigned long base_addr_lo,
+                                      unsigned long base_addr_hi)
+----
+
+Write bytes to the debug console from input memory.
+
+The `num_bytes` parameter specifies the number of bytes in the input
+memory. The physical base address of the input memory is represented
+by two XLEN bits wide parameters. The `base_addr_lo` parameter specifies
+the lower XLEN bits and the `base_addr_hi` parameter specifies the upper
+XLEN bits of the input memory physical base address.
+
+This is a non-blocking SBI call and it may do partial/no writes if
+the debug console is not able to accept more bytes.
+
+The number of bytes written is returned in `sbiret.value` and the
+possible error codes returned in `sbiret.error` are shown in
+<<table_debug_console_write_errors>> below.
+
+[#table_debug_console_write_errors]
+.Debug Console Write Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Bytes written successfully.
+| SBI_ERR_INVALID_PARAM | The memory pointed to by the `num_bytes`,
+                          `base_addr_lo`, and `base_addr_hi` parameters
+                          does not satisfy the requirements described in the
+                          <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_FAILED        | Failed to write due to I/O errors.
+|===
+
+=== Function: Console Read (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_debug_console_read(unsigned long num_bytes,
+                                      unsigned long base_addr_lo,
+                                      unsigned long base_addr_hi)
+----
+
+Read bytes from the debug console into an output memory.
+
+The `num_bytes` parameter specifies the maximum number of bytes which
+can be written into the output memory. The physical base address of
+the output memory is represented by two XLEN bits wide parameters.
+The `base_addr_lo` parameter specifies the lower XLEN bits and the
+`base_addr_hi` parameter specifies the upper XLEN bits of the output
+memory physical base address.
+
+This is a non-blocking SBI call and it will not write anything
+into the output memory if there are no bytes to be read in the
+debug console.
+
+The number of bytes read is returned in `sbiret.value` and the
+possible error codes returned in `sbiret.error` are shown in
+<<table_debug_console_read_errors>> below.
+
+[#table_debug_console_read_errors]
+.Debug Console Read Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Bytes read successfully.
+| SBI_ERR_INVALID_PARAM | The memory pointed to by the `num_bytes`,
+                          `base_addr_lo`, and `base_addr_hi` parameters
+                          does not satisfy the requirements described in the
+                          <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_FAILED        | Failed to read due to I/O errors.
+|===
+
+=== Function: Console Write Byte (FID #2)
+
+[source, C]
+----
+struct sbiret sbi_debug_console_write_byte(uint8_t byte)
+----
+
+Write a single byte to the debug console.
+
+This is a blocking SBI call and it will only return after writing
+the specified byte to the debug console. It will also return, with
+SBI_ERR_FAILED, if there are I/O errors.
+
+The `sbiret.value` is set to zero and the possible error codes returned
+in `sbiret.error` are shown in <<table_debug_console_write_byte_errors>>
+below.
+
+[#table_debug_console_write_byte_errors]
+.Debug Console Write Byte Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Byte written successfully.
+| SBI_ERR_FAILED        | Failed to write the byte due to I/O errors.
+|===
+
+=== Function Listing
+
+[#table_dbcn_function_list]
+.DBCN Function List
+[cols="5,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name                   | SBI Version | FID | EID
+| sbi_debug_console_write         | 2.0         | 0   | 0x4442434E
+| sbi_debug_console_read          | 2.0         | 1   | 0x4442434E
+| sbi_debug_console_write_byte    | 2.0         | 2   | 0x4442434E
 |===
 
 == Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
