@@ -266,6 +266,10 @@ address range MUST satisfy the following requirements:
   to prevent the loss of coherence and memory ordering.
 * The data in the shared memory MUST follow little-endian byte ordering.
 
+It is recommended that a memory physical address passed to an SBI function
+should use at least two `unsigned long` parameters to support platforms
+which have memory physical addresses wider than XLEN bits.
+
 == Base Extension (EID #0x10)
 
 The base extension is designed to be as small as possible. As such, it only
@@ -958,6 +962,10 @@ below.
 2+|All other registers remain in an undefined state.
 |===
 
+*NOTE:* A single `unsigned long` parameter is sufficient as `start_addr`,
+because the hart will start execution in the supervisor-mode with MMU off,
+hence the `start_addr` must be less than XLEN bits wide.
+
 This call is asynchronous -- more specifically, the `sbi_hart_start()` may
 return before the target hart starts executing as long as the SBI implementation
 is capable of ensuring the return code is accurate.
@@ -1090,6 +1098,10 @@ values described in the <<table_hsm_hart_resume_regs>> below.
 |a1            | `opaque` parameter
 2+|All other registers remain in an undefined state.
 |===
+
+*NOTE:* A single `unsigned long` parameter is sufficient for `resume_addr`,
+because the hart will resume execution in the supervisor-mode with MMU off,
+hence the `resume_addr` must be less than XLEN bits wide.
 
 The `suspend_type` parameter is 32 bits wide and the possible values are
 shown in <<table_hsm_hart_suspend_types>> below.
