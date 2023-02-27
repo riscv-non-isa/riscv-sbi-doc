@@ -950,9 +950,8 @@ struct sbiret sbi_hart_start(unsigned long hartid,
 ----
 
 Request the SBI implementation to start executing the target hart in
-supervisor-mode at address specified by `start_addr` parameter with
-specific registers values described in the <<table_hsm_hart_start_regs>>
-below.
+supervisor-mode, at the address specified by `start_addr`, with the
+specific register values described in <<table_hsm_hart_start_regs>>.
 
 [#table_hsm_hart_start_regs]
 .HSM Hart Start Register State
@@ -1143,7 +1142,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 [cols="1,2", width=100%, align="center", options="header"]
 |===
 | Error code              | Description
-| SBI_SUCCESS             | Hart has suspended and resumed back successfully
+| SBI_SUCCESS             | Hart has suspended and resumed successfully
                             from a retentive suspend state.
 | SBI_ERR_INVALID_PARAM   | `suspend_type` is reserved or is platform-specific
                             and unimplemented.
