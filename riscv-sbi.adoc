@@ -70,6 +70,7 @@ https://creativecommons.org/licenses/by/4.0/.
 * Added SBI CPPC extension
 * Clarified that an SBI extension can be partially implemented only if it
   defines a mechanism to discover implemented SBI functions
+* Added error code SBI_ERR_NO_SHMEM
 
 === Version 1.0.0
 
@@ -219,6 +220,7 @@ error codes.
 |  SBI_ERR_ALREADY_AVAILABLE | -6
 |  SBI_ERR_ALREADY_STARTED   | -7
 |  SBI_ERR_ALREADY_STOPPED   | -8
+|  SBI_ERR_NO_SHMEM          | -9
 |===
 
 An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
