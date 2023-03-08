@@ -94,6 +94,8 @@ include::src/ext-nested-acceleration.adoc[]
 
 include::src/ext-steal-time.adoc[]
 
+include::src/ext-sse.adoc[]
+
 include::src/ext-experimental.adoc[]
 
 include::src/ext-vendor.adoc[]
