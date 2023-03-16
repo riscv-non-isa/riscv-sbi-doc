@@ -1897,7 +1897,7 @@ below.
 | sbi_debug_console_write_byte    | 2.0         | 2   | 0x4442434E
 |===
 
-== SBI System Suspend Extension (EID #0x53555350 "SUSP")
+== System Suspend Extension (EID #0x53555350 "SUSP")
 
 The system suspend extension defines a set of system-level sleep states and a
 function which allows the supervisor-mode software to request that the system
@@ -2184,15 +2184,15 @@ The possible error codes returned in `sbiret.error` are shown in
 | sbi_cppc_write      | 2.0         |  3  | 0x43505043
 |===
 
-== Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
+== Experimental Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
 
 No management.
 
-== Vendor-Specific SBI Extension Space (EIDs #0x09000000 - #0x09FFFFFF)
+== Vendor Specific Extension Space (EIDs #0x09000000 - #0x09FFFFFF)
 
 Low bits from `mvendorid`.
 
-== Firmware Specific SBI Extension Space (EIDs #0x0A000000 - #0x0AFFFFFF)
+== Firmware Specific Extension Space (EIDs #0x0A000000 - #0x0AFFFFFF)
 
 Low bits is SBI implementation ID. The firmware specific SBI extensions are
 for SBI implementations. It provides firmware specific SBI functions which
