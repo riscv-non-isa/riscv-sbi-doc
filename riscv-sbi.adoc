@@ -151,14 +151,14 @@ This specification uses the following terms and abbreviations:
 |===
 | Term  | Meaning
 
-| SBI   | Supervisor Binary Interface
-| SEE   | Supervisor Execution Environment
+| ASID  | Address Space Identifier
 | EID   | Extension ID
 | FID   | Function ID
 | HSM   | Hart State Management
-| PMU   | Performance Monitoring Unit
 | IPI   | Inter Processor Interrupt
-| ASID  | Address Space Identifier
+| PMU   | Performance Monitoring Unit
+| SBI   | Supervisor Binary Interface
+| SEE   | Supervisor Execution Environment
 | VMID  | Virtual Machine Identifier
 |===
 
