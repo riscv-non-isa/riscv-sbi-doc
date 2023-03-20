@@ -67,6 +67,7 @@ https://creativecommons.org/licenses/by/4.0/.
 * Added sbi_pmu_counter_fw_read_hi() in SBI PMU extension
 * Reserved space for SBI implementation specific firmware events
 * Added SBI system suspend extension
+* Added SBI CPPC extension
 
 === Version 1.0.0
 
@@ -151,7 +152,10 @@ This specification uses the following terms and abbreviations:
 |===
 | Term  | Meaning
 
+| ACPI  | Advanced Configuration and Power Interface
 | ASID  | Address Space Identifier
+| BMC   | Baseboard Management Controller
+| CPPC  | Collaborative Processor Performance Control
 | EID   | Extension ID
 | FID   | Function ID
 | HSM   | Hart State Management
@@ -2010,6 +2014,173 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Function Name       | SBI Version | FID | EID
 | sbi_system_suspend  | 2.0         |  0  | 0x53555350
+|===
+
+== CPPC Extension (EID #0x43505043 "CPPC")
+
+ACPI defines the Collaborative Processor Performance Control (CPPC) mechanism,
+which is an abstract and flexible mechanism for the supervisor-mode
+power-management software to collaborate with an entity in the platform to
+manage the performance of the processors.
+
+The SBI CPPC extension provides an abstraction to access the CPPC registers
+through SBI calls. The CPPC registers can be memory locations shared with a
+separate platform entity such as a BMC. Even though CPPC is defined in the ACPI
+specification, it may be possible to implement a CPPC driver based on
+Device Tree.
+
+<<table_cppc_registers>> defines 32-bit identifiers for all CPPC registers
+to be used by the SBI CPPC functions. The first half of the 32-bit register
+space corresponds to the registers as defined by the ACPI specification.
+The second half provides the information not defined in the ACPI specification,
+but is additionally required by the supervisor-mode power-management software.
+
+[#table_cppc_registers]
+.CPPC Registers
+[cols="1,2,1,1,3", width=100%, align="center", options="header"]
+|===
+| Register ID | Register                              | Bit Width | Attribute    | Description
+| 0x00000000  | HighestPerformance                    | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.1
+| 0x00000001  | NominalPerformance                    | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.2
+| 0x00000002  | LowestNonlinearPerformance            | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.4
+| 0x00000003  | LowestPerformance                     | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.5
+| 0x00000004  | GuaranteedPerformanceRegister         | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.6
+| 0x00000005  | DesiredPerformanceRegister            | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.2.3
+| 0x00000006  | MinimumPerformanceRegister            | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.2.2
+| 0x00000007  | MaximumPerformanceRegister            | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.2.1
+| 0x00000008  | PerformanceReductionToleranceRegister | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.2.4
+| 0x00000009  | TimeWindowRegister                    | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.2.5
+| 0x0000000A  | CounterWraparoundTime                 | 32 / 64   | Read-only    | ACPI Spec 6.5: 8.4.6.1.3.1
+| 0x0000000B  | ReferencePerformanceCounterRegister   | 32 / 64   | Read-only    | ACPI Spec 6.5: 8.4.6.1.3.1
+| 0x0000000C  | DeliveredPerformanceCounterRegister   | 32 / 64   | Read-only    | ACPI Spec 6.5: 8.4.6.1.3.1
+| 0x0000000D  | PerformanceLimitedRegister            | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.3.2
+| 0x0000000E  | CPPCEnableRegister                    | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.4
+| 0x0000000F  | AutonomousSelectionEnable             | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.5
+| 0x00000010  | AutonomousActivityWindowRegister      | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.6
+| 0x00000011  | EnergyPerformancePreferenceRegister   | 32        | Read / Write | ACPI Spec 6.5: 8.4.6.1.7
+| 0x00000012  | ReferencePerformance                  | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.3
+| 0x00000013  | LowestFrequency                       | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.7
+| 0x00000014  | NominalFrequency                      | 32        | Read-only    | ACPI Spec 6.5: 8.4.6.1.1.7
+| 0x00000015 - 0x7FFFFFFF |                           |           |              | Reserved for future use.
+| 0x80000000  | TransitionLatency                     | 32        | Read-only    | Provides the maximum (worst-case) performance
+                                                                                   state transition latency in nanoseconds.
+| 0x80000001 - 0xFFFFFFFF |                           |           |              | Reserved for future use.
+|===
+
+=== Function: Probe CPPC register (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_cppc_probe(uint32_t cppc_reg_id)
+----
+Probe whether the CPPC register as specified by the `cppc_reg_id` parameter
+is implemented or not by the platform.
+
+If the register is implemented, `sbiret.value` will contain the register
+width. If the register is not implemented, `sbiret.value` will be set to 0.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_cppc_probe_errors>>.
+
+[#table_cppc_probe_errors]
+.CPPC Probe Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Probe completed successfully.
+| SBI_ERR_INVALID_PARAM   | `cppc_reg_id` is reserved.
+| SBI_ERR_FAILED          | The probe request failed for unspecified or
+                            unknown other reasons.
+|===
+
+=== Function: Read CPPC register (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_cppc_read(uint32_t cppc_reg_id)
+----
+Reads the register as specified in the `cppc_reg_id` parameter and returns the
+value in `sbiret.value`. When supervisor mode XLEN is 32, the `sbiret.value`
+will only contain the lower 32 bits of the CPPC register value.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_cppc_read_errors>>.
+
+[#table_cppc_read_errors]
+.CPPC Read Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Read completed successfully.
+| SBI_ERR_INVALID_PARAM   | `cppc_reg_id` is reserved.
+| SBI_ERR_NOT_SUPPORTED   | `cppc_reg_id` is not implemented by the platform.
+| SBI_ERR_DENIED          | `cppc_reg_id` is a write-only register.
+| SBI_ERR_FAILED          | The read request failed for unspecified or
+                            unknown other reasons.
+|===
+
+=== Function: Read CPPC register high bits (FID #2)
+
+[source, C]
+----
+struct sbiret sbi_cppc_read_hi(uint32_t cppc_reg_id)
+----
+Reads the upper 32-bit value of the register specified in the `cppc_reg_id`
+parameter and returns the value in `sbiret.value`. This function always
+returns zero in `sbiret.value` when supervisor mode XLEN is 64 or higher.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_cppc_read_hi_errors>>.
+
+[#table_cppc_read_hi_errors]
+.CPPC Read Hi Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Read completed successfully.
+| SBI_ERR_INVALID_PARAM   | `cppc_reg_id` is reserved.
+| SBI_ERR_NOT_SUPPORTED   | `cppc_reg_id` is not implemented by the platform.
+| SBI_ERR_DENIED          | `cppc_reg_id` is a write-only register.
+| SBI_ERR_FAILED          | The read request failed for unspecified or
+                            unknown other reasons.
+|===
+
+=== Function: Write to CPPC register (FID #3)
+
+[source, C]
+----
+struct sbiret sbi_cppc_write(uint32_t cppc_reg_id, uint64_t val)
+----
+Writes the value passed in the `val` parameter to the register as
+specified in the `cppc_reg_id` parameter.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_cppc_write_errors>>.
+
+[#table_cppc_write_errors]
+.CPPC Write Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Write completed successfully.
+| SBI_ERR_INVALID_PARAM   | `cppc_reg_id` is reserved.
+| SBI_ERR_NOT_SUPPORTED   | `cppc_reg_id` is not implemented by the platform.
+| SBI_ERR_DENIED          | `cppc_reg_id` is a read-only register.
+| SBI_ERR_FAILED          | The write request failed for unspecified or
+                            unknown other reasons.
+|===
+
+=== Function Listing
+
+[#table_cppc_function_list]
+.CPPC Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name       | SBI Version | FID | EID
+| sbi_cppc_probe      | 2.0         |  0  | 0x43505043
+| sbi_cppc_read       | 2.0         |  1  | 0x43505043
+| sbi_cppc_read_hi    | 2.0         |  2  | 0x43505043
+| sbi_cppc_write      | 2.0         |  3  | 0x43505043
 |===
 
 == Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
