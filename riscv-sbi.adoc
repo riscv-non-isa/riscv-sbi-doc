@@ -208,19 +208,19 @@ error codes.
 
 [#table_standard_sbi_errors]
 .Standard SBI Errors
-[cols="4,1", width=70%, align="center", options="header"]
+[cols="4,1,4", width=90%, align="center", options="header"]
 |===
-|  Error Type                |Value
-|  SBI_SUCCESS               |  0
-|  SBI_ERR_FAILED            | -1
-|  SBI_ERR_NOT_SUPPORTED     | -2
-|  SBI_ERR_INVALID_PARAM     | -3
-|  SBI_ERR_DENIED            | -4
-|  SBI_ERR_INVALID_ADDRESS   | -5
-|  SBI_ERR_ALREADY_AVAILABLE | -6
-|  SBI_ERR_ALREADY_STARTED   | -7
-|  SBI_ERR_ALREADY_STOPPED   | -8
-|  SBI_ERR_NO_SHMEM          | -9
+|  Error Type                | Value | Description
+|  SBI_SUCCESS               |  0    | Completed successfully
+|  SBI_ERR_FAILED            | -1    | Failed
+|  SBI_ERR_NOT_SUPPORTED     | -2    | Not supported
+|  SBI_ERR_INVALID_PARAM     | -3    | Invalid parameter(s)
+|  SBI_ERR_DENIED            | -4    | Denied or not allowed
+|  SBI_ERR_INVALID_ADDRESS   | -5    | Invalid address(s)
+|  SBI_ERR_ALREADY_AVAILABLE | -6    | Already available
+|  SBI_ERR_ALREADY_STARTED   | -7    | Already started
+|  SBI_ERR_ALREADY_STOPPED   | -8    | Already stopped
+|  SBI_ERR_NO_SHMEM          | -9    | Shared memory not available
 |===
 
 An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
