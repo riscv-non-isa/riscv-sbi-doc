@@ -8,7 +8,7 @@ the only interface between them, as well as the Hypervisor extended-Supervisor
 (HS) and Virtualized Supervisor (VS).
 
 Discussion of SBI occurs on the
-https://lists.riscv.org/g/tech-unixplatformspec[RISC-V Unix Platform Mailing
+https://lists.riscv.org/g/tech-prs[RISC-V Platform Runtime Services 
 list]. It is publicly readable but posting requires being a member of the
 RISC-V Foundation. Any new SBI extension needs to be discussed and approved
 there before being merged.
