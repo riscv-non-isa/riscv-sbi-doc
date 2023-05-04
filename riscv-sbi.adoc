@@ -72,6 +72,7 @@ https://creativecommons.org/licenses/by/4.0/.
   defines a mechanism to discover implemented SBI functions
 * Added error code SBI_ERR_NO_SHMEM
 * Added SBI nested acceleration extension
+* Added common description for a virtual HART
 
 === Version 1.0.0
 
@@ -146,6 +147,11 @@ image::riscv-sbi-intro1.png[width=524,height=218]
 [#fig_intro2]
 .RISC-V System with H-extension
 image::riscv-sbi-intro2.png[width=800,height=350]
+
+HARTs are provisioned by the SBI implementation for supervisor-mode software.
+Hence, from the perspective of the SBI implementation, the S-mode HART contexts
+are referred to as virtual HARTs. In the case that the implementation is a
+hypervisor, virtual HARTs represent the VS-mode guest contexts.
 
 The SBI specification doesn’t specify any method for hardware discovery.
 The supervisor software must rely on the other industry standard hardware
