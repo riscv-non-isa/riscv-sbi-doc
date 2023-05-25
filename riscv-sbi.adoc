@@ -276,11 +276,13 @@ address range MUST satisfy the following requirements:
   type requested (read and/or write).
 * The SBI implementation MUST access the specified physical memory range
   using the PMA attributes.
-  *NOTE:* If the supervisor-mode software accesses the same physical memory
+
+NOTE: If the supervisor-mode software accesses the same physical memory
   range using a memory type different than the PMA, then a loss of coherence
   or unexpected memory ordering may occur.  The invoking software should
   follow the rules and sequences defined in the RISC-V Svpbmt specification
   to prevent the loss of coherence and memory ordering.
+
 * The data in the shared memory MUST follow little-endian byte ordering.
 
 It is recommended that a memory physical address passed to an SBI function
@@ -979,7 +981,7 @@ specific register values described in <<table_hsm_hart_start_regs>>.
 2+|All other registers remain in an undefined state.
 |===
 
-*NOTE:* A single `unsigned long` parameter is sufficient as `start_addr`,
+NOTE: A single `unsigned long` parameter is sufficient as `start_addr`,
 because the hart will start execution in supervisor-mode with the MMU off,
 hence `start_addr` must be less than XLEN bits wide.
 
@@ -1119,7 +1121,7 @@ values described in the <<table_hsm_hart_resume_regs>> below.
 2+|All other registers remain in an undefined state.
 |===
 
-*NOTE:* A single `unsigned long` parameter is sufficient for `resume_addr`,
+NOTE: A single `unsigned long` parameter is sufficient for `resume_addr`,
 because the hart will resume execution in supervisor-mode with the MMU off,
 hence `resume_addr` must be less than XLEN bits wide.
 
@@ -1350,23 +1352,22 @@ general events and each hardware general event is identified by an unique
                                               CPU cycle
 |===
 
-*NOTE:* The `event_data` (i.e. *event data*) is unused for hardware
-general events and all non-zero values of `event_data` are reserved
-for future use.
+The `event_data` (i.e. *event data*) is unused for hardware general events
+and all non-zero values of `event_data` are reserved for future use.
 
-*NOTE:* A RISC-V platform might halt the CPU clock when it enters WAIT
+NOTE: A RISC-V platform might halt the CPU clock when it enters WAIT
 state using the WFI instruction or enters platform specific SUSPEND state
 using the SBI HSM HART suspend call.
 
-*NOTE:* The *SBI_PMU_HW_CPU_CYCLES* event counts CPU clock cycles as
+NOTE: The *SBI_PMU_HW_CPU_CYCLES* event counts CPU clock cycles as
 counted by the `cycle` CSR. These may be variable frequency cycles, and
 are not counted when the CPU clock is halted.
 
-*NOTE:* The *SBI_PMU_HW_REF_CPU_CYCLES* counts fixed-frequency clock
+NOTE: The *SBI_PMU_HW_REF_CPU_CYCLES* counts fixed-frequency clock
 cycles while the CPU clock is not halted. The fixed-frequency of counting
 might, for example, be the same frequency at which the `time` CSR counts.
 
-*NOTE:* The *SBI_PMU_HW_BUS_CYCLES* counts fixed-frequency clock cycles.
+NOTE: The *SBI_PMU_HW_BUS_CYCLES* counts fixed-frequency clock cycles.
 The fixed-frequency of counting might be the same frequency at which the
 `time` CSR counts, or may be the frequency of the clock at the boundary
 between the HART (and it's private caches) and the rest of the system.
@@ -1421,8 +1422,8 @@ and `event_idx.code.result_id` (i.e. *cache result id*).
 | SBI_PMU_HW_CACHE_RESULT_MISS   |         1 | Cache miss
 |===
 
-*NOTE:* The `event_data` (i.e. *event data*) is unused for hardware cache
-events and all non-zero values of `event_data` are reserved for future use.
+The `event_data` (i.e. *event data*) is unused for hardware cache events
+and all non-zero values of `event_data` are reserved for future use.
 
 === Event: Hardware raw events (Type #2)
 
@@ -1439,7 +1440,7 @@ in the lower 48-bits of `mhpmeventX` CSR and the SBI implementation shall
 determine the value to be programmed in the upper 16 bits of `mhpmeventX`
 CSR.
 
-*Note:* The RISC-V platform hardware implementation may choose to define
+NOTE: The RISC-V platform hardware implementation may choose to define
 the expected value to be written to `mhpmeventX` CSR for a hardware event.
 In case of hardware general/cache events, the RISC-V platform hardware
 implementation may use the zero-extended `event_idx` as the expected
@@ -1503,9 +1504,9 @@ events and each firmware event is identified by an unique `event_idx.code`
                                                  the event encoding.
 |===
 
-*NOTE:* For all firmware events except SBI_PMU_FW_PLATFORM, the `event_data`
-configuration (or parameter) is unused and all non-zero values of `event_data`
-are reserved for future use.
+For all firmware events except SBI_PMU_FW_PLATFORM, the `event_data`
+configuration (or parameter) is unused and all non-zero values of
+`event_data` are reserved for future use.
 
 === Function: Get number of counters (FID #0)
 
@@ -1598,14 +1599,14 @@ shown in the <<table_pmu_counter_cfg_match_flags>> below.
                                              reserved for future use
 |===
 
-*NOTE:* When *SBI_PMU_CFG_FLAG_SKIP_MATCH* is set in `config_flags`, the
+NOTE: When *SBI_PMU_CFG_FLAG_SKIP_MATCH* is set in `config_flags`, the
 SBI implementation will unconditionally select the first counter from the
 set of counters specified by the `counter_idx_base` and `counter_idx_mask`.
 
-*NOTE:* The *SBI_PMU_CFG_FLAG_AUTO_START* flag in `config_flags` has no
+NOTE: The *SBI_PMU_CFG_FLAG_AUTO_START* flag in `config_flags` has no
 impact on the counter value.
 
-*NOTE:* The `config_flags[3:7]` bits are event filtering hints so these
+NOTE: The `config_flags[3:7]` bits are event filtering hints so these
 can be ignored or overridden by the SBI implementation for security concerns
 or due to lack of event filtering support in the underlying RISC-V platform.
 
@@ -1654,7 +1655,7 @@ The bit definitions of the `start_flags` parameter are shown in the
                                               reserved for future use
 |===
 
-*NOTE:* When SBI_PMU_START_SET_INIT_VALUE is not set in `start_flags`,
+NOTE: When SBI_PMU_START_SET_INIT_VALUE is not set in `start_flags`,
 the counter value will not be modified and event counting will start
 from current counter value.
 
@@ -1788,7 +1789,7 @@ If the underlying physical console has extra bits for error checking
 (or correction) then these extra bits should be handled by the SBI
 implementation.
 
-*NOTE:* It is recommended that bytes sent/received using the debug
+NOTE: It is recommended that bytes sent/received using the debug
 console extension follow UTF-8 character encoding.
 
 === Function: Console Write (FID #0)
@@ -1968,7 +1969,7 @@ in <<table_susp_resume_state>>.
 2+|All other registers remain in an undefined state.
 |===
 
-*NOTE:* A single `unsigned long` parameter is sufficient for `resume_addr`,
+NOTE: A single `unsigned long` parameter is sufficient for `resume_addr`,
 because the hart will resume execution in supervisor-mode with the MMU off,
 hence `resume_addr` must be less than XLEN bits wide.
 
