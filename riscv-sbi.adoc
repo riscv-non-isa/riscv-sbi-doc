@@ -30,7 +30,7 @@ endif::[]
 :hide-uri-scheme:
 :stem: latexmath
 :footnote:
-:xrefstyle: short 
+:xrefstyle: short
 
 = RISC-V Supervisor Binary Interface Specification
 :author: RISC-V Platform Runtime Services Task Group
@@ -1566,10 +1566,10 @@ The possible error codes returned in `sbiret.error` are shown in the
 [source, C]
 ----
 struct sbiret sbi_pmu_counter_config_matching(unsigned long counter_idx_base,
-					      unsigned long counter_idx_mask,
-					      unsigned long config_flags,
-					      unsigned long event_idx,
-					      uint64_t event_data)
+                                              unsigned long counter_idx_mask,
+                                              unsigned long config_flags,
+                                              unsigned long event_idx,
+                                              uint64_t event_data)
 ----
 
 Find and configure a counter from a set of counters which is not started
@@ -1637,9 +1637,9 @@ shown in the <<table_pmu_counter_cfg_match_errors>> below.
 [source, C]
 ----
 struct sbiret sbi_pmu_counter_start(unsigned long counter_idx_base,
-				    unsigned long counter_idx_mask,
-				    unsigned long start_flags,
-				    uint64_t initial_value)
+                                    unsigned long counter_idx_mask,
+                                    unsigned long start_flags,
+                                    uint64_t initial_value)
 ----
 
 Start or enable a set of counters on the calling HART with the specified
@@ -1685,8 +1685,8 @@ The possible error codes returned in `sbiret.error` are shown in the
 [source, C]
 ----
 struct sbiret sbi_pmu_counter_stop(unsigned long counter_idx_base,
-				    unsigned long counter_idx_mask,
-				    unsigned long stop_flags)
+                                   unsigned long counter_idx_mask,
+                                   unsigned long stop_flags)
 ----
 
 Stop or disable a set of counters on the calling HART. The `counter_idx_base`
