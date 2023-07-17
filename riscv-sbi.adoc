@@ -72,7 +72,7 @@ https://creativecommons.org/licenses/by/4.0/.
   defines a mechanism to discover implemented SBI functions
 * Added error code SBI_ERR_NO_SHMEM
 * Added SBI nested acceleration extension
-* Added common description for a virtual HART
+* Added common description for a virtual hart
 * Added SBI steal-time accounting extension
 * Added SBI PMU snapshot extension
 
@@ -150,10 +150,10 @@ image::riscv-sbi-intro1.png[width=524,height=218]
 .RISC-V System with H-extension
 image::riscv-sbi-intro2.png[width=800,height=350]
 
-HARTs are provisioned by the SBI implementation for supervisor-mode software.
-Hence, from the perspective of the SBI implementation, the S-mode HART contexts
-are referred to as virtual HARTs. In the case that the implementation is a
-hypervisor, virtual HARTs represent the VS-mode guest contexts.
+Harts are provisioned by the SBI implementation for supervisor-mode software.
+Hence, from the perspective of the SBI implementation, the S-mode hart contexts
+are referred to as virtual harts. In the case that the implementation is a
+hypervisor, virtual harts represent the VS-mode guest contexts.
 
 The SBI specification doesn’t specify any method for hardware discovery.
 The supervisor software must rely on the other industry standard hardware
@@ -240,7 +240,7 @@ the specification simple and easily adaptable for all RISC-V ISA types.
 In case the data is defined as 32bit wide, higher privilege software must
 ensure that it only uses 32 bit data only.
 
-=== HART list parameter
+=== Hart list parameter
 
 If an SBI function needs to pass a list of harts to the higher privilege mode,
 it must use a hart mask as defined below. This is applicable to any extensions
@@ -263,7 +263,7 @@ Any function using hart mask may return error values listed in the
 specific error values.
 
 [#table_hart_mask_errors]
-.HART Mask Errors
+.Hart Mask Errors
 [cols="1,2", width=90%, align="center", options="header"]
 |===
 | Error code            | Description
@@ -965,7 +965,7 @@ following approaches:
 .. Always prefer most recent suspend state requested for higher topology
    group
 
-=== Function: HART start (FID #0)
+=== Function: Hart start (FID #0)
 
 [source, C]
 ----
@@ -1034,7 +1034,7 @@ The possible error codes returned in `sbiret.error` are shown in the
                               unknown other reasons.
 |===
 
-=== Function: HART stop (FID #1)
+=== Function: Hart stop (FID #1)
 
 [source, C]
 ----
@@ -1057,7 +1057,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_ERR_FAILED | Failed to stop execution of the current hart
 |===
 
-=== Function: HART get status (FID #2)
+=== Function: Hart get status (FID #2)
 
 [source, C]
 ----
@@ -1089,7 +1089,7 @@ The harts may transition HSM states at any time due to any concurrent
 the return value from this function may not represent the actual state
 of the hart at the time of return value verification.
 
-=== Function: HART suspend (FID #3)
+=== Function: Hart suspend (FID #3)
 
 [source, C]
 ----
@@ -1312,7 +1312,7 @@ bits wide.
 The SBI PMU extension provides:
 
 1. An interface for supervisor-mode software to discover and configure
-   per-HART hardware/firmware counters
+   per-hart hardware/firmware counters
 2. A typical https://en.wikipedia.org/wiki/Perf_(Linux)[perf] compatible
    interface for hardware/firmware performance counters and events
 3. Full access to microarchitecture's raw event encodings
@@ -1366,7 +1366,7 @@ and all non-zero values of `event_data` are reserved for future use.
 
 NOTE: A RISC-V platform might halt the CPU clock when it enters WAIT
 state using the WFI instruction or enters platform specific SUSPEND state
-using the SBI HSM HART suspend call.
+using the SBI HSM hart suspend call.
 
 NOTE: The *SBI_PMU_HW_CPU_CYCLES* event counts CPU clock cycles as
 counted by the `cycle` CSR. These may be variable frequency cycles, and
@@ -1379,7 +1379,7 @@ might, for example, be the same frequency at which the `time` CSR counts.
 NOTE: The *SBI_PMU_HW_BUS_CYCLES* counts fixed-frequency clock cycles.
 The fixed-frequency of counting might be the same frequency at which the
 `time` CSR counts, or may be the frequency of the clock at the boundary
-between the HART (and it's private caches) and the rest of the system.
+between the hart (and it's private caches) and the rest of the system.
 
 === Event: Hardware cache events (Type #1)
 
@@ -1472,37 +1472,37 @@ events and each firmware event is identified by an unique `event_idx.code`
 | SBI_PMU_FW_ACCESS_STORE              |    3 | Store access trap event
 | SBI_PMU_FW_ILLEGAL_INSN              |    4 | Illegal instruction trap event
 | SBI_PMU_FW_SET_TIMER                 |    5 | Set timer event
-| SBI_PMU_FW_IPI_SENT                  |    6 | Sent IPI to other HART event
+| SBI_PMU_FW_IPI_SENT                  |    6 | Sent IPI to other hart event
 | SBI_PMU_FW_IPI_RECEIVED              |    7 | Received IPI from other
-                                                HART event
+                                                hart event
 | SBI_PMU_FW_FENCE_I_SENT              |    8 | Sent FENCE.I request to
-                                                other HART event
+                                                other hart event
 | SBI_PMU_FW_FENCE_I_RECEIVED          |    9 | Received FENCE.I request
-                                                from other HART event
+                                                from other hart event
 | SBI_PMU_FW_SFENCE_VMA_SENT           |   10 | Sent SFENCE.VMA request
-                                                to other HART event
+                                                to other hart event
 | SBI_PMU_FW_SFENCE_VMA_RECEIVED       |   11 | Received SFENCE.VMA request
-                                                from other HART event
+                                                from other hart event
 | SBI_PMU_FW_SFENCE_VMA_ASID_SENT      |   12 | Sent SFENCE.VMA with ASID
-                                                request to other HART event
+                                                request to other hart event
 | SBI_PMU_FW_SFENCE_VMA_ASID_RECEIVED  |   13 | Received SFENCE.VMA with ASID
-                                                request from other HART event
+                                                request from other hart event
 | SBI_PMU_FW_HFENCE_GVMA_SENT          |   14 | Sent HFENCE.GVMA request to
-                                                other HART event
+                                                other hart event
 | SBI_PMU_FW_HFENCE_GVMA_RECEIVED      |   15 | Received HFENCE.GVMA request
-                                                from other HART event
+                                                from other hart event
 | SBI_PMU_FW_HFENCE_GVMA_VMID_SENT     |   16 | Sent HFENCE.GVMA with VMID
-                                                request to other HART event
+                                                request to other hart event
 | SBI_PMU_FW_HFENCE_GVMA_VMID_RECEIVED |   17 | Received HFENCE.GVMA with VMID
-                                                request from other HART event
+                                                request from other hart event
 | SBI_PMU_FW_HFENCE_VVMA_SENT          |   18 | Sent HFENCE.VVMA request to
-                                                other HART event
+                                                other hart event
 | SBI_PMU_FW_HFENCE_VVMA_RECEIVED      |   19 | Received HFENCE.VVMA request
-                                                from other HART event
+                                                from other hart event
 | SBI_PMU_FW_HFENCE_VVMA_ASID_SENT     |   20 | Sent HFENCE.VVMA with ASID
-                                                request to other HART event
+                                                request to other hart event
 | SBI_PMU_FW_HFENCE_VVMA_ASID_RECEIVED |   21 | Received HFENCE.VVMA with ASID
-                                                request from other HART event
+                                                request from other hart event
 | Reserved                             | 22 - 255 | Reserved for future use
 | Implementation specific events       | 256 - 65534 | SBI implementation
                                                        specific firmware events
@@ -1644,7 +1644,7 @@ struct sbiret sbi_pmu_counter_start(unsigned long counter_idx_base,
                                     uint64_t initial_value)
 ----
 
-Start or enable a set of counters on the calling HART with the specified
+Start or enable a set of counters on the calling hart with the specified
 initial value. The `counter_idx_base` and `counter_idx_mask` parameters
 represent the set of counters whereas the `initial_value` parameter
 specifies the initial value of the counter.
@@ -1704,7 +1704,7 @@ struct sbiret sbi_pmu_counter_stop(unsigned long counter_idx_base,
                                    unsigned long stop_flags)
 ----
 
-Stop or disable a set of counters on the calling HART. The `counter_idx_base`
+Stop or disable a set of counters on the calling hart. The `counter_idx_base`
 and `counter_idx_mask` parameters represent the set of counters. The bit
 definitions of the `stop_flags` parameter are shown in the
 <<table_pmu_counter_stop_flags>> below.
@@ -2808,17 +2808,17 @@ returned in `sbiret.error` upon failure are shown in
 
 == Steal-time Accounting Extension (EID #0x535441 "STA")
 
-SBI implementations may encounter situations where virtual HARTs are ready to
+SBI implementations may encounter situations where virtual harts are ready to
 run, but must be withheld from running. These situations may be, for example,
 when multiple SBI domains share processors or when an SBI implementation is a
 hypervisor and guest contexts share processors with other guest contexts or
-host tasks. When virtual HARTs are at times withheld from running, observers
-within the contexts of the virtual HARTs may need a way to account for less
-progress than would otherwise be expected. The time a virtual HART was ready,
+host tasks. When virtual harts are at times withheld from running, observers
+within the contexts of the virtual harts may need a way to account for less
+progress than would otherwise be expected. The time a virtual hart was ready,
 but had to wait, is called "stolen time" and the tracking of it is referred to
 as steal-time accounting. The Steal-time Accounting (STA) extension defines the
 mechanism in which an SBI implementation provides steal-time and preemption
-information, for each virtual HART, to supervisor-mode software.
+information, for each virtual hart, to supervisor-mode software.
 
 === Function: Set Steal-time Shared Memory Address (FID #0)
 
@@ -2830,7 +2830,7 @@ struct sbiret sbi_steal_time_set_shmem(unsigned long shmem_phys_lo,
 ----
 
 Set the shared memory physical base address for steal-time accounting of the
-calling virtual HART and enable the SBI implementation's steal-time information
+calling virtual hart and enable the SBI implementation's steal-time information
 reporting.
 
 If `shmem_phys_lo` and `shmem_phys_hi` are not all-ones bitwise, then
@@ -2841,7 +2841,7 @@ least 64 bytes. All bytes MUST be set to zero by the SBI implementation before
 returning from the SBI call.
 
 If `shmem_phys_lo` and `shmem_phys_hi` are all-ones bitwise, the SBI
-implementation will stop reporting steal-time information for the virtual HART.
+implementation will stop reporting steal-time information for the virtual hart.
 
 `flags` MUST be set to zero.
 
@@ -2885,17 +2885,17 @@ The shared memory layout is defined in <<table_sta_shmem_structure>>
                               fields of the shared memory. Such extensions will
                               not be enabled as long as a zero value is used for
                               the flags argument to the SBI call._
-| steal     | 8      | 8    | The amount of time in which this virtual HART was
+| steal     | 8      | 8    | The amount of time in which this virtual hart was
                               not idle and scheduled out, in nanoseconds. The
-                              time during which the virtual HART is idle will
+                              time during which the virtual hart is idle will
                               not be reported as steal-time.
 | preempted | 16     | 1    | An advisory flag indicating whether the virtual
-                              HART which registered this structure is running or
+                              hart which registered this structure is running or
                               not. A non-zero value MAY be written by the
-                              SBI implementation if the virtual HART has been
+                              SBI implementation if the virtual hart has been
                               preempted (i.e. while the `steal` field is
                               increasing), while a zero value MUST be written
-                              before the virtual HART starts to run again. +
+                              before the virtual hart starts to run again. +
                                                                            +
                               _This preempted field can, for example, be used
                               by the supervisor-mode software to check if a
