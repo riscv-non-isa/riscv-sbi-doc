@@ -2010,9 +2010,9 @@ transitions to a sleep state. Sleep states are identified with 32-bit wide
 identifiers (`sleep_type`). The possible values for the identifiers are shown
 in <<table_susp_sleep_types>>.
 
-The term "system" refers to the world-view of supervisor software. The
-underlying SBI implementation may be provided by machine mode firmware or a
-hypervisor.
+The term "system" refers to the world-view of the supervisor software domain
+invoking the call. System suspend may only suspend the part of the overall
+system which is visible to the invoking supervisor software domain.
 
 The system suspend extension does not provide any way for supported sleep types
 to be probed. Platforms are expected to specify their supported system sleep
@@ -2084,9 +2084,8 @@ resumption from the system sleep state is platform specific and beyond the
 scope of this specification.
 
 When supervisor software is running inside a virtual machine, the SBI
-implementation is provided by a hypervisor. The system suspend will behave
-functionally the same as the native case, but might not result in any physical
-power changes.
+implementation is provided by a hypervisor. System suspend will behave
+similarly to the native case from the point of view of the supervisor software.
 
 The possible error codes returned in `sbiret.error` are shown in
 <<table_susp_errors>>.
