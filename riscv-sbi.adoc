@@ -2108,6 +2108,8 @@ The possible error codes returned in `sbiret.error` are shown in
                             * Executable access to the address is prohibited by
                               a physical memory protection mechanism or
                               H-extension G-stage for supervisor mode.
+| SBI_ERR_DENIED          | The suspend request failed due to unsatisfied entry
+                            criteria.
 | SBI_ERR_FAILED          | The suspend request failed for unspecified or
                             unknown other reasons.
 |===
