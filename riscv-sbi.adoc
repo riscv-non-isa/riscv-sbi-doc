@@ -2851,8 +2851,13 @@ implementation MUST not misbehave if a write from supervisor-mode software
 occurs, however, in that case, it MAY leave the shared memory filled with
 inconsistent data.
 
-The SBI implementation MUST stop writing to the shared memory upon system
-reset.
+The SBI implementation MUST stop writing to the shared memory when the
+supervisor-mode software is not runnable, such as upon system reset or system
+suspend.
+
+NOTE: Not writing to the shared memory when the supervisor-mode software is
+not runnable avoids unnecessary work and supports repeatable capture of a
+system image while the supervisor-mode software is suspended.
 
 The shared memory layout is defined in <<table_sta_shmem_structure>>
 
