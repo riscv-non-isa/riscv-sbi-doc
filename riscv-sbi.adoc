@@ -2352,8 +2352,8 @@ acceleration shared memory.
                                               specification <<priv_v1.12>>.
 |===
 
-The contents of the scratch space shown in the <<table_nacl_shmem_layout>>
-above is defined separately for each nested acceleration feature.
+Any nested acceleration feature may define the contents of the scratch space
+shown in the <<table_nacl_shmem_layout>> above if required.
 
 The contents of the CSR space shown in the <<table_nacl_shmem_layout>>
 above is an array of RISC-V H-extension CSR values where CSR `<x>` is at
