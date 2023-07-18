@@ -1922,6 +1922,7 @@ possible error codes returned in `sbiret.error` are shown in
                           `base_addr_lo`, and `base_addr_hi` parameters
                           does not satisfy the requirements described in the
                           <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_DENIED        | Writes to the debug console is not allowed.
 | SBI_ERR_FAILED        | Failed to write due to I/O errors.
 |===
 
@@ -1961,6 +1962,7 @@ possible error codes returned in `sbiret.error` are shown in
                           `base_addr_lo`, and `base_addr_hi` parameters
                           does not satisfy the requirements described in the
                           <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_DENIED        | Reads from the debug console is not allowed.
 | SBI_ERR_FAILED        | Failed to read due to I/O errors.
 |===
 
@@ -1987,6 +1989,7 @@ below.
 |===
 | Error code            | Description
 | SBI_SUCCESS           | Byte written successfully.
+| SBI_ERR_DENIED        | Write to the debug console is not allowed.
 | SBI_ERR_FAILED        | Failed to write the byte due to I/O errors.
 |===
 
