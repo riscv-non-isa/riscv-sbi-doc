@@ -40,7 +40,7 @@ endif::[]
 [WARNING]
 .This document is in the link:http://riscv.org/spec-state[Development state]
 ====
-Assume everything can change but backward compatibility with perviously
+Assume everything can change but backward compatibility with previously
 ratified specification will be maintained.
 ====
 
@@ -58,6 +58,11 @@ https://creativecommons.org/licenses/by/4.0/.
 
 [preface]
 == Change Log
+
+=== Version 2.0-rc2
+* Added clarification for SUSP, NACL & STA extensions.
+* Standardization of hart usage.
+* Added an error code in SBI DBCN extension. 
 
 === Version 2.0-rc1
 
