@@ -433,9 +433,7 @@ memory on behalf of the supervisor are redirected back to the supervisor
 with `sepc` CSR pointing to the faulting `ECALL` instruction.
 
 The legacy SBI extensions is deprecated in favor of the other extensions
-listed below. The legacy console SBI functions (`sbi_console_getchar()`
-and `sbi_console_putchar()`) are expected to be deprecated; they have
-no replacement.
+listed below.
 
 === Extension: Set Timer (EID #0x00)
 
@@ -582,8 +580,8 @@ This SBI call doesn't return irrespective whether it succeeds or fails.
 |===
 | Function Name             | SBI Version | FID | EID       | Replacement EID
 | sbi_set_timer             | 0.1         |   0 | 0x00      | 0x54494D45
-| sbi_console_putchar       | 0.1         |   0 | 0x01      | N/A
-| sbi_console_getchar       | 0.1         |   0 | 0x02      | N/A
+| sbi_console_putchar       | 0.1         |   0 | 0x01      | 0x4442434E
+| sbi_console_getchar       | 0.1         |   0 | 0x02      | 0x4442434E
 | sbi_clear_ipi             | 0.1         |   0 | 0x03      | N/A
 | sbi_send_ipi              | 0.1         |   0 | 0x04      | 0x735049
 | sbi_remote_fence_i        | 0.1         |   0 | 0x05      | 0x52464E43
