@@ -1153,7 +1153,6 @@ shown in <<table_hsm_hart_suspend_types>> below.
 | 0x80000000              | Default non-retentive suspend
 | 0x80000001 - 0x8FFFFFFF | Reserved for future use
 | 0x90000000 - 0xFFFFFFFF | Platform specific non-retentive suspend
-| > 0xFFFFFFFF            | Reserved
 |===
 
 The `resume_addr` parameter points to a runtime-specified physical address,
@@ -1232,7 +1231,6 @@ in the <<table_srst_system_reset_types>> below.
 | 0x00000002              | Warm reboot
 | 0x00000003 - 0xEFFFFFFF | Reserved for future use
 | 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset type
-| > 0xFFFFFFFF            | Reserved
 |===
 
 The `reset_reason` is an optional parameter representing the reason for
@@ -1249,7 +1247,6 @@ in the <<table_srst_system_reset_reasons>> below
 | 0x00000002 - 0xDFFFFFFF | Reserved for future use
 | 0xE0000000 - 0xEFFFFFFF | SBI implementation specific reset reason
 | 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset reason
-| > 0xFFFFFFFF            | Reserved
 |===
 
 When supervisor software is running natively, the SBI implementation is
@@ -2042,7 +2039,6 @@ by that of the extension.
 | 0x00000001 - 0x7fffffff |                | Reserved for future use
 | 0x80000000 - 0xffffffff |                | Platform-specific system sleep
                                              types
-| > 0xffffffff            |                | Reserved
 |===
 
 === Function: System Suspend (FID #0)
