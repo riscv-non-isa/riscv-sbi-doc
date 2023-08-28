@@ -1,0 +1,63 @@
+name: Create Specification Document
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Tag as a pre-release?'
+        required: false
+        type: boolean
+        default: true
+      draft:
+        description: 'Create release as a draft?'
+        required: false
+        type: boolean
+        default: false
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+
+    # Step 2: Install Dependencies
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc asciidoctor ditaa ruby-asciidoctor-pdf
+
+    # Step 3: Build Files
+    - name: Build Files
+      run: make
+    
+    # Step 4: Upload the built PDF and HTML files as artifacts
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Build Artifacts
+        path: |
+          riscv-sbi.pdf
+        retention-days: 30
+      
+    # Create Release
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./riscv-sbi.pdf
+        tag_name: commit-${{ github.sha }}
+        name: Release commit-${{ github.sha }}
+        draft: ${{ github.event.inputs.draft }}
+        prerelease: ${{ github.event.inputs.prerelease }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+      if: github.event_name == 'workflow_dispatch'
