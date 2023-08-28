@@ -1,0 +1,34 @@
+== Contributors
+
+This RISC-V specification has been contributed to directly or indirectly by:
+
+[%hardbreaks]
+
+Abner Chang <abner.chang@hpe.com>
+Al Stone <ahs3@ahs3.net>
+Andrew Jones <ajones@ventanamicro.com>
+Anup Patel <apatel@ventanamicro.com>
+Atish Patra <atishp04@gmail.com>
+Atish Patra <atishp@rivosinc.com>
+Bin Meng <bmeng.cn@gmail.com>
+Chris Williams <diodesign@tuta.io>
+Conor Dooley <conor.dooley@microchip.com>
+Daniel Schaefer <git@danielschaefer.me>
+Esteban Blanc <estblcsk@gmail.com>
+hasheddan <georgedanielmangum@gmail.com>
+Heinrich Schuchardt <xypron.glpk@gmx.de>
+Jeff Scheel <jeff@riscv.org>
+Jessica Clarke <jrtc27@jrtc27.com>
+john <799433746@qq.com>
+Jonathan Behrens <fintelia@gmail.com>
+Konrad Schwarz <konrad.schwarz@siemens.com>
+Luo Jia <me@luojia.cc>
+Nick Kossifidis <mickflemm@gmail.com>
+Palmer Dabbelt <palmer@dabbelt.com>
+Paolo Bonzini <pbonzini@redhat.com>
+Sean Anderson <seanga2@gmail.com>
+Stefano Stabellini <stefano.stabellini@amd.com>
+Sunil V L <sunilvl@ventanamicro.com>
+Tsukasa OI <tsukasa.ooi@aist.go.jp>
+Vincent Pelletier <plr.vincent@gmail.com>
+Yiting Wang <yiting.wang@windriver.com>
