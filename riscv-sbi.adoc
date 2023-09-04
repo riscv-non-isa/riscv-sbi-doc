@@ -63,6 +63,9 @@ include::contributors.adoc[]
 [preface]
 == Change Log
 
+=== Version 2.0-rc4
+* Added flags parameter to sbi_pmu_snapshot_set_shmem()
+
 === Version 2.0-rc3
 * CI support added
 * Fix revmark in the makefile.
@@ -1810,7 +1813,8 @@ The possible error codes returned in `sbiret.error` are shown in
 [source, C]
 ----
 struct sbiret sbi_pmu_snapshot_set_shmem(unsigned long shmem_phys_lo,
-                                         unsigned long shmem_phys_hi)
+                                         unsigned long shmem_phys_hi,
+                                         unsigned long flags)
 ----
 
 Set shared memory area for PMU state snapshot. The `shmem_phys_lo` specifies
@@ -1818,6 +1822,8 @@ the lower XLEN bits and `shmem_phys_hi` specifies the upper XLEN bits of the
 shared memory physical address. The `shmem_phys_lo` MUST be 4096 bytes
 (i.e. page) aligned. The shared memory size must be 4096 bytes. The layout of
 the shared memory is described in <<table_snapshot_shmem_layout>>.
+
+The `flags` parameter is reserved for future use and must be zero.
 
 [#table_snapshot_shmem_layout]
 .SBI PMU Snapshot shared memory layout
@@ -1857,6 +1863,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code              | Description
 | SBI_SUCCESS             | firmware counter read successfully.
+| SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero.
 | SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
                             and `shmem_phys_hi` parameters is not writable or
                             does not satisfy other requirements of
