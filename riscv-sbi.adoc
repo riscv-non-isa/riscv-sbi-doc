@@ -66,6 +66,7 @@ include::contributors.adoc[]
 === Version 2.0-rc4
 * Added flags parameter to sbi_pmu_snapshot_set_shmem()
 * Return error code SBI_ERR_NO_SHMEM in SBI PMU extension wherever applicable
+* Made flags parameter of sbi_steal_time_set_shmem() as unsigned long
 
 === Version 2.0-rc3
 * CI support added
@@ -2853,7 +2854,7 @@ information, for each virtual hart, to supervisor-mode software.
 ----
 struct sbiret sbi_steal_time_set_shmem(unsigned long shmem_phys_lo,
                                        unsigned long shmem_phys_hi,
-                                       uint32_t flags)
+                                       unsigned long flags)
 ----
 
 Set the shared memory physical base address for steal-time accounting of the
@@ -2870,7 +2871,7 @@ returning from the SBI call.
 If `shmem_phys_lo` and `shmem_phys_hi` are all-ones bitwise, the SBI
 implementation will stop reporting steal-time information for the virtual hart.
 
-`flags` MUST be set to zero.
+The `flags` parameter is reserved for future use and MUST be zero.
 
 It is not expected for the shared memory to be written by the supervisor-mode
 software while it is in use for steal-time accounting. However, the SBI
