@@ -65,6 +65,7 @@ include::contributors.adoc[]
 
 === Version 2.0-rc4
 * Added flags parameter to sbi_pmu_snapshot_set_shmem()
+* Return error code SBI_ERR_NO_SHMEM in SBI PMU extension wherever applicable
 
 === Version 2.0-rc3
 * CI support added
@@ -1700,11 +1701,11 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code              | Description
 | SBI_SUCCESS             | counter started successfully.
 | SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
-                            or the snapshot address is not configured and
-                            `SBI_PMU_START_FLAG_INIT_SNAPSHOT` is set in the
-                            flags.
 | SBI_ERR_ALREADY_STARTED | set of counters includes at least one counter which
                             is already started.
+| SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
+                            `SBI_PMU_START_FLAG_INIT_SNAPSHOT` is set in the
+                            flags.
 |===
 
 === Function: Stop a set of counters (FID #4)
@@ -1753,11 +1754,11 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code              | Description
 | SBI_SUCCESS             | counter stopped successfully.
 | SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
-                            Or the snapshot address is not configured and
-                            `SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` is set in the
-                            flags.
 | SBI_ERR_ALREADY_STOPPED | set of counters includes at least one counter which
                             is already stopped.
+| SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
+                            `SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` is set in the
+                            flags.
 |===
 
 === Function: Read a firmware counter (FID #5)
@@ -1808,7 +1809,7 @@ The possible error codes returned in `sbiret.error` are shown in
                           or an invalid counter.
 |===
 
-=== Function: Enable PMU snapshot feature (FID #7)
+=== Function: Set PMU snapshot shared memory (FID #7)
 
 [source, C]
 ----
@@ -1817,11 +1818,17 @@ struct sbiret sbi_pmu_snapshot_set_shmem(unsigned long shmem_phys_lo,
                                          unsigned long flags)
 ----
 
-Set shared memory area for PMU state snapshot. The `shmem_phys_lo` specifies
-the lower XLEN bits and `shmem_phys_hi` specifies the upper XLEN bits of the
-shared memory physical address. The `shmem_phys_lo` MUST be 4096 bytes
-(i.e. page) aligned. The shared memory size must be 4096 bytes. The layout of
-the shared memory is described in <<table_snapshot_shmem_layout>>.
+Set and enable the PMU snapshot shared memory.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
+bitwise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
+specifies the upper XLEN bits of the snapshot shared memory physical base
+address. The `shmem_phys_lo` MUST be 4096 bytes (i.e. page) aligned and
+the size of the snapshot shared memory is assumed to be 4096 bytes. The layout
+of the snapshot shared memory is described in <<table_snapshot_shmem_layout>>.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bitwise
+then the PMU snapshot shared memory is cleared and disabled.
 
 The `flags` parameter is reserved for future use and must be zero.
 
@@ -1862,8 +1869,9 @@ The possible error codes returned in `sbiret.error` are shown in
 [cols="2,3", width=90%, align="center", options="header"]
 |===
 | Error code              | Description
-| SBI_SUCCESS             | firmware counter read successfully.
-| SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero.
+| SBI_SUCCESS             | Shared memory was set or cleared successfully.
+| SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
+                           `shmem_phys_lo` parameter is not 4096 bytes aligned.
 | SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
                             and `shmem_phys_hi` parameters is not writable or
                             does not satisfy other requirements of
