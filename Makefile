@@ -5,6 +5,7 @@
 ASCIIDOCTOR = asciidoctor
 ASCIIDOCTOR_PDF = $(ASCIIDOCTOR)-pdf
 DITAA = ditaa
+DEPS = contributors.adoc
 IMAGES = riscv-sbi-intro1.png
 IMAGES += riscv-sbi-intro2.png
 IMAGES += riscv-sbi-hsm.png
@@ -23,10 +24,10 @@ all: $(IMAGES) $(TARGETS)
 	rm -f $@
 	$(DITAA) $<
 
-%.html: %.adoc $(IMAGES) $(REVSNIP)
+%.html: %.adoc $(IMAGES) $(REVSNIP) $(DEPS)
 	$(ASCIIDOCTOR) -d book -b html $<
 
-%.pdf: %.adoc $(IMAGES) docs-resources/themes/riscv-pdf.yml $(REVSNIP)
+%.pdf: %.adoc $(IMAGES) docs-resources/themes/riscv-pdf.yml $(REVSNIP) $(DEPS)
 	$(ASCIIDOCTOR_PDF) \
 	-a toc \
 	-a compress \
