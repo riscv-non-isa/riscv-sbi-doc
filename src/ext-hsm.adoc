@@ -47,7 +47,7 @@ the state machine shown below in the <<figure_hsm>>.
 
 [#figure_hsm]
 .SBI HSM State Machine
-image::riscv-sbi-hsm.png[]
+image::images/riscv-sbi-hsm.png[]
 
 A platform can have multiple harts grouped into hierarchical topology
 groups (namely cores, clusters, nodes, etc.) with separate platform specific
