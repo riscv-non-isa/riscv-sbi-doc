@@ -1,0 +1,88 @@
+== System Reset Extension (EID #0x53525354 "SRST")
+
+The System Reset Extension provides a function that allow the supervisor
+software to request system-level reboot or shutdown. The term "system"
+refers to the world-view of supervisor software and the underlying SBI
+implementation could be provided by machine mode firmware or a hypervisor.
+
+=== Function: System reset (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_system_reset(uint32_t reset_type, uint32_t reset_reason)
+----
+
+Reset the system based on provided `reset_type` and `reset_reason`. This is
+a synchronous call and does not return if it succeeds.
+
+The `reset_type` parameter is 32 bits wide and it's possible values are shown
+in the <<table_srst_system_reset_types>> below.
+
+[#table_srst_system_reset_types]
+.SRST System Reset Types
+[cols="1,2", width=90%, align="center", options="header"]
+|===
+| Value                   | Description
+| 0x00000000              | Shutdown
+| 0x00000001              | Cold reboot
+| 0x00000002              | Warm reboot
+| 0x00000003 - 0xEFFFFFFF | Reserved for future use
+| 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset type
+|===
+
+The `reset_reason` is an optional parameter representing the reason for
+system reset. This parameter is 32 bits wide with possible values shown
+in the <<table_srst_system_reset_reasons>> below
+
+[#table_srst_system_reset_reasons]
+.SRST System Reset Reasons
+[cols="1,2", width=90%, align="center", options="header"]
+|===
+| Value                   | Description
+| 0x00000000              | No reason
+| 0x00000001              | System failure
+| 0x00000002 - 0xDFFFFFFF | Reserved for future use
+| 0xE0000000 - 0xEFFFFFFF | SBI implementation specific reset reason
+| 0xF0000000 - 0xFFFFFFFF | Vendor or platform specific reset reason
+|===
+
+When supervisor software is running natively, the SBI implementation is
+provided by machine mode firmware. In this case, shutdown is equivalent to
+a physical power down of the entire system and cold reboot is equivalent to
+a physical power cycle of the entire system. Further, warm reboot is equivalent
+to a power cycle of the main processor and parts of the system, but not the
+entire system. For example, on a server class system with a BMC (board
+management controller), a warm reboot will not power cycle the BMC whereas a
+cold reboot will definitely power cycle the BMC.
+
+When supervisor software is running inside a virtual machine, the SBI
+implementation is provided by a hypervisor. Shutdown, cold reboot and warm
+reboot will behave functionally the same as the native case, but might not
+result in any physical power changes.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_srst_system_reset_errors>> below.
+
+[#table_srst_system_reset_errors]
+.SRST System Reset Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_ERR_INVALID_PARAM | At least one of `reset_type` or `reset_reason` is
+                          reserved or is platform-specific and unimplemented.
+| SBI_ERR_NOT_SUPPORTED | `reset_type` is not reserved and is implemented,
+                          but the platform does not support it due to one
+                          or more missing dependencies.
+| SBI_ERR_FAILED        | The reset request failed for unspecified or
+                          unknown other reasons.
+|===
+
+=== Function Listing
+
+[#table_srst_function_list]
+.SRST Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name       | SBI Version | FID | EID
+| sbi_system_reset    | 0.3         |   0 | 0x53525354
+|===

@@ -1,0 +1,174 @@
+== Legacy Extensions (EIDs #0x00 - #0x0F)
+
+The legacy SBI extensions follow a slightly different calling convention
+as compared to the SBI v0.2 (or higher) specification where:
+
+* The SBI function ID field in `a6` register is ignored because these are
+  encoded as multiple SBI extension IDs.
+* Nothing is returned in `a1` register.
+* All registers except `a0` must be preserved across an SBI call by the
+  callee.
+* The value returned in `a0` register is SBI legacy extension specific.
+
+The page and access faults taken by the SBI implementation while accessing
+memory on behalf of the supervisor are redirected back to the supervisor
+with `sepc` CSR pointing to the faulting `ECALL` instruction.
+
+The legacy SBI extensions is deprecated in favor of the other extensions
+listed below.
+
+=== Extension: Set Timer (EID #0x00)
+
+[source, C]
+----
+long sbi_set_timer(uint64_t stime_value)
+----
+
+Programs the clock for next event after *stime_value* time. This function
+also clears the pending timer interrupt bit.
+
+If the supervisor wishes to clear the timer interrupt without scheduling
+the next timer event, it can either request a timer interrupt infinitely
+far into the future (i.e., (uint64_t)-1), or it can instead mask the timer
+interrupt by clearing `sie.STIE` CSR bit.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: Console Putchar (EID #0x01)
+
+[source, C]
+----
+long sbi_console_putchar(int ch)
+----
+
+Write data present in *ch* to debug console.
+
+Unlike `sbi_console_getchar()`, this SBI call **will block** if there remain
+any pending characters to be transmitted or if the receiving terminal is not
+yet ready to receive the byte. However, if the console doesn't exist at all,
+then the character is thrown away.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: Console Getchar (EID #0x02)
+
+[source, C]
+----
+long sbi_console_getchar(void)
+----
+
+Read a byte from debug console.
+
+The SBI call returns the byte on success, or -1 for failure.
+
+=== Extension: Clear IPI (EID #0x03)
+
+[source, C]
+----
+long sbi_clear_ipi(void)
+----
+
+Clears the pending IPIs if any. The IPI is cleared only in the hart for
+which this SBI call is invoked. `sbi_clear_ipi()` is deprecated because
+S-mode code can clear `sip.SSIP` CSR bit directly.
+
+This SBI call returns 0 if no IPI had been pending, or an implementation
+specific positive value if an IPI had been pending.
+
+=== Extension: Send IPI (EID #0x04)
+
+[source, C]
+----
+long sbi_send_ipi(const unsigned long *hart_mask)
+----
+
+Send an inter-processor interrupt to all the harts defined in hart_mask.
+Interprocessor interrupts manifest at the receiving harts as Supervisor
+Software Interrupts.
+
+hart_mask is a virtual address that points to a bit-vector of harts. The
+bit vector is represented as a sequence of unsigned longs whose length
+equals the number of harts in the system divided by the number of bits
+in an unsigned long, rounded up to the next integer.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: Remote FENCE.I (EID #0x05)
+
+[source, C]
+----
+long sbi_remote_fence_i(const unsigned long *hart_mask)
+----
+
+Instructs remote harts to execute `FENCE.I` instruction. The `hart_mask`
+is same as described in `sbi_send_ipi()`.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: Remote SFENCE.VMA (EID #0x06)
+
+[source, C]
+----
+long sbi_remote_sfence_vma(const unsigned long *hart_mask,
+                           unsigned long start,
+                           unsigned long size)
+----
+
+Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
+covering the range of virtual addresses between start and size.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: Remote SFENCE.VMA with ASID (EID #0x07)
+
+[source, C]
+----
+long sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
+                                unsigned long start,
+                                unsigned long size,
+                                unsigned long asid)
+----
+
+Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
+covering the range of virtual addresses between start and size. This covers
+only the given `ASID`.
+
+This SBI call returns 0 upon success or an implementation specific negative
+error code.
+
+=== Extension: System Shutdown (EID #0x08)
+
+[source, C]
+----
+void sbi_shutdown(void)
+----
+
+Puts all the harts to shutdown state from supervisor point of view.
+
+This SBI call doesn't return irrespective whether it succeeds or fails.
+
+=== Function Listing
+
+[cols="3,1,1,2", width=80%, align="center", options="header"]
+
+[#table_legacy_function_list]
+.Legacy Function List
+[cols="4,2,1,2,3", width=100%, align="center", options="header"]
+|===
+| Function Name             | SBI Version | FID | EID       | Replacement EID
+| sbi_set_timer             | 0.1         |   0 | 0x00      | 0x54494D45
+| sbi_console_putchar       | 0.1         |   0 | 0x01      | 0x4442434E
+| sbi_console_getchar       | 0.1         |   0 | 0x02      | 0x4442434E
+| sbi_clear_ipi             | 0.1         |   0 | 0x03      | N/A
+| sbi_send_ipi              | 0.1         |   0 | 0x04      | 0x735049
+| sbi_remote_fence_i        | 0.1         |   0 | 0x05      | 0x52464E43
+| sbi_remote_sfence_vma     | 0.1         |   0 | 0x06      | 0x52464E43
+| sbi_remote_sfence_vma_asid| 0.1         |   0 | 0x07      | 0x52464E43
+| sbi_shutdown              | 0.1         |   0 | 0x08      | 0x53525354
+| *RESERVED*                |             |     | 0x09-0x0F |
+|===

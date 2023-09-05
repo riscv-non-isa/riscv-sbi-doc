@@ -1,0 +1,76 @@
+== Change Log
+
+=== Version 2.0-rc4
+* Added flags parameter to sbi_pmu_snapshot_set_shmem()
+* Return error code SBI_ERR_NO_SHMEM in SBI PMU extension wherever applicable
+* Made flags parameter of sbi_steal_time_set_shmem() as unsigned long
+* Split the specification into multiple adoc files
+
+=== Version 2.0-rc3
+* CI support added
+* Fix revmark in the makefile.
+* Few minor cleanups. 
+
+=== Version 2.0-rc2
+* Added clarification for SUSP, NACL & STA extensions.
+* Standardization of hart usage.
+* Added an error code in SBI DBCN extension. 
+
+=== Version 2.0-rc1
+
+* Added common description for shared memory physical address range parameter
+* Added SBI debug console extension
+* Relaxed the counter width requirement on SBI PMU firmware counters
+* Added sbi_pmu_counter_fw_read_hi() in SBI PMU extension
+* Reserved space for SBI implementation specific firmware events
+* Added SBI system suspend extension
+* Added SBI CPPC extension
+* Clarified that an SBI extension can be partially implemented only if it
+  defines a mechanism to discover implemented SBI functions
+* Added error code SBI_ERR_NO_SHMEM
+* Added SBI nested acceleration extension
+* Added common description for a virtual hart
+* Added SBI steal-time accounting extension
+* Added SBI PMU snapshot extension
+
+=== Version 1.0.0
+
+* Updated the version for ratification
+
+=== Version 1.0-rc3
+
+* Updated the calling convention
+* Fixed a typo in PMU extension
+* Added a abbreviation table
+
+=== Version 1.0-rc2
+
+* Update to RISC-V formatting
+* Improved the introduction
+* Removed all references to RV32
+
+=== Version 1.0-rc1
+
+* A typo fix
+
+=== Version 0.3.0
+
+* Few typo fixes
+* Updated the LICENSE with detailed text instead of a hyperlink
+
+=== Version 0.3-rc1
+
+* Improved document styling and naming conventions
+* Added SBI system reset extension
+* Improved SBI introduction section
+* Improved documentation of SBI hart state management extension
+* Added suspend function to SBI hart state management extension
+* Added performance monitoring unit extension
+* Clarified that an SBI extension shall not be partially implemented
+
+=== Version 0.2
+
+* The entire v0.1 SBI has been moved to the legacy extension, which is now
+  an optional extension. This is technically a backwards-incompatible change
+  because the legacy extension is optional and v0.1 of the SBI doesn't allow
+  probing, but it's as good as we can do.

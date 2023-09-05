@@ -1,0 +1,5 @@
+== References
+
+* [[[priv_v1.12]]] The RISC-V Instruction Set Manual, Volume II:
+Privileged Architecture, Document Version 20211203,
+URL: https://github.com/riscv/riscv-isa-manual/releases/tag/Priv-v1.12
