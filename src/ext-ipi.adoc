@@ -1,0 +1,38 @@
+== IPI Extension (EID #0x735049 "sPI: s-mode IPI")
+
+This extension replaces the legacy extension (EID #0x04). The other IPI related
+legacy extension(0x3) is deprecated now. All the functions in this extension
+follow the `hart_mask` as defined in the binary encoding section.
+
+=== Function: Send IPI (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_send_ipi(unsigned long hart_mask,
+                           unsigned long hart_mask_base)
+----
+
+Send an inter-processor interrupt to all the harts defined in hart_mask.
+Interprocessor interrupts manifest at the receiving harts as the supervisor
+software interrupts.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_ipi_send_errors>> below.
+
+[#table_ipi_send_errors]
+.IPI Send Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code  | Description
+| SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
+|===
+
+=== Function Listing
+
+[#table_ipi_function_list]
+.IPI Function List
+[cols="4,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name | SBI Version | FID | EID
+| sbi_send_ipi  | 0.2         | 0   | 0x735049
+|===

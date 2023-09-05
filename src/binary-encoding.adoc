@@ -1,0 +1,115 @@
+== Binary Encoding
+
+All SBI functions share a single binary encoding, which facilitates the mixing
+of SBI extensions. The SBI specification follows the below calling convention.
+
+* An `ECALL` is used as the control transfer instruction between the supervisor
+  and the SEE.
+
+* `a7` encodes the SBI extension ID (*EID*),
+
+* `a6` encodes the SBI function ID (*FID*) for a given extension ID encoded
+   in `a7` for any SBI extension defined in or after SBI v0.2.
+
+* All registers except `a0` & `a1` must be preserved across an SBI call by the
+  callee.
+
+* SBI functions must return a pair of values in `a0` and `a1`, with `a0`
+returning an error code. This is analogous to returning the C structure
+
+[source, C]
+----
+    struct sbiret {
+        long error;
+        long value;
+    };
+----
+
+In the name of compatibility, SBI extension IDs (*EIDs*) and SBI function IDs
+(*FIDs*) are encoded as signed 32-bit integers. When passed in registers these
+follow the standard above calling convention rules.
+
+The <<table_standard_sbi_errors>> below provides a list of Standard SBI
+error codes.
+
+[#table_standard_sbi_errors]
+.Standard SBI Errors
+[cols="4,1,4", width=90%, align="center", options="header"]
+|===
+|  Error Type                | Value | Description
+|  SBI_SUCCESS               |  0    | Completed successfully
+|  SBI_ERR_FAILED            | -1    | Failed
+|  SBI_ERR_NOT_SUPPORTED     | -2    | Not supported
+|  SBI_ERR_INVALID_PARAM     | -3    | Invalid parameter(s)
+|  SBI_ERR_DENIED            | -4    | Denied or not allowed
+|  SBI_ERR_INVALID_ADDRESS   | -5    | Invalid address(s)
+|  SBI_ERR_ALREADY_AVAILABLE | -6    | Already available
+|  SBI_ERR_ALREADY_STARTED   | -7    | Already started
+|  SBI_ERR_ALREADY_STOPPED   | -8    | Already stopped
+|  SBI_ERR_NO_SHMEM          | -9    | Shared memory not available
+|===
+
+An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
+function ID (*FID*) must return the error code `SBI_ERR_NOT_SUPPORTED`.
+
+Every SBI function should prefer `unsigned long` as the data type. It keeps
+the specification simple and easily adaptable for all RISC-V ISA types.
+In case the data is defined as 32bit wide, higher privilege software must
+ensure that it only uses 32 bit data only.
+
+=== Hart list parameter
+
+If an SBI function needs to pass a list of harts to the higher privilege mode,
+it must use a hart mask as defined below. This is applicable to any extensions
+defined in or after v0.2.
+
+Any function, requiring a hart mask, need to pass following two arguments.
+
+* `unsigned long hart_mask` is a scalar bit-vector containing hartids
+* `unsigned long hart_mask_base` is the starting hartid from which bit-vector
+   must be computed.
+
+In a single SBI function call, maximum number harts that can be set is
+always XLEN. If a lower privilege mode needs to pass information about more
+than XLEN harts, it should invoke multiple instances of the SBI function
+call. `hart_mask_base` can be set to `-1` to indicate that `hart_mask` can
+be ignored and all available harts must be considered.
+
+Any function using hart mask may return error values listed in the
+<<table_hart_mask_errors>> below which are in addition to function
+specific error values.
+
+[#table_hart_mask_errors]
+.Hart Mask Errors
+[cols="1,2", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_ERR_INVALID_PARAM | Either `hart_mask_base`, or at least one hartid from
+                          `hart_mask`, is not valid, i.e. either the hartid is
+                          not enabled by the platform or is not available to
+                          the supervisor.
+|===
+
+=== Shared memory physical address range parameter
+
+If an SBI function needs to pass a shared memory physical address range to
+the SBI implementation (or higher privilege mode), then this physical memory
+address range MUST satisfy the following requirements:
+
+* The SBI implementation MUST check that the supervisor-mode software is
+  allowed to access the specified physical memory range with the access
+  type requested (read and/or write).
+* The SBI implementation MUST access the specified physical memory range
+  using the PMA attributes.
+
+NOTE: If the supervisor-mode software accesses the same physical memory
+  range using a memory type different than the PMA, then a loss of coherence
+  or unexpected memory ordering may occur.  The invoking software should
+  follow the rules and sequences defined in the RISC-V Svpbmt specification
+  to prevent the loss of coherence and memory ordering.
+
+* The data in the shared memory MUST follow little-endian byte ordering.
+
+It is recommended that a memory physical address passed to an SBI function
+should use at least two `unsigned long` parameters to support platforms
+which have memory physical addresses wider than XLEN bits.

@@ -1,0 +1,593 @@
+== Performance Monitoring Unit Extension (EID #0x504D55 "PMU")
+
+The RISC-V hardware performance counters such as `mcycle`, `minstret`, and
+`mhpmcounterX` CSRs are accessible as read-only from supervisor-mode using
+`cycle`, `instret`, and `hpmcounterX` CSRs. The SBI performance monitoring
+unit (PMU) extension is an interface for supervisor-mode to configure and
+use the RISC-V hardware performance counters with assistance from the
+machine-mode (or hypervisor-mode). These hardware performance counters
+can only be started, stopped, or configured from machine-mode using
+`mcountinhibit` and `mhpmeventX` CSRs. Due to this, a machine-mode SBI
+implementation may choose to disallow SBI PMU extension if `mcountinhibit`
+CSR is not implemented by the RISC-V platform.
+
+A RISC-V platform generally supports monitoring of various hardware events
+using a limited number of hardware performance counters which are up to
+64 bits wide. In addition, a SBI implementation can also provide firmware
+performance counters which can monitor firmware events such as number of
+misaligned load/store instructions, number of RFENCEs, number of IPIs, etc.
+All firmware counters must have same number of bits and can be up to 64
+bits wide.
+
+The SBI PMU extension provides:
+
+1. An interface for supervisor-mode software to discover and configure
+   per-hart hardware/firmware counters
+2. A typical https://en.wikipedia.org/wiki/Perf_(Linux)[perf] compatible
+   interface for hardware/firmware performance counters and events
+3. Full access to microarchitecture's raw event encodings
+
+To define SBI PMU extension calls, we first define important entities
+`counter_idx`, `event_idx`, and `event_data`. The `counter_idx` is a
+logical number assigned to each hardware/firmware counter. The `event_idx`
+represents a hardware (or firmware) event whereas the `event_data` is
+64 bits wide and represents additional configuration (or parameters) for
+a hardware (or firmware) event.
+
+The event_idx is a 20 bits wide number encoded as follows:
+[source, C]
+----
+    event_idx[19:16] = type
+    event_idx[15:0] = code
+----
+
+=== Event: Hardware general events (Type #0)
+
+The `event_idx.type` (i.e. *event type*) should be `0x0` for all hardware
+general events and each hardware general event is identified by an unique
+`event_idx.code` (i.e. *event code*) described in the
+<<table_pmu_hardware_events>> below.
+
+[#table_pmu_hardware_events]
+.PMU Hardware Events
+[cols="6,1,4", width=95%, align="center", options="header"]
+|===
+| General Event Name                 | Code | Description
+| SBI_PMU_HW_NO_EVENT                |    0 | Unused event because
+                                              `event_idx` cannot be zero
+| SBI_PMU_HW_CPU_CYCLES              |    1 | Event for each CPU cycle
+| SBI_PMU_HW_INSTRUCTIONS            |    2 | Event for each completed
+                                              instruction
+| SBI_PMU_HW_CACHE_REFERENCES        |    3 | Event for cache hit
+| SBI_PMU_HW_CACHE_MISSES            |    4 | Event for cache miss
+| SBI_PMU_HW_BRANCH_INSTRUCTIONS     |    5 | Event for a branch instruction
+| SBI_PMU_HW_BRANCH_MISSES           |    6 | Event for a branch misprediction
+| SBI_PMU_HW_BUS_CYCLES              |    7 | Event for each BUS cycle
+| SBI_PMU_HW_STALLED_CYCLES_FRONTEND |    8 | Event for a stalled cycle in
+                                              microarchitecture frontend
+| SBI_PMU_HW_STALLED_CYCLES_BACKEND  |    9 | Event for a stalled cycle in
+                                              microarchitecture backend
+| SBI_PMU_HW_REF_CPU_CYCLES          |   10 | Event for each reference
+                                              CPU cycle
+|===
+
+The `event_data` (i.e. *event data*) is unused for hardware general events
+and all non-zero values of `event_data` are reserved for future use.
+
+NOTE: A RISC-V platform might halt the CPU clock when it enters WAIT
+state using the WFI instruction or enters platform specific SUSPEND state
+using the SBI HSM hart suspend call.
+
+NOTE: The *SBI_PMU_HW_CPU_CYCLES* event counts CPU clock cycles as
+counted by the `cycle` CSR. These may be variable frequency cycles, and
+are not counted when the CPU clock is halted.
+
+NOTE: The *SBI_PMU_HW_REF_CPU_CYCLES* counts fixed-frequency clock
+cycles while the CPU clock is not halted. The fixed-frequency of counting
+might, for example, be the same frequency at which the `time` CSR counts.
+
+NOTE: The *SBI_PMU_HW_BUS_CYCLES* counts fixed-frequency clock cycles.
+The fixed-frequency of counting might be the same frequency at which the
+`time` CSR counts, or may be the frequency of the clock at the boundary
+between the hart (and it's private caches) and the rest of the system.
+
+=== Event: Hardware cache events (Type #1)
+
+The `event_idx.type` (i.e. *event type*) should be `0x1` for all hardware
+cache events and each hardware cache event is identified by an unique
+`event_idx.code` (i.e. *event code*) which is encoded as follows:
+
+[source, C]
+----
+    event_idx.code[15:3] = cache_id
+    event_idx.code[2:1] = op_id
+    event_idx.code[0:0] = result_id
+----
+
+Below tables show possible values of: `event_idx.code.cache_id` (i.e.
+*cache event id*), `event_idx.code.op_id` (i.e. *cache operation id*)
+and `event_idx.code.result_id` (i.e. *cache result id*).
+
+[#table_pmu_cache_event_id]
+.PMU Cache Event ID
+[cols="6,2,4", width=95%, align="center", options="header"]
+|===
+| Cache Event Name      | Event ID | Description
+| SBI_PMU_HW_CACHE_L1D  |        0 | Level1 data cache event
+| SBI_PMU_HW_CACHE_L1I  |        1 | Level1 instruction cache event
+| SBI_PMU_HW_CACHE_LL   |        2 | Last level cache event
+| SBI_PMU_HW_CACHE_DTLB |        3 | Data TLB event
+| SBI_PMU_HW_CACHE_ITLB |        4 | Instruction TLB event
+| SBI_PMU_HW_CACHE_BPU  |        5 | Branch predictor unit event
+| SBI_PMU_HW_CACHE_NODE |        6 | NUMA node cache event
+|===
+
+[#table_pmu_cache_ops_id]
+.PMU Cache Operation ID
+[cols="6,2,4", width=95%, align="center", options="header"]
+|===
+| Cache Operation Name         | Operation ID | Description
+| SBI_PMU_HW_CACHE_OP_READ     |            0 | Read cache line
+| SBI_PMU_HW_CACHE_OP_WRITE    |            1 | Write cache line
+| SBI_PMU_HW_CACHE_OP_PREFETCH |            2 | Prefetch cache line
+|===
+
+[#table_pmu_cache_result_id]
+.PMU Cache Operation Result ID
+[cols="6,2,4", width=95%, align="center", options="header"]
+|===
+| Cache Result Name              | Result ID | Description
+| SBI_PMU_HW_CACHE_RESULT_ACCESS |         0 | Cache access
+| SBI_PMU_HW_CACHE_RESULT_MISS   |         1 | Cache miss
+|===
+
+The `event_data` (i.e. *event data*) is unused for hardware cache events
+and all non-zero values of `event_data` are reserved for future use.
+
+=== Event: Hardware raw events (Type #2)
+
+The `event_idx.type` (i.e. *event type*) should be `0x2` for all hardware
+raw events and `event_idx.code` (i.e. *event code*) should be zero.
+
+On RISC-V platform with 32 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 32-bit value to to be programmed
+in the `mhpmeventX` CSR.
+
+On RISC-V platform with 64 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 48-bit value to to be programmed
+in the lower 48-bits of `mhpmeventX` CSR and the SBI implementation shall
+determine the value to be programmed in the upper 16 bits of `mhpmeventX`
+CSR.
+
+NOTE: The RISC-V platform hardware implementation may choose to define
+the expected value to be written to `mhpmeventX` CSR for a hardware event.
+In case of hardware general/cache events, the RISC-V platform hardware
+implementation may use the zero-extended `event_idx` as the expected
+value for simplicity.
+
+=== Event: Firmware events (Type #15)
+
+The `event_idx.type` (i.e. *event type*) should be `0xf` for all firmware
+events and each firmware event is identified by an unique `event_idx.code`
+(i.e. *event code*) described in the <<table_pmu_firmware_events>> below.
+
+[#table_pmu_firmware_events]
+.PMU Firmware Events
+[cols="8,2,5", width=95%, align="center", options="header"]
+|===
+| Firmware Event Name                  | Code | Description
+| SBI_PMU_FW_MISALIGNED_LOAD           |    0 | Misaligned load trap event
+| SBI_PMU_FW_MISALIGNED_STORE          |    1 | Misaligned store trap event
+| SBI_PMU_FW_ACCESS_LOAD               |    2 | Load access trap event
+| SBI_PMU_FW_ACCESS_STORE              |    3 | Store access trap event
+| SBI_PMU_FW_ILLEGAL_INSN              |    4 | Illegal instruction trap event
+| SBI_PMU_FW_SET_TIMER                 |    5 | Set timer event
+| SBI_PMU_FW_IPI_SENT                  |    6 | Sent IPI to other hart event
+| SBI_PMU_FW_IPI_RECEIVED              |    7 | Received IPI from other
+                                                hart event
+| SBI_PMU_FW_FENCE_I_SENT              |    8 | Sent FENCE.I request to
+                                                other hart event
+| SBI_PMU_FW_FENCE_I_RECEIVED          |    9 | Received FENCE.I request
+                                                from other hart event
+| SBI_PMU_FW_SFENCE_VMA_SENT           |   10 | Sent SFENCE.VMA request
+                                                to other hart event
+| SBI_PMU_FW_SFENCE_VMA_RECEIVED       |   11 | Received SFENCE.VMA request
+                                                from other hart event
+| SBI_PMU_FW_SFENCE_VMA_ASID_SENT      |   12 | Sent SFENCE.VMA with ASID
+                                                request to other hart event
+| SBI_PMU_FW_SFENCE_VMA_ASID_RECEIVED  |   13 | Received SFENCE.VMA with ASID
+                                                request from other hart event
+| SBI_PMU_FW_HFENCE_GVMA_SENT          |   14 | Sent HFENCE.GVMA request to
+                                                other hart event
+| SBI_PMU_FW_HFENCE_GVMA_RECEIVED      |   15 | Received HFENCE.GVMA request
+                                                from other hart event
+| SBI_PMU_FW_HFENCE_GVMA_VMID_SENT     |   16 | Sent HFENCE.GVMA with VMID
+                                                request to other hart event
+| SBI_PMU_FW_HFENCE_GVMA_VMID_RECEIVED |   17 | Received HFENCE.GVMA with VMID
+                                                request from other hart event
+| SBI_PMU_FW_HFENCE_VVMA_SENT          |   18 | Sent HFENCE.VVMA request to
+                                                other hart event
+| SBI_PMU_FW_HFENCE_VVMA_RECEIVED      |   19 | Received HFENCE.VVMA request
+                                                from other hart event
+| SBI_PMU_FW_HFENCE_VVMA_ASID_SENT     |   20 | Sent HFENCE.VVMA with ASID
+                                                request to other hart event
+| SBI_PMU_FW_HFENCE_VVMA_ASID_RECEIVED |   21 | Received HFENCE.VVMA with ASID
+                                                request from other hart event
+| Reserved                             | 22 - 255 | Reserved for future use
+| Implementation specific events       | 256 - 65534 | SBI implementation
+                                                       specific firmware events
+| SBI_PMU_FW_PLATFORM                  | 65535 | RISC-V platform specific
+                                                 firmware events, where the
+                                                 `event_data` configuration
+                                                 (or parameter) contains
+                                                 the event encoding.
+|===
+
+For all firmware events except SBI_PMU_FW_PLATFORM, the `event_data`
+configuration (or parameter) is unused and all non-zero values of
+`event_data` are reserved for future use.
+
+=== Function: Get number of counters (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_pmu_num_counters()
+----
+
+*Returns* the number of counters (both hardware and firmware) in
+`sbiret.value` and always returns `SBI_SUCCESS` in sbiret.error.
+
+=== Function: Get details of a counter (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_get_info(unsigned long counter_idx)
+----
+
+Get details about the specified counter such as underlying CSR number,
+width of the counter, type of counter hardware/firmware, etc.
+
+The `counter_info` returned by this SBI call is encoded as follows:
+[source, C]
+----
+    counter_info[11:0] = CSR (12bit CSR number)
+    counter_info[17:12] = Width (One less than number of bits in CSR)
+    counter_info[XLEN-2:18] = Reserved for future use
+    counter_info[XLEN-1] = Type (0 = hardware and 1 = firmware)
+----
+
+If `counter_info.type == 1` then `counter_info.csr` and `counter_info.width`
+should be ignored.
+
+*Returns* the `counter_info` described above in `sbiret.value`.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_pmu_counter_get_info_errors>> below.
+
+[#table_pmu_counter_get_info_errors]
+.PMU Counter Get Info Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | `counter_info` read successfully.
+| SBI_ERR_INVALID_PARAM | `counter_idx` points to an invalid counter.
+|===
+
+=== Function: Find and configure a matching counter (FID #2)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_config_matching(unsigned long counter_idx_base,
+                                              unsigned long counter_idx_mask,
+                                              unsigned long config_flags,
+                                              unsigned long event_idx,
+                                              uint64_t event_data)
+----
+
+Find and configure a counter from a set of counters which is not started
+(or enabled) and can monitor the specified event. The `counter_idx_base`
+and `counter_idx_mask` parameters represent the set of counters whereas
+`event_idx` represents the event to be monitored and `event_data`
+represents any additional event configuration.
+
+The `config_flags` parameter represents additional counter configuration
+and filter flags. The bit definitions of the `config_flags` parameter are
+shown in the <<table_pmu_counter_cfg_match_flags>> below.
+
+[#table_pmu_counter_cfg_match_flags]
+.PMU Counter Config Match Flags
+[cols="3,1,2", width=90%, align="center", options="header"]
+|===
+| Flag Name                   | Bits       | Description
+| SBI_PMU_CFG_FLAG_SKIP_MATCH | 0:0        | Skip the counter matching
+| SBI_PMU_CFG_FLAG_CLEAR_VALUE| 1:1        | Clear (or zero) the counter
+                                             value in counter configuration
+| SBI_PMU_CFG_FLAG_AUTO_START | 2:2        | Start the counter after
+                                             configuring a matching counter
+| SBI_PMU_CFG_FLAG_SET_VUINH  | 3:3        | Event counting inhibited +
+                                             in VU-mode
+| SBI_PMU_CFG_FLAG_SET_VSINH  | 4:4        | Event counting inhibited +
+                                             in VS-mode
+| SBI_PMU_CFG_FLAG_SET_UINH   | 5:5        | Event counting inhibited +
+                                             in U-mode
+| SBI_PMU_CFG_FLAG_SET_SINH   | 6:6        | Event counting inhibited +
+                                             in S-mode
+| SBI_PMU_CFG_FLAG_SET_MINH   | 7:7        | Event counting inhibited +
+                                             in M-mode
+| *RESERVED*                  | 8:(XLEN-1) | All non-zero values are
+                                             reserved for future use
+|===
+
+NOTE: When *SBI_PMU_CFG_FLAG_SKIP_MATCH* is set in `config_flags`, the
+SBI implementation will unconditionally select the first counter from the
+set of counters specified by the `counter_idx_base` and `counter_idx_mask`.
+
+NOTE: The *SBI_PMU_CFG_FLAG_AUTO_START* flag in `config_flags` has no
+impact on the counter value.
+
+NOTE: The `config_flags[3:7]` bits are event filtering hints so these
+can be ignored or overridden by the SBI implementation for security concerns
+or due to lack of event filtering support in the underlying RISC-V platform.
+
+*Returns* the `counter_idx` in `sbiret.value` upon success.
+
+In case of failure, the possible error codes returned in `sbiret.error` are
+shown in the <<table_pmu_counter_cfg_match_errors>> below.
+
+[#table_pmu_counter_cfg_match_errors]
+.PMU Counter Config Match Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | counter found and configured successfully.
+| SBI_ERR_INVALID_PARAM | set of counters has at least one invalid counter.
+| SBI_ERR_NOT_SUPPORTED | none of the counters can monitor the specified event.
+|===
+
+=== Function: Start a set of counters (FID #3)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_start(unsigned long counter_idx_base,
+                                    unsigned long counter_idx_mask,
+                                    unsigned long start_flags,
+                                    uint64_t initial_value)
+----
+
+Start or enable a set of counters on the calling hart with the specified
+initial value. The `counter_idx_base` and `counter_idx_mask` parameters
+represent the set of counters whereas the `initial_value` parameter
+specifies the initial value of the counter.
+
+The bit definitions of the `start_flags` parameter are shown in the
+<<table_pmu_counter_start_flags>> below.
+
+[#table_pmu_counter_start_flags]
+.PMU Counter Start Flags
+[cols="3,1,2", width=90%, align="center", options="header"]
+|===
+| Flag Name                        | Bits       | Description
+| SBI_PMU_START_SET_INIT_VALUE     | 0:0        | Set the value of counters
+                                                  based on the `initial_value`
+                                                  parameter
+| SBI_PMU_START_FLAG_INIT_SNAPSHOT | 1:1        | Initialize the given counters
+                                                  from shared memory if
+                                                  available.
+| *RESERVED*                       | 2:(XLEN-1) | Reserved for future use
+|===
+
+NOTE: When SBI_PMU_START_SET_INIT_VALUE is not set in `start_flags`,
+the counter value will not be modified and event counting will start
+from current counter value.
+
+The shared memory address must be set during boot via
+`sbi_pmu_snapshot_set_shmem` before the `SBI_PMU_START_FLAG_INIT_SNAPSHOT`
+flag may be used. The SBI implementation must initialize all the given valid
+counters (to be started) from the value set in the shared snapshot memory.
+
+NOTE: `SBI_PMU_START_SET_INIT_VALUE` and `SBI_PMU_START_FLAG_INIT_SNAPSHOT` are
+mutually exclusive as the former is only valid for a single counter.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_pmu_counter_start_errors>> below.
+
+[#table_pmu_counter_start_errors]
+.PMU Counter Start Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | counter started successfully.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_ALREADY_STARTED | set of counters includes at least one counter which
+                            is already started.
+| SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
+                            `SBI_PMU_START_FLAG_INIT_SNAPSHOT` is set in the
+                            flags.
+|===
+
+=== Function: Stop a set of counters (FID #4)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_stop(unsigned long counter_idx_base,
+                                   unsigned long counter_idx_mask,
+                                   unsigned long stop_flags)
+----
+
+Stop or disable a set of counters on the calling hart. The `counter_idx_base`
+and `counter_idx_mask` parameters represent the set of counters. The bit
+definitions of the `stop_flags` parameter are shown in the
+<<table_pmu_counter_stop_flags>> below.
+
+[#table_pmu_counter_stop_flags]
+.PMU Counter Stop Flags
+[cols="3,1,2", width=90%, align="center", options="header"]
+|===
+| Flag Name                       | Bits       | Description
+| SBI_PMU_STOP_FLAG_RESET         | 0:0        | Reset the counter to event
+                                                 mapping.
+| SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT | 1:1        | Save a snapshot of the given
+                                                 counter's values in the shared
+                                                 memory if available.
+| *RESERVED*                      | 2:(XLEN-1) | Reserved for future use
+|===
+
+
+The shared memory address must be set during boot via
+`sbi_pmu_snapshot_set_shmem` before the `SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` flag
+may be used. The SBI implementation must save the current value of all the
+stopped counters in the shared memory if `SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` is
+set. The values corresponding to all other counters must not be modified. The
+SBI implementation must additionally update the overflown counter bitmap in the
+shared memory.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_pmu_counter_stop_errors>> below.
+
+[#table_pmu_counter_stop_errors]
+.PMU Counter Stop Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | counter stopped successfully.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_ALREADY_STOPPED | set of counters includes at least one counter which
+                            is already stopped.
+| SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
+                            `SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` is set in the
+                            flags.
+|===
+
+=== Function: Read a firmware counter (FID #5)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_fw_read(unsigned long counter_idx)
+----
+
+Provide the current firmware counter value in `sbiret.value`. On RV32 systems,
+the `sbiret.value` will only contain the lower 32 bits of the current firmware
+counter value.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_pmu_counter_fw_read_errors>> below.
+
+[#table_pmu_counter_fw_read_errors]
+.PMU Counter Firmware Read Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | firmware counter read successfully.
+| SBI_ERR_INVALID_PARAM | `counter_idx` points to a hardware counter
+                          or an invalid counter.
+|===
+
+=== Function: Read a firmware counter high bits (FID #6)
+
+[source, C]
+----
+struct sbiret sbi_pmu_counter_fw_read_hi(unsigned long counter_idx)
+----
+
+Provide the upper 32 bits of the current firmware counter value in
+`sbiret.value`. This function always returns zero in `sbiret.value`
+for RV64 (or higher) systems.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_pmu_counter_fw_read_hi_errors>> below.
+
+[#table_pmu_counter_fw_read_hi_errors]
+.PMU Counter Firmware Read High Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Firmware counter read successfully.
+| SBI_ERR_INVALID_PARAM | `counter_idx` points to a hardware counter
+                          or an invalid counter.
+|===
+
+=== Function: Set PMU snapshot shared memory (FID #7)
+
+[source, C]
+----
+struct sbiret sbi_pmu_snapshot_set_shmem(unsigned long shmem_phys_lo,
+                                         unsigned long shmem_phys_hi,
+                                         unsigned long flags)
+----
+
+Set and enable the PMU snapshot shared memory.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
+bitwise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
+specifies the upper XLEN bits of the snapshot shared memory physical base
+address. The `shmem_phys_lo` MUST be 4096 bytes (i.e. page) aligned and
+the size of the snapshot shared memory is assumed to be 4096 bytes. The layout
+of the snapshot shared memory is described in <<table_snapshot_shmem_layout>>.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bitwise
+then the PMU snapshot shared memory is cleared and disabled.
+
+The `flags` parameter is reserved for future use and must be zero.
+
+[#table_snapshot_shmem_layout]
+.SBI PMU Snapshot shared memory layout
+[cols="5,2,2,5", width=90%, align="center", options="header"]
+|===
+| Name                    | Offset   | Size | Description
+| counter_overflow_bitmap | 0x0000   | 8    | A bitmap of all logical overflown
+                                              counters. This is valid only if
+                                              the `Sscofpmf` ISA extension is
+                                              available. Otherwise, it must be
+                                              zero.
+| counter_values          | 0x0008   | 512  | An array of 64-bit logical
+                                              counters where each index
+                                              represents the value of each
+                                              logical counter associated with
+                                              hardware/firmware.
+| Reserved                | 0x0208   | 3576 | Reserved for future use
+|===
+
+Any future revisions to this structure should be made in a backward compatible
+manner and will be associated with an SBI version.
+
+This function should be invoked only once per hart at boot time. Once
+configured, the SBI implementation has read/write access to the shared memory
+when `sbi_pmu_counter_stop` is invoked with the
+`SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT` flag set. The SBI implementation has read
+only access when `sbi_pmu_counter_start` is invoked with the
+`SBI_PMU_START_FLAG_INIT_SNAPSHOT` flag set. The SBI implementation must not
+access this memory any other time.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_pmu_snapshot_set_shmem_errors>> below.
+
+[#table_pmu_snapshot_set_shmem_errors]
+.PMU Setup Snapshot Area Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Shared memory was set or cleared successfully.
+| SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
+                           `shmem_phys_lo` parameter is not 4096 bytes aligned.
+| SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
+                            and `shmem_phys_hi` parameters is not writable or
+                            does not satisfy other requirements of
+                            <<_shared_memory_physical_address_range_parameter>>.
+|===
+
+=== Function Listing
+
+[#table_pmu_function_list]
+.PMU Function List
+[cols="5,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name                   | SBI Version | FID | EID
+| sbi_pmu_num_counters            | 0.3         | 0   | 0x504D55
+| sbi_pmu_counter_get_info        | 0.3         | 1   | 0x504D55
+| sbi_pmu_counter_config_matching | 0.3         | 2   | 0x504D55
+| sbi_pmu_counter_start           | 0.3         | 3   | 0x504D55
+| sbi_pmu_counter_stop            | 0.3         | 4   | 0x504D55
+| sbi_pmu_counter_fw_read         | 0.3         | 5   | 0x504D55
+| sbi_pmu_counter_fw_read_hi      | 2.0         | 6   | 0x504D55
+| sbi_pmu_snapshot_set_shmem      | 2.0         | 7   | 0x504D55
+|===

@@ -1,0 +1,228 @@
+== RFENCE Extension (EID #0x52464E43 "RFNC")
+
+This extension defines all remote fence related functions and replaces
+the legacy extensions (EIDs #0x05 - #0x07). All the functions follow the
+`hart_mask` as defined in binary encoding section. Any function wishes
+to use range of addresses (i.e. start_addr and size), have to abide by
+the below constraints on range parameters.
+
+The remote fence function acts as a full TLB flush if
+
+* `start_addr` and `size` are both 0
+* `size` is equal to 2^XLEN-1
+
+=== Function: Remote FENCE.I (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_remote_fence_i(unsigned long hart_mask,
+                                 unsigned long hart_mask_base)
+----
+Instructs remote harts to execute `FENCE.I` instruction.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_fence_i_errors>> below.
+
+[#table_rfence_remote_fence_i_errors]
+.RFENCE Remote FENCE.I Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code  | Description
+| SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
+|===
+
+=== Function: Remote SFENCE.VMA (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_remote_sfence_vma(unsigned long hart_mask,
+                                    unsigned long hart_mask_base,
+                                    unsigned long start_addr,
+                                    unsigned long size)
+----
+
+Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
+covering the range of virtual addresses between start and size.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_sfence_vma_errors>> below.
+
+[#table_rfence_remote_sfence_vma_errors]
+.RFENCE Remote SFENCE.VMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function: Remote SFENCE.VMA with ASID (FID #2)
+
+[source, C]
+----
+struct sbiret sbi_remote_sfence_vma_asid(unsigned long hart_mask,
+                                         unsigned long hart_mask_base,
+                                         unsigned long start_addr,
+                                         unsigned long size,
+                                         unsigned long asid)
+----
+
+Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
+covering the range of virtual addresses between start and size. This covers
+only the given `ASID`.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_sfence_vma_asid_errors>> below.
+
+[#table_rfence_remote_sfence_vma_asid_errors]
+.RFENCE Remote SFENCE.VMA with ASID Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function: Remote HFENCE.GVMA with VMID (FID #3)
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_gvma_vmid(unsigned long hart_mask,
+                                          unsigned long hart_mask_base,
+                                          unsigned long start_addr,
+                                          unsigned long size,
+                                          unsigned long vmid)
+----
+
+Instruct the remote harts to execute one or more `HFENCE.GVMA` instructions,
+covering the range of guest physical addresses between start and size only
+for the given `VMID`. This function call is only valid for harts implementing
+hypervisor extension.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_gvma_vmid_errors>> below.
+
+[#table_rfence_remote_hfence_gvma_vmid_errors]
+.RFENCE Remote HFENCE.GVMA with VMID Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function: Remote HFENCE.GVMA (FID #4)
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_gvma(unsigned long hart_mask,
+                                     unsigned long hart_mask_base,
+                                     unsigned long start_addr,
+                                     unsigned long size)
+----
+
+Instruct the remote harts to execute one or more `HFENCE.GVMA` instructions,
+covering the range of guest physical addresses between start and size for all
+the guests. This function call is only valid for harts implementing hypervisor
+extension.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_gvma_errors>> below.
+
+[#table_rfence_remote_hfence_gvma_errors]
+.RFENCE Remote HFENCE.GVMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function: Remote HFENCE.VVMA with ASID (FID #5)
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_vvma_asid(unsigned long hart_mask,
+                                          unsigned long hart_mask_base,
+                                          unsigned long start_addr,
+                                          unsigned long size,
+                                          unsigned long asid)
+----
+
+Instruct the remote harts to execute one or more `HFENCE.VVMA` instructions,
+covering the range of guest virtual addresses between start and size for the
+given `ASID` and current `VMID` (in `hgatp` CSR) of calling hart. This function
+call is only valid for harts implementing hypervisor extension.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_vvma_asid_errors>> below.
+
+[#table_rfence_remote_hfence_vvma_asid_errors]
+.RFENCE Remote HFENCE.VVMA with ASID Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function: Remote HFENCE.VVMA (FID #6)
+
+[source, C]
+----
+struct sbiret sbi_remote_hfence_vvma(unsigned long hart_mask,
+                                     unsigned long hart_mask_base,
+                                     unsigned long start_addr,
+                                     unsigned long size)
+----
+
+Instruct the remote harts to execute one or more `HFENCE.VVMA` instructions,
+covering the range of guest virtual addresses between start and size for
+current `VMID` (in `hgatp` CSR) of calling hart. This function call is only
+valid for harts implementing hypervisor extension.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_rfence_remote_hfence_vvma_errors>> below.
+
+[#table_rfence_remote_hfence_vvma_errors]
+.RFENCE Remote HFENCE.VVMA Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | IPI was sent to all the targeted harts
+                            successfully.
+| SBI_ERR_NOT_SUPPORTED   | This function is not supported as it is not
+                            implemented or one of the target hart doesn't
+                            support hypervisor extension.
+| SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+|===
+
+=== Function Listing
+
+[#table_rfence_function_list]
+.RFENCE Function List
+[cols="4,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name               | SBI Version | FID | EID
+| sbi_remote_fence_i          | 0.2         | 0   | 0x52464E43
+| sbi_remote_sfence_vma       | 0.2         | 1   | 0x52464E43
+| sbi_remote_sfence_vma_asid  | 0.2         | 2   | 0x52464E43
+| sbi_remote_hfence_gvma_vmid | 0.2         | 3   | 0x52464E43
+| sbi_remote_hfence_gvma      | 0.2         | 4   | 0x52464E43
+| sbi_remote_hfence_vvma_asid | 0.2         | 5   | 0x52464E43
+| sbi_remote_hfence_vvma      | 0.2         | 6   | 0x52464E43
+|===
