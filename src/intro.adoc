@@ -24,11 +24,11 @@ it can be some hypervisor executing in hypervisor-mode (HS-mode) (see below
 
 [#fig_intro1]
 .RISC-V System without H-extension
-image::riscv-sbi-intro1.png[width=524,height=218]
+image::images/riscv-sbi-intro1.png[width=524,height=218]
 
 [#fig_intro2]
 .RISC-V System with H-extension
-image::riscv-sbi-intro2.png[width=800,height=350]
+image::images/riscv-sbi-intro2.png[width=800,height=350]
 
 Harts are provisioned by the SBI implementation for supervisor-mode software.
 Hence, from the perspective of the SBI implementation, the S-mode hart contexts
