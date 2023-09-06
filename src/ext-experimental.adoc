@@ -1,3 +1,4 @@
 == Experimental SBI Extension Space (EIDs #0x08000000 - #0x08FFFFFF)
 
-No management.
+The SBI specification doesn't define any rules for the EID management for
+experimental SBI extensions.

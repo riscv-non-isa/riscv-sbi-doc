@@ -1,5 +1,6 @@
 == Firmware Specific Extension Space (EIDs #0x0A000000 - #0x0AFFFFFF)
 
-Low bits is SBI implementation ID. The firmware specific SBI extensions are
-for SBI implementations. It provides firmware specific SBI functions which
-are defined in the external firmware specification.
+The lower 24 bits of the firmware EID must match the lower 24 bits of the SBI
+implementation ID. The firmware specific SBI extensions space is reserved for
+SBI implementations. It provides firmware specific SBI functions which are
+defined in the external firmware specification.
