@@ -521,7 +521,7 @@ If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
 bitwise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
 specifies the upper XLEN bits of the snapshot shared memory physical base
 address. The `shmem_phys_lo` MUST be 4096 bytes (i.e. page) aligned and
-the size of the snapshot shared memory is assumed to be 4096 bytes. The layout
+the size of the snapshot shared memory must be 4096 bytes. The layout
 of the snapshot shared memory is described in <<table_snapshot_shmem_layout>>.
 
 If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bitwise
