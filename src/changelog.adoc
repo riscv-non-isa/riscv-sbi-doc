@@ -5,6 +5,8 @@
 * Return error code SBI_ERR_NO_SHMEM in SBI PMU extension wherever applicable
 * Made flags parameter of sbi_steal_time_set_shmem() as unsigned long
 * Split the specification into multiple adoc files
+* Add more clarification for firmware/vendor/experimental extension space.
+* Fix ambiguous usage of normative statements. 
 
 === Version 2.0-rc3
 * CI support added
