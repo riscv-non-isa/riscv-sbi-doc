@@ -41,7 +41,7 @@ To use the SBI nested acceleration extension, the supervisor software
 physical address for each virtual hart at boot-time. The physical base
 address of the nested acceleration shared memory MUST be 4096 bytes
 (i.e. page) aligned and the size of the nested acceleration shared
-memory is assumed to be `4096 + (1024 * (XLEN / 8))` bytes. The
+memory must be `4096 + (1024 * (XLEN / 8))` bytes. The
 <<table_nacl_shmem_layout>> below shows the layout of nested
 acceleration shared memory.
 
@@ -163,7 +163,7 @@ bit set. After processing pending nested HFENCE entries, the SBI implementation
                        &nbsp;&nbsp;&nbsp;&nbsp;BIT[29:16] - VMID +
                        &nbsp;&nbsp;&nbsp;&nbsp;BIT[15:0] - ASID +
                        +
-                       The page size for invalidation is assumed to be +
+                       The page size for invalidation must be +
                        `1 << (Config.Order + 12)` bytes.
 | 1    | Page_Number | Page address right shifted by `Config.Order + 12`
 | 2    | Reserved    | Reserved for future use and must be zero
@@ -376,7 +376,7 @@ If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
 bitwise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
 specifies the upper XLEN bits of the shared memory physical base address.
 `shmem_phys_lo` MUST be 4096 bytes (i.e. page) aligned and the size of the
-shared memory is assumed to be `4096 + (XLEN * 128)` bytes.
+shared memory must be `4096 + (XLEN * 128)` bytes.
 
 If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bitwise
 then the nested acceleration features are disabled.
