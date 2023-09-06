@@ -1,3 +1,4 @@
 == Vendor Specific Extension Space (EIDs #0x09000000 - #0x09FFFFFF)
 
-Low bits from `mvendorid`.
+The lower 24 bits of vendor specific EID must match the lower 24 bits of the
+`mvendorid` value. 
