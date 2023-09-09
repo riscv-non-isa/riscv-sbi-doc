@@ -29,6 +29,6 @@ Paolo Bonzini <pbonzini@redhat.com>
 Sean Anderson <seanga2@gmail.com>
 Stefano Stabellini <stefano.stabellini@amd.com>
 Sunil V L <sunilvl@ventanamicro.com>
-Tsukasa OI <tsukasa.ooi@aist.go.jp>
+Tsukasa OI <research_trasio@irq.a4lg.com>
 Vincent Pelletier <plr.vincent@gmail.com>
 Yiting Wang <yiting.wang@windriver.com>
