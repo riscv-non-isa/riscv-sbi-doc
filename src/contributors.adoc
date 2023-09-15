@@ -20,7 +20,6 @@ Heinrich Schuchardt <xypron.glpk@gmx.de>
 Jeff Scheel <jeff@riscv.org>
 Jessica Clarke <jrtc27@jrtc27.com>
 john <799433746@qq.com>
-Jonathan Behrens <fintelia@gmail.com>
 Konrad Schwarz <konrad.schwarz@siemens.com>
 Luo Jia <me@luojia.cc>
 Nick Kossifidis <mickflemm@gmail.com>
@@ -30,5 +29,4 @@ Sean Anderson <seanga2@gmail.com>
 Stefano Stabellini <stefano.stabellini@amd.com>
 Sunil V L <sunilvl@ventanamicro.com>
 Tsukasa OI <research_trasio@irq.a4lg.com>
-Vincent Pelletier <plr.vincent@gmail.com>
 Yiting Wang <yiting.wang@windriver.com>
