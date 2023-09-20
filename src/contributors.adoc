@@ -21,7 +21,7 @@ Jeff Scheel <jeff@riscv.org>
 Jessica Clarke <jrtc27@jrtc27.com>
 john <799433746@qq.com>
 Konrad Schwarz <konrad.schwarz@siemens.com>
-Luo Jia <me@luojia.cc>
+Luo Jia / Zhouqi Jiang <luojia@hust.edu.cn>
 Nick Kossifidis <mickflemm@gmail.com>
 Palmer Dabbelt <palmer@dabbelt.com>
 Paolo Bonzini <pbonzini@redhat.com>
