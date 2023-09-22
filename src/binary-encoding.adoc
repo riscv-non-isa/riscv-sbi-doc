@@ -15,7 +15,7 @@ of SBI extensions. The SBI specification follows the below calling convention.
   callee.
 
 * SBI functions must return a pair of values in `a0` and `a1`, with `a0`
-returning an error code. This is analogous to returning the C structure
+  returning an error code. This is analogous to returning the C structure
 
 [source, C]
 ----
@@ -55,28 +55,28 @@ function ID (*FID*) must return the error code `SBI_ERR_NOT_SUPPORTED`.
 Every SBI function should prefer `unsigned long` as the data type. It keeps
 the specification simple and easily adaptable for all RISC-V ISA types.
 In case the data is defined as 32bit wide, higher privilege software must
-ensure that it only uses 32 bit data only.
+ensure that it only uses 32 bit data.
 
 === Hart list parameter
 
-If an SBI function needs to pass a list of harts to the higher privilege mode,
-it must use a hart mask as defined below. This is applicable to any extensions
-defined in or after v0.2.
+If an SBI function caller needs to pass a list of harts to the higher privilege
+mode, it must use a hart mask as defined below. This is applicable to any
+extensions defined in or after v0.2.
 
-Any function, requiring a hart mask, need to pass following two arguments.
+Any SBI function, requiring a hart mask, must take the following two arguments:
 
 * `unsigned long hart_mask` is a scalar bit-vector containing hartids
-* `unsigned long hart_mask_base` is the starting hartid from which bit-vector
-   must be computed.
+* `unsigned long hart_mask_base` is the starting hartid from which the
+   bit-vector must be computed.
 
-In a single SBI function call, maximum number harts that can be set is
+In a single SBI function call, the maximum number of harts that can be set is
 always XLEN. If a lower privilege mode needs to pass information about more
-than XLEN harts, it should invoke multiple instances of the SBI function
-call. `hart_mask_base` can be set to `-1` to indicate that `hart_mask` can
+than XLEN harts, it must invoke the SBI function multiple times.
+`hart_mask_base` can be set to `-1` to indicate that `hart_mask` shall
 be ignored and all available harts must be considered.
 
-Any function using hart mask may return error values listed in the
-<<table_hart_mask_errors>> below which are in addition to function
+Any SBI function taking hart mask arguments may return the error values listed
+in the <<table_hart_mask_errors>> below which are in addition to function
 specific error values.
 
 [#table_hart_mask_errors]
