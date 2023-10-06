@@ -1,5 +1,8 @@
 == Change Log
 
+=== Version 2.0-rc5
+* Update the document state to Frozen
+
 === Version 2.0-rc4
 * Added flags parameter to sbi_pmu_snapshot_set_shmem()
 * Return error code SBI_ERR_NO_SHMEM in SBI PMU extension wherever applicable
