@@ -119,7 +119,7 @@ long sbi_remote_sfence_vma(const unsigned long *hart_mask,
 ----
 
 Instructs the remote harts to execute one or more `SFENCE.VMA` instructions,
-covering the range of virtual addresses between start and size.
+covering the range of virtual addresses between `start` and `start + size`.
 
 This SBI call returns 0 upon success or an implementation specific negative
 error code.
@@ -135,8 +135,8 @@ long sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
 ----
 
 Instruct the remote harts to execute one or more `SFENCE.VMA` instructions,
-covering the range of virtual addresses between start and size. This covers
-only the given `ASID`.
+covering the range of virtual addresses between `start` and `start + size`.
+This covers only the given `ASID`.
 
 This SBI call returns 0 upon success or an implementation specific negative
 error code.
