@@ -71,6 +71,8 @@ include::src/terms.adoc[]
 
 include::src/binary-encoding.adoc[]
 
+include::src/configuration.adoc[]
+
 include::src/ext-base.adoc[]
 
 include::src/ext-legacy.adoc[]

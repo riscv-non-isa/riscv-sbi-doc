@@ -1,0 +1,7 @@
+== Configuration
+
+=== Machine Security Configuration Register (mseccfg)
+
+M-mode SBI implementations shall set mseccfg.sseed=1 and mseccfg.useed=0 if
+extension Zkr <<crypt_ext_1_v1.0.1>> is available. This allows S-mode but not
+U-mode to access the seed CSR.

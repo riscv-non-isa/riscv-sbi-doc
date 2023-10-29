@@ -3,3 +3,6 @@
 * [[[priv_v1.12]]] The RISC-V Instruction Set Manual, Volume II:
 Privileged Architecture, Document Version 20211203,
 URL: https://github.com/riscv/riscv-isa-manual/releases/tag/Priv-v1.12
+* [[[crypt_ext_1_v1.0.1]]] Cryptography Extensions, Volume I:
+Scalar & Entropy Source Instructions, Document Version v1.0.1
+URL: https://drive.google.com/file/d/1Thd010Eh2DqnhDHpDd3SM7Ame7KENkPw/view
