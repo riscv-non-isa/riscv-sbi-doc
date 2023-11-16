@@ -2,14 +2,14 @@
 
 This extension defines all remote fence related functions and replaces
 the legacy extensions (EIDs #0x05 - #0x07). All the functions follow the
-`hart_mask` as defined in binary encoding section. Any function wishes
-to use range of addresses (i.e. start_addr and size), have to abide by
+`hart_mask` as defined in binary encoding section. Any function which
+accepts a range of addresses (i.e. `start_addr` and `size`) must abide by
 the below constraints on range parameters.
 
-The remote fence function acts as a full TLB flush if
+The remote fence operation applies to the entire address space if either:
 
-* `start_addr` and `size` are both 0
-* `size` is equal to 2^XLEN-1
+* `start_addr` and `size` are both 0, or
+* `size` is equal to 2^XLEN-1.
 
 === Function: Remote FENCE.I (FID #0)
 
