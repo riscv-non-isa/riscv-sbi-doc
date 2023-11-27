@@ -1,5 +1,8 @@
 == Change Log
 
+=== Version 2.0-rc7
+* Few clarfications around system suspend and pmu snapshot.
+
 === Version 2.0-rc6
 * Few clarifications around rfence extensions
 * Marks public review period complete.
