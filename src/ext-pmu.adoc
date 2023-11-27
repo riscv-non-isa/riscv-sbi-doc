@@ -529,6 +529,9 @@ then the PMU snapshot shared memory is cleared and disabled.
 
 The `flags` parameter is reserved for future use and must be zero.
 
+This is an optional function and the SBI implementation may choose not to
+implement it.  
+
 [#table_snapshot_shmem_layout]
 .SBI PMU Snapshot shared memory layout
 [cols="5,2,2,5", width=90%, align="center", options="header"]
@@ -567,6 +570,8 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Shared memory was set or cleared successfully.
+| SBI_ERR_NOT_SUPPORTED	  | The SBI PMU snapshot functionality is not available
+                            in the SBI implementation. 
 | SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
                            `shmem_phys_lo` parameter is not 4096 bytes aligned.
 | SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
