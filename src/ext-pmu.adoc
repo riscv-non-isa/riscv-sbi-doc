@@ -538,20 +538,27 @@ implement it.
 |===
 | Name                    | Offset   | Size | Description
 | counter_overflow_bitmap | 0x0000   | 8    | A bitmap of all logical overflown
-                                              counters. This is valid only if
-                                              the `Sscofpmf` ISA extension is
-                                              available. Otherwise, it must be
-                                              zero.
+                                              counters relative to the
+					      `counter_idx_base`. This is valid
+					      only if the `Sscofpmf` ISA
+					      extension is available. Otherwise,
+					      it must be zero.
 | counter_values          | 0x0008   | 512  | An array of 64-bit logical
                                               counters where each index
                                               represents the value of each
                                               logical counter associated with
-                                              hardware/firmware.
+                                              hardware/firmware relative to the
+					      `counter_idx_base`.
 | Reserved                | 0x0208   | 3576 | Reserved for future use
 |===
 
 Any future revisions to this structure should be made in a backward compatible
 manner and will be associated with an SBI version.
+
+The logical counter indicies in the `counter_overflow_bitmap` and `counter_values`
+array are relative w.r.t to `counter_idx_base` argument present in the
+`sbi_pmu_counter_stop` and `sbi_pmu_counter_start` functions. This allows the
+users to use snapshot feature for more than XLEN counters if required.
 
 This function should be invoked only once per hart at boot time. Once
 configured, the SBI implementation has read/write access to the shared memory
