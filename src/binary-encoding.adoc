@@ -47,6 +47,8 @@ error codes.
 |  SBI_ERR_ALREADY_STARTED   | -7    | Already started
 |  SBI_ERR_ALREADY_STOPPED   | -8    | Already stopped
 |  SBI_ERR_NO_SHMEM          | -9    | Shared memory not available
+|  SBI_ERR_INVALID_STATE     | -10   | Invalid state
+|  SBI_ERR_BAD_RANGE         | -11   | Bad (or invalid) range
 |===
 
 An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
