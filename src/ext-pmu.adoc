@@ -515,7 +515,7 @@ struct sbiret sbi_pmu_snapshot_set_shmem(unsigned long shmem_phys_lo,
                                          unsigned long flags)
 ----
 
-Set and enable the PMU snapshot shared memory.
+Set and enable the PMU snapshot shared memory on the calling hart.
 
 If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
 bitwise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
