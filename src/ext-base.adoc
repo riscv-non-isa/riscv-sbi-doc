@@ -85,9 +85,9 @@ value for this CSR.
 [cols="3,2,1,1", width=70%, align="center", options="header"]
 |===
 | Function Name            | SBI Version | FID | EID
-| sbi_get_sbi_spec_version | 0.2         |   0 | 0x10
-| sbi_get_sbi_impl_id      | 0.2         |   1 | 0x10
-| sbi_get_sbi_impl_version | 0.2         |   2 | 0x10
+| sbi_get_spec_version     | 0.2         |   0 | 0x10
+| sbi_get_impl_id          | 0.2         |   1 | 0x10
+| sbi_get_impl_version     | 0.2         |   2 | 0x10
 | sbi_probe_extension      | 0.2         |   3 | 0x10
 | sbi_get_mvendorid        | 0.2         |   4 | 0x10
 | sbi_get_marchid          | 0.2         |   5 | 0x10
