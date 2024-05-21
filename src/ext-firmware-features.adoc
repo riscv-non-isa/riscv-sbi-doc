@@ -1,0 +1,199 @@
+== SBI Firmware Features Extension (EID #0x46574654 "FWFT")
+
+The Firmware Features extension is meant to control the behavior of specific
+firmware features. <<table_fw_features_types>> defines 32-bit identifiers for
+the features which supervisor-mode software may request to set or get.
+
+[#table_fw_features_types]
+.FWFT Feature Types
+[cols="1,3,2", width=90%, align="center", options="header"]
+|===
+| Value        | Name                     | Description
+| 0x00000000   | MISALIGNED_EXC_DELEG     | Control misaligned access exception
+                                            delegation to supervisor-mode if
+                                            `medeleg` is present.
+| 0x00000001   | SOFTWARE_CHECK_EXC_DELEG | Control software check exception
+                                            delegation to supervisor-mode if
+                                            `medeleg` is present.
+| 0x00000002   | LANDING_PAD              | Control landing pad support for
+                                            supervisor-mode.
+| 0x00000003   | SHADOW_STACK             | Control shadow stack support for
+                                            supervisor-mode.
+| 0x00000004   | DOUBLE_TRAP              | Control double trap support for
+                                            supervisor-mode.
+| 0x00000005   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
+                                            bits for supervisor-mode.
+| 0x00000006 -
+  0x3fffffff   |                          | Local feature types reserved for
+                                            future use.
+| 0x40000000 -
+  0x7fffffff   |                          | Platform specific local feature
+                                            types.
+| 0x80000000 -
+  0xbfffffff   |                          | Global feature types reserved for
+                                            future use.
+| 0xc0000000 -
+  0xffffffff   |                          | Platform specific global feature
+                                            types.
+|===
+
+These features have some attributes that define their behavior and are described
+in <<table_fw_features_attributes>>. The attribute values are defined for each
+feature in <<table_fw_features_attribute_values>>.
+
+[#table_fw_features_attributes]
+.FWFT Feature Attributes
+[cols="1,3", width=90%, align="center", options="header"]
+|===
+| Attribute   | Description
+| Scope       | Defines if a feature is local (per-hart) or global. Global
+                features only need to be enabled/disabled by a single hart,
+                whereas local features need to be enabled/disabled by each hart.
+                The status and flags of local features can be different from one
+                hart to another.
+| Reset value | Reset value of the feature. Might be implementation defined.
+| Values      | Per feature values that can be set.
+|===
+
+During non-retentive suspend, feature values are retained and restored by the
+SBI when resuming operations. Upon hart reset, local feature values are not
+retained and reset to their default reset values according to the feature
+description. Upon system reset, global and local feature values are reset.
+
+[#table_fw_features_attribute_values]
+.FWFT Feature Attribute Values
+[cols="2,1,1,3a", width=90%, align="center", options="header"]
+|===
+| Feature Name             | Reset                  | Scope | Values
+| MISALIGNED_EXC_DELEG     | Implementation-defined | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable misaligned exception delegation.
+! 1 ! Enable misaligned exception delegation.
+!===
+| SOFTWARE_CHECK_EXC_DELEG                          | 0     | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable software check exception delegation.
+! 1 ! Enable software check exception delegation.
+!===
+| LANDING_PAD                                       | 0     | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable landing pad for supervisor-mode.
+! 1 ! Enable landing pad for supervisor-mode.
+!===
+| SHADOW_STACK                                      | 0     | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable shadow-stack for supervisor-mode.
+! 1 ! Enable shadow-stack for supervisor-mode.
+!===
+| DOUBLE_TRAP                                       | 0     | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable double trap for supervisor-mode.
+! 1 ! Enable double trap for supervisor-mode.
+!===
+| PTE_AD_HW_UPDATING                                | 0     | Local |
+[cols="1,4"]
+!===
+! 0 ! Disable hardware updating of PTE A/D bits for supervisor-mode.
+! 1 ! Enable hardware updating of PTE A/D bits for supervisor-mode.
+!===
+|===
+
+=== Function: Firmware Features Set (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_fwft_set(unsigned long feature,
+                           unsigned long value,
+                           unsigned long flags)
+----
+
+A successful return from `sbi_fwft_set()` results in the requested
+firmware feature to be set according to the `value` and `flags` parameters for
+which per feature supported values are described in
+<<table_fw_features_attributes>> and flags in <<table_fw_features_flags>>.
+
+[#table_fw_features_flags]
+.FWFT Firmware Features Set Flags
+[cols="1,1,3", width=90%, align="center", options="header"]
+|===
+| Name | Encoding      | Description
+| LOCK | BIT[0]        | If provided, once set, the feature value can no longer
+                         be modified until: +
+			 - hart reset for feature with local scope +
+			 - system reset for feature with global scope +
+|      | BIT[XLEN-1:1] | Reserved for future use.
+|===
+
+In case of failure, `feature` value is not modified and the possible error codes
+returned in `sbiret.error` are shown in <<table_fw_features_set_errors>> below.
+
+[#table_fw_features_set_errors]
+.FWFT Firmware Features Set Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | `feature` was set successfully.
+| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and is implemented, but the
+                          platform does not support it due to one or more
+                          missing dependencies.
+| SBI_ERR_INVALID_PARAM | Provided `value` or `flags` parameter is invalid.
+| SBI_ERR_DENIED        | `feature` set operation failed because either: +
+                          - it was denied by the SBI implementation +
+                          - `feature` is locked +
+                          - `feature` is reserved or is platform-specific and
+                          unimplemented
+| SBI_ERR_FAILED        | The set operation failed for unspecified or unknown
+                          other reasons.
+|===
+
+NOTE: The rationale for an SBI implementation to return `SBI_ERR_DENIED` is for
+instance to allow some hypervisors to simply passthrough the misaligned
+delegation state to the Guest/VM and deny any changes to that delegation state
+from the Guest/VM. If authorized, an SBI call would be required at each Guest/VM
+switch if delegation choices are different between Host and Guest/VM.
+
+=== Function: Firmware Features Get (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_fwft_get(unsigned long feature)
+----
+
+A successful return from `sbi_fwft_get()` results in the firmware
+feature configuration value to be returned in `sbiret.value`. Possible
+`sbiret.value` values are described in <<table_fw_features_attributes>> for each
+feature ID.
+
+In case of failure, the content of `sbiret.value` is zero and the possible error
+codes returned in `sbiret.error` are shown in <<table_fw_features_get_errors>>.
+
+[#table_fw_features_get_errors]
+.FWFT Firmware Features Get Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Feature status was retrieved successfully.
+| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and is implemented, but the
+                          platform does not support it due to one or more
+                          missing dependencies.
+| SBI_ERR_DENIED        | `feature` is reserved or is platform-specific and
+                          unimplemented.
+| SBI_ERR_FAILED        | The get operation failed for unspecified or unknown
+                          other reasons.
+|===
+
+=== Function Listing
+
+[#table_fw_features_function_list]
+.FWFT Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name | SBI Version | FID | EID
+| sbi_fwft_set  | 3.0         |  0  | 0x46574654
+| sbi_fwft_get  | 3.0         |  1  | 0x46574654
+|===

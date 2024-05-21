@@ -12,6 +12,7 @@ Atish Patra <atishp04@gmail.com>
 Atish Patra <atishp@rivosinc.com>
 Bin Meng <bmeng.cn@gmail.com>
 Chris Williams <diodesign@tuta.io>
+Clément Léger <cleger@rivosinc.com>
 Conor Dooley <conor.dooley@microchip.com>
 Daniel Schaefer <git@danielschaefer.me>
 Esteban Blanc <estblcsk@gmail.com>
