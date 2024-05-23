@@ -112,4 +112,5 @@ value for this CSR.
 | 8                 | PolarFire Hart Software Services
 | 9                 | coreboot
 | 10                | oreboot
+| 11                | bhyve
 |===
