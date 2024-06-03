@@ -35,6 +35,7 @@ DEPS += src/ext-nested-acceleration.adoc
 DEPS += src/ext-steal-time.adoc
 DEPS += src/ext-sse.adoc
 DEPS += src/ext-firmware-features.adoc
+DEPS += src/ext-debug-triggers.adoc
 DEPS += src/ext-experimental.adoc
 DEPS += src/ext-vendor.adoc
 DEPS += src/ext-firmware.adoc
