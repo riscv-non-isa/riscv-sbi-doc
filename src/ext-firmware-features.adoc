@@ -12,18 +12,15 @@ the features which supervisor-mode software may request to set or get.
 | 0x00000000   | MISALIGNED_EXC_DELEG     | Control misaligned access exception
                                             delegation to supervisor-mode if
                                             `medeleg` is present.
-| 0x00000001   | SOFTWARE_CHECK_EXC_DELEG | Control software check exception
-                                            delegation to supervisor-mode if
-                                            `medeleg` is present.
-| 0x00000002   | LANDING_PAD              | Control landing pad support for
+| 0x00000001   | LANDING_PAD              | Control landing pad support for
                                             supervisor-mode.
-| 0x00000003   | SHADOW_STACK             | Control shadow stack support for
+| 0x00000002   | SHADOW_STACK             | Control shadow stack support for
                                             supervisor-mode.
-| 0x00000004   | DOUBLE_TRAP              | Control double trap support for
+| 0x00000003   | DOUBLE_TRAP              | Control double trap support for
                                             supervisor-mode.
-| 0x00000005   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
+| 0x00000004   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
                                             bits for supervisor-mode.
-| 0x00000006 -
+| 0x00000005 -
   0x3fffffff   |                          | Local feature types reserved for
                                             future use.
 | 0x40000000 -
@@ -70,12 +67,6 @@ description. Upon system reset, global and local feature values are reset.
 !===
 ! 0 ! Disable misaligned exception delegation.
 ! 1 ! Enable misaligned exception delegation.
-!===
-| SOFTWARE_CHECK_EXC_DELEG                          | 0     | Local |
-[cols="1,4"]
-!===
-! 0 ! Disable software check exception delegation.
-! 1 ! Enable software check exception delegation.
 !===
 | LANDING_PAD                                       | 0     | Local |
 [cols="1,4"]
