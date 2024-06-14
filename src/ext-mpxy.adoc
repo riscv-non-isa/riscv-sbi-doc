@@ -1,0 +1,830 @@
+== Message Proxy Extension (EID #0x4D505859 “MPXY”)
+
+The Message Proxy (MPXY) extension allows the supervisor software to send and
+receive messages through the SBI implementation. This extension defines a
+generic interface allowing supervisor software to implement clients for various
+messaging protocols implemented by the SBI implementation
+(such as RPMI cite:[rpmi], etc). The SBI MPXY interface is abstract and
+agnostic of message protocol implementations in the SBI implementation. The
+message format used by a client in the supervisor software to send/receive
+messages through the SBI MPXY extension is defined by the corresponding message
+protocol specification.
+
+This extension requires a per-hart shared memory between the supervisor
+software and the SBI implementation for message data transfer. This per-hart
+shared memory is different from the message protocol specific shared memory
+that is used between the SBI implementation and other agents such as other
+secure or non-secure domain or an external device like platform microcontroller.
+The supervisor software must first setup the shared memory before calling any
+other function defined in this extension.
+
+=== SBI MPXY and Dedicated SBI extension rule
+The implementation may only provide either an SBI MPXY or a dedicated SBI
+extension interface for a specific functionality within the specified message
+protocol, but never both.
+
+=== Message Channels
+The MPXY extension defines an abstract message channel which is identified by
+a unique 32 bits unsigned integer referred to as `channel_id`. The supervisor
+software can discover the `channel_id` of a message channel using standard
+hardware discovery mechanisms. The message protocol specification associated
+with a message channel is discovered through the standard message channel
+attributes defined in the following sections.
+
+The type of messages data(or group of messages) that can be transmitted through
+a MPXY message channel are defined by the message protocol specification. The
+message protocol specification can define multiple message groups but only
+selected groups can be accessible to the supervisor software via the MPXY
+extension.
+
+NOTE: Any `channel_id` exported to the supervisor software via the hardware
+discovery mechanism is implicitly associated with a particular message protocol
+transport. This binding is internal to the SBI implementation. To the supervisor
+software, a message channel is an abstract entity with associated attributes
+that can be accessed through the MPXY extension. The message channel attributes
+describe the characteristics of a message channel depending on the associated
+message protocol.
+
+=== Message Channel Attributes
+Each message channel (`channel_id`) has a set of associated attributes which
+are identified by a unique 32 bits unsigned integer called `attribute_id` where
+each attribute value is 32 bits wide.
+
+The message channel attributes are divided into two categories namely standard
+attributes and message protocol specific attributes. The encoding of message
+channel `attribute_id` is as follows:
+
+```c
+attribute_id[31] = 0 (Standard)
+attribute_id[31] = 1 (Message protocol)
+```
+
+Standard attributes are defined by the MPXY extension and all message channels
+must support these attributes. Apart from standard attributes, a message
+channel can also have message protocol attributes which are defined by the
+message protocol specification.
+
+Once a client in supervisor software has verified the channel and its
+associated attributes, it can use the MPXY interface to send messages over the
+message channel where each message can have protocol specific type referred to
+as `message_id`.
+
+[#table_mpxy_channel_attributes]
+.MPXY Channel Attributes
+[cols="6,3,2,9a", width=95%, align="center", options="header"]
+|===
+| Attribute Name
+| Attribute ID
+| Access
+| Description
+
+| MSG_PROT_ID
+| 0x00000000
+| RO
+| *Message Protocol Identifier* +
+Unique ID for identifying the message protocol specification. The table
+<<table_mpxy_message_protocol_id>> provides a list of supported message protocol
+specifications and their IDs.
+
+| MSG_PROT_VERSION
+| 0x00000001
+| RO
+| *Message Protocol Version* +
+Version of the message protocol specification.
+```
+[31:16]: Major version.
+ [15:0]: Minor version.
+```
+
+If the message protocol specification has additional version fields or the
+above encoding is not suitable then the message protocol specification must
+define message protocol attribute for discovering version of the message
+protocol specification.
+
+| MSG_DATA_MAX_LEN
+| 0x00000002
+| RO
+| *Maximum Message Data Length* +
+Maximum message data size in bytes supported by the message channel.
+
+| MSG_SEND_TIMEOUT
+| 0x00000003
+| RO
+| *Message Send Timeout* +
+Timeout for sending a message in microseconds as supported by the message
+protocol specification. Functions which do not wait for response can use this
+timeout value.
+
+| MSG_COMPLETION_TIMEOUT
+| 0x00000004
+| RO
+| *Message Completion Timeout* +
+This is the aggregate of `MSG_SEND_TIMEOUT` and the response receive timeout in
+microseconds as supported by the message protocol specification. Functions which
+wait for response can use this timeout value.
+
+
+| CHANNEL_CAPABILITY
+| 0x00000005
+| RO
+| *Channel Capabilities Bits*
+```
+[31:6]: Reserved and `0`
+
+   [5]: Send Message with
+        Response (FID #4) Support
+
+   [4]: Send Message without
+        Response (FID #5) Support
+
+   [3]: Get Notifications (FID #6)
+        Support
+
+   [2]: Events State Support
+
+   [1]: SSE Event
+
+   [0]: MSI Interrupt
+```
+Any defined bit as `1` means the corresponding capability is supported.
+
+The SBI implementation only needs to support one, either MSI or SSE.
+If both are enabled, the MSI is preferred over the SSE event.
+
+If the Get Notifications (FID #6) is not supported then the Events State
+Support, SSE Event and MSI Interrupt bits will be `0`.
+
+| SSE_EVENT_ID
+| 0x00000006
+| RO
+| *SSE Event ID* +
+Channel SSE event id if SSE events are supported as discovered via
+`CHANNEL_CAPABILITY` attribute.
+
+| MSI_CONTROL
+| 0x00000007
+| RW
+| *MSI Control* +
+MSI Interrupt control for notification indication
+```
+0 = Disable
+1 = Enable
+```
+This attribute can be set to `1` if  `MSI_ADDR_LOW` and `MSI_ADDR_HIGH`
+attributes point to a valid MSI target.
+
+If the message channel does not support MSI interrupt based indication
+mechanism discovered via `CHANNEL_CAPABILITY` attribute then this `MSI_CONTROL`
+ignores writes and reads always zero.
+
+The reset value of this attribute is `0`.
+
+| MSI_ADDR_LOW
+| 0x00000008
+| RW
+| *MSI Address Low* +
+Low 32 bits of the MSI target physical address.
+
+If the message channel does not support MSI based notifications then this
+attribute ignores writes and reads always `0`.
+
+The reset value of this attribute is `0`.
+
+| MSI_ADDR_HIGH
+| 0x00000009
+| RW
+| *MSI Address High* +
+High 32 bits of the MSI target physical address.
+
+If the message channel does not support MSI based notifications then this
+attribute ignores writes and reads always `0`.
+
+The reset value of this attribute is `0`.
+
+| MSI_DATA
+| 0x0000000A
+| RW
+| *MSI Data* +
+MSI data word written to the MSI target.
+
+If the message channel does not support MSI based notifications then this
+attribute ignores writes and reads always `0`.
+
+The reset value of this attribute is `0`.
+
+| EVENTS_STATE_CONTROL
+| 0x0000000B
+| RW
+| *Events State Data.* +
+If the message channel supports notification events state data then this
+attribute can be used to enable state reporting like number of events
+`RETURNED`, `REMAINING` or `LOST` after a call to
+Get Notifications (FID #6) function.
+
+The reset value of this attribute is `0`, which means disabled. If a client
+wants to enable events state reporting, it must write `1`. If the events
+state reporting is not supported by the channel or the
+Get Notifications (FID #6) function is not implemented as indicated by
+the `CHANNEL_CAPABILITY` attribute, then the writes to this attribute will be
+ignored.
+
+More details on events state data are mentioned in the function
+Get Notifications (FID #6) description.
+
+| RESERVED
+| 0x0000000C - 0x7fffffff
+|
+| Reserved for future use.
+
+| Message Protocol Attributes
+| 0x80000000 - 0xffffffff
+|
+| Attributes defined by the message protocol specification.
+Refer to message protocol specification for details.
+|===
+
+=== Message Protocol IDs
+Each message protocol specification supporting MPXY extension will be assigned
+a 32 bits identifier which is listed in the table below. New message protocol
+enabling support for MPXY will need to be added in the below table with its
+assigned ID.
+
+[#table_mpxy_message_protocol_id]
+.MPXY Message Protocol IDs
+[cols="5,5,8", width=95%, align="center", options="header"]
+|===
+| Message Protocol Name
+| MSG_PROT_ID value
+| Description
+
+| RPMI
+| 0x00000000
+| RPMI cite:[rpmi]
+
+| RESERVED
+| 0x00000001 - 0x7fffffff
+|
+
+| Vendor Specific
+| 0x80000000 - 0xffffffff
+| Custom vendor specific message protocol
+|===
+
+=== Function: Set shared memory (FID #0)
+
+```c
+struct sbiret sbi_mpxy_set_shmem(unsigned long shmem_size,
+                                 unsigned long shmem_phys_lo,
+                                 unsigned long shmem_phys_hi,
+                                 unsigned long flags)
+```
+
+Set the shared memory for sending/receiving messages on the calling hart.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
+bit-wise then `shmem_phys_lo` specifies the lower XLEN bits and `shmem_phys_hi`
+specifies the upper XLEN bits of the shared memory physical base address. The
+`shmem_phys_lo` must be 4096 bytes aligned and the `shmem_size` must be
+multiples of 4096 bytes.
+
+If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bit-wise
+then shared memory is disabled and `shmem_size` parameter is ignored.
+
+The `flags` parameter specifies configuration for shared memory setup and it is
+encoded as follows:
+
+```
+flags[XLEN-1:2]: Reserved for future use and should be zero.
+flags[1:0]: Shared memory setup mode (Refer table below).
+```
+
+[#table_mpxy_shmem_setup_mode]
+.MPXY Shared Memory Setup Mode
+[cols="5,5,8", width=95%, align="center", options="header"]
+|===
+| Mode
+| flags[1:0]
+| Description
+
+| OVERWRITE
+| 0b00
+| Ignore the current shared memory state and force setup shared memory state
+based on parameters.
+
+| OVERWRITE-RETURN
+| 0b01
+|Same as `OVERWRITE` mode and in addition the new shared memory state is
+enabled, the old shared memory state `shmem_size`, `shmem_phys_lo` and
+`shmem_phys_hi` in the same order are written in the new shared memory at
+offset `0x0`. +
+This flag provides provisions to software layers in the supervisor software
+that want to send messages using the shared memory but do not know the shared
+memory details that have already been setup. Those layers can temporarily setup
+their own shared memory on the calling hart, send messages and then restore back
+the previous shared memory with SBI implementation.
+
+| RESERVED
+| 0b10 - 0b11
+| Reserved for future use. Must be initialized to `0`.
+|===
+
+The possible error codes returned in `sbiret.error` are below.
+
+[#table_mpxy_set_shmem_errors]
+.MPXY Set Shared Memory Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Shared memory was set or cleared successfully.
+
+| SBI_ERR_INVALID_PARAM
+| The `flags` parameter is either reserved or invalid value. +
+Or the `shmem_phys_lo` parameter is not 4096 bytes aligned or `shmem_size`
+is not multiple of 4096 bytes.
+
+| SBI_ERR_INVALID_ADDRESS
+| The shared memory pointed to by the `shmem_phys_lo` and `shmem_phys_hi`
+parameters does not satisfy the requirements described in
+<<_shared_memory_physical_address_range_parameter>>.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+NOTE: The supervisor software must call this function to setup the shared
+memory first before using any other function.
+
+=== Function: Get Channel IDs (FID #1)
+
+```c
+struct sbiret sbi_mpxy_get_channel_ids(uint32_t start_index)
+```
+
+Get channel IDs of the message channels accessible to the supervisor software
+in the shared memory of the calling hart. The channel IDs are returned as an
+array of 32 bits unsigned integers where the `start_index` parameter specifies
+the array index of the first channel ID to be returned in the shared memory.
+
+The SBI implementation will return channel IDs in the shared memory of the
+calling hart as specified by the table below:
+
+[#table_mpxy_get_channel_ids]
+.MPXY Channel IDs Shared Memory Layout
+[cols="3,5,6", width=95%, align="center", options="header"]
+|===
+| Offset
+| Field
+| Description
+
+| 0x0
+| REMAINING
+| Remaining number of channel IDs.
+
+| 0x4
+| RETURNED
+| Number of channel IDs (N) returned in the shared memory.
+
+| 0x8
+| CHANNEL_ID [start_index + 0]
+| Channel ID
+
+| 0xC
+| CHANNEL_ID [start_index + 1]
+| Channel ID
+
+| 0x8 + ((N-1) * 4)
+| CHANNEL_ID [start_index + N - 1]
+| Channel ID
+|===
+
+The number of channel IDs returned in the shared memory are specified by the
+`RETURNED` field whereas the `REMAINING` field specifies the number of
+remaining channel IDs. If the `REMAINING` is not `0` then supervisor software
+can call this function again to get remaining channel IDs with `start_index`
+passed accordingly. The supervisor software may require multiple SBI calls to
+get the complete list of channel IDs depending on the `RETURNED` and
+`REMAINING` fields.
+
+The `sbiret.value` is always set to zero whereas the possible error codes
+returned in `sbiret.error` are below.
+
+[#table_mpxy_get_channel_ids_errors]
+.MPXY Get Channel IDs Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| The channel ID array has been written successfully.
+
+| SBI_ERR_INVALID_PARAM
+| `start_index` is invalid.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_DENIED
+| Getting channel ID array not allowed on calling hart.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function: Read Channel Attribute (FID #2)
+
+```c
+struct sbiret sbi_mpxy_read_attributes(uint32_t channel_id,
+                                       uint32_t base_attribute_id,
+                                       uint32_t attribute_count)
+```
+
+Read message channel attributes. The `channel_id` parameter specifies the
+message channel whereas `base_attribute_id` and `attribute_count` parameters
+specify the range of attribute ids to be read.
+
+Supervisor software must only call this function for the contiguous attribute
+range where the `base_attribute_id` is the starting index of that range and
+`attribute_count` is the number of attributes in the contiguous range. If there
+are multiple such attribute ranges then multiple calls of this function must be
+done from supervisor software. Supervisor software must read the message
+protocol specific attributes via separate call to this function with
+`base_attribute_id` and `attribute_count` without any overlap with the MPXY
+standard attributes.
+
+Upon calling this function the message channel attribute values are returned
+starting from the offset `0x0` in the shared memory of the calling hart where
+the value of the attribute with `attribute_id = base_attribute_id + i` is
+available at the shared memory offset `4 * i`.
+
+The possible error codes returned in `sbiret.error` are shown below.
+
+[#table_mpxy_read_channel_attributes_errors]
+.MPXY Read Channel Attributes Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Message channel attributes has been read successfully.
+
+| SBI_ERR_INVALID_PARAM
+| `attribute_count` is `0`. +
+Or the `attribute_count > (shared memory size)/4`.
+Or the `base_attribute_count_id` is not valid.
+
+| SBI_ERR_NOT_SUPPORTED
+| `channel_id` is not supported or invalid.
+
+| SBI_ERR_BAD_RANGE
+| One of the attributes in the range specified by the `base_attribute_id` and
+`attribute_count` do not exist.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function: Write Channel Attribute (FID #3)
+
+```c
+struct sbiret sbi_mpxy_write_attributes(uint32_t channel_id,
+                                        uint32_t base_attribute_id,
+                                        uint32_t attribute_count)
+```
+
+Write message channel attributes. The `channel_id` parameter specifies the
+message channel whereas `base_attribute_id` and `attribute_count` parameters
+specify the range of attribute ids.
+
+
+Supervisor software must only call this function for the contiguous attribute
+range where the `base_attribute_id` is the starting index of that range and
+`attribute_count` is the number of attributes in the contiguous range. If there
+are multiple such attribute ranges then multiple calls of this function must be
+done from supervisor software. Apart from contiguous attribute indices,
+supervisor software must also consider the attribute access permissions and
+attributes with Read Only access must be excluded from the attribute range.
+Supervisor software must read the message protocol specific attributes via
+separate call to this function with `base_attribute_id` and `attribute_count`
+without any overlap with the MPXY standard attributes.
+
+Upon calling this function the message channel attribute values are returned
+starting from the offset `0x0` in the shared memory of the calling hart where
+the value to be written in attribute with
+`attribute_id = base_attribute_id + i` is at the shared memory offset `4 * i`.
+
+The possible error codes returned in `sbiret.error` are shown below.
+
+[#table_mpxy_write_channel_attributes_errors]
+.MPXY Write Channel Attributes Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Message channel attributes has been written successfully.
+
+| SBI_ERR_INVALID_PARAM
+| `attribute_count` is `0`. +
+Or the `attribute_count > (shared memory size)/4`. +
+Or the `base_attribute_count_id` is not valid.
+
+| SBI_ERR_NOT_SUPPORTED
+| `channel_id` is not supported or invalid.
+
+| SBI_ERR_BAD_RANGE
+| One of the attributes in the range specified by the `base_attribute_id` and
+`attribute_count` do not exist or the attribute is read-only (RO). +
+Or `base_attribute_id`  and `attribute_count` result into a range which
+overlaps with standard and message protocol specific attributes.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_DENIED
+| If any attribute write dependency is not satisfied.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function: Send Message with Response (FID #4)
+
+```c
+struct sbiret
+sbi_mpxy_send_message_with_response(uint32_t channel_id,
+                                    uint32_t message_id,
+                                    unsigned long message_data_len)
+```
+
+Send a message to the message proxy channel specified by the `channel_id`
+parameter. The `message_id` parameter specifies a message specific to a message
+protocol to be sent whereas the `message_data_len` parameter represents the
+length of message data in bytes which is located at the offset `0x0` in the
+shared memory setup by the calling hart.
+
+After sending the message, this function waits for SBI implementation for the
+message response. This function only succeeds upon receipt of the response.
+Some messages may require sending multiple times for complete data transfer so
+the supervisor software is responsible for doing multiple requests in such cases.
+Details of such cases can be found in respective message protocol
+specifications.
+
+Upon calling this function the SBI implementation must write the response
+message data at the offset `0x0` in the shared memory setup by the calling hart
+and the number of bytes written will be returned through `sbiret.value`.
+The layout of data in case of both request and response is according to the
+respective message protocol specification message format.
+
+Upon success, this function: +
+1) Writes the message response data at offset `0x0` of the shared memory setup
+by the calling hart. +
+2) Returns `SBI_SUCCESS` in `sbiret.error`. +
+3) Returns message response data length in `sbiret.value` +
+
+This function is optional. If this function is implemented, the corresponding
+bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
+
+The possible error codes returned in `sbiret.error` are below.
+
+[#table_mpxy_send_message_withresponse_errors]
+.MPXY Send Message with Response Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Message sent and response received successfully.
+
+| SBI_ERR_INVALID_PARAM
+| The `message_data_len > max_message_data_len` for specified `channel_id`. +
+Or the `message_data_len` is greater than the size of shared memory on the
+calling hart.
+
+| SBI_ERR_NOT_SUPPORTED
+| `channel_id` is not supported or invalid. +
+Or the message represented by the `message_id` is not supported or invalid. +
+Or this function is not supported.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_TIMEOUT
+| Waiting for response timeout.
+
+| SBI_ERR_IO
+| Failed due to I/O error.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function: Send Message without Response (FID #5)
+
+```c
+struct sbiret
+sbi_mpxy_send_message_without_response(uint32_t channel_id,
+                                       uint32_t message_id,
+                                       unsigned long message_data_len)
+```
+
+Send a message to the message channel specified by the `channel_id` parameter.
+The `message_id` parameter specifies a message specific to a message protocol
+to be sent whereas the `message_data_len` parameter represents the length of
+message data in bytes which is located at the offset `0x0` in the shared memory
+setup by the calling hart.
+
+This function does not wait for response and returns after successful message
+transmission.
+
+Some messages may require sending multiple times for complete data transfer so
+the supervisor software is responsible for doing multiple requests in such
+cases. Details of such cases can be found in the respective message protocol
+specification.
+
+This function is optional. If this function is implemented, the corresponding
+bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
+
+The possible error codes returned in `sbiret.error` are below.
+
+[#table_mpxy_send_message_withoutresponse_errors]
+.MPXY Send Message without Response Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Message sent successfully.
+
+| SBI_ERR_INVALID_PARAM
+| The `message_data_len > max_message_data_len` for specified `channel_id`. +
+Or the `message_data_len` is greater than the size of shared memory on the
+calling hart.
+
+| SBI_ERR_NOT_SUPPORTED
+| `channel_id` is not supported or invalid. +
+Or the message represented by the `message_id` is not supported or invalid. +
+Or this function is not supported.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_TIMEOUT
+| Message send timeout.
+
+| SBI_ERR_IO
+| Failed due to I/O error.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function: Get Notifications (FID #6)
+
+```c
+struct sbiret sbi_mpxy_get_notification_events(uint32_t channel_id)
+```
+
+Get message protocol specific notification events received on the message
+channel specified by the `channel_id` parameter.
+
+NOTE: If any notification indication mechanism like MSI or SSE is not
+supported/configured for the message channel then supervisor software can
+periodically call `sbi_mpxy_get_notification_events()` (i.e. poll).
+
+NOTE: Notifications are asynchronous in nature from Supervisor software
+perspective. Caching or buffering mechanism if any is specific to SBI
+implementation. Supervisor software must fetch the notification events through
+this function periodically if polling and fast enough in order to avoid missing
+any event due to limited buffering in SBI implementation.
+
+Depending on the message protocol implementation, a channel may support events
+state which includes data like number of events `RETURNED`, `REMAINING` and
+`LOST`. Events state data is optional and if the message protocol
+implementation supports then the channel will have a corresponding bit set in
+`CHANNEL_CAPABILITY` attribute. +
+By default the events state is disabled and clients can explicitly enable it
+through the `EVENTS_STATE_CONTROL` attribute.
+
+NOTE: Client must assume that only after enabling EVENTS_STATE_CONTROL
+attribute the events state data starts getting accumulated by the SBI
+implementation. Clients if required can enable EVENTS_STATE_CONTROL attribute
+if supported in the initialization phase.
+
+In the shared memory, 16 bytes starting from offset `0x0` are used for this
+state data.
+
+Shared memory layout with events state data (each field is of 4 bytes):
+```c
+Offset 0x0: REMAINING
+Offset 0x4: RETURNED
+Offset 0x8: LOST
+Offset 0xC: RESERVED
+Offset 0x10: Start of message protocol specific notification events data
+```
+
+The `RETURNED` field represents the number of events which are returned in the
+shared memory when this function is called. The `REMAINING` field
+represents the number of events still remaining with SBI implementation and the
+client may need to call this function again until the `REMAINING` field becomes
+`0`.
+
+The `LOST` field represents the number of events which are lost due to limited
+buffer size managed by the message protocol implementation. Details of
+buffering/caching of events is specific to message protocol implementation.
+
+Upon calling this function the received notification events are written by the
+SBI implementation at the offset `0x10` in the shared memory setup by the
+calling hart irrespective of events state data reporting. If events state data
+reporting is disabled or not supported, then the values in events state fields
+are undefined. The number of the bytes written to the shared memory will be
+returned through `sbiret.value` which is the number of bytes starting from
+offset `0x10`.  The layout and encoding of notification events are defined by
+the message protocol specification associated with the message proxy channel
+(`channel_id`).
+
+This function is optional. If this function is implemented, the corresponding
+bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
+
+The possible error codes returned in `sbiret.error` are below.
+
+[#table_mpxy_get_notifications_errors]
+.MPXY Get Notifications Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code
+| Description
+
+| SBI_SUCCESS
+| Notifications received successfully.
+
+| SBI_ERR_NOT_SUPPORTED
+| `channel_id` is not supported or invalid. +
+Or this function is not supported.
+
+| SBI_ERR_NO_SHMEM
+| The shared memory setup is not done or disabled for calling hart.
+
+| SBI_ERR_IO
+| Failed due to I/O error.
+
+| SBI_ERR_FAILED
+| Failed due to other unspecified errors.
+|===
+
+=== Function Listing
+
+[#table_mpxy_function_list]
+.MPXY Function List
+[cols="7,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name
+| SBI Version
+| FID
+| EID
+
+| sbi_mpxy_set_shmem
+| 3.0
+| 0
+| 0x4D505859
+
+| sbi_mpxy_get_channel_ids
+| 3.0
+| 1
+| 0x4D505859
+
+| sbi_mpxy_read_attributes
+| 3.0
+| 2
+| 0x4D505859
+
+| sbi_mpxy_write_attributes
+| 3.0
+| 3
+| 0x4D505859
+
+| sbi_mpxy_send_message_with_response
+| 3.0
+| 4
+| 0x4D505859
+
+| sbi_mpxy_send_message_without_response
+| 3.0
+| 5
+| 0x4D505859
+
+| sbi_mpxy_get_notification_events
+| 3.0
+| 6
+| 0x4D505859
+|===
