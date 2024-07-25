@@ -27,8 +27,14 @@ The possible error codes returned in `sbiret.error` are shown in the
 .RFENCE Remote FENCE.I Errors
 [cols="2,3", width=90%, align="center", options="header"]
 |===
-| Error code  | Description
-| SBI_SUCCESS | IPI was sent to all the targeted harts successfully.
+| Error code            | Description
+| SBI_SUCCESS           | IPI was sent to all the targeted harts successfully.
+| SBI_ERR_INVALID_PARAM | Either `hart_mask_base` or at least one hartid from
+                          `hart_mask` is not valid, i.e., either the hartid is
+                          not enabled by the platform or is not available to
+                          the supervisor.
+| SBI_ERR_FAILED        | The request failed for unspecified or unknown other
+                          reasons.
 |===
 
 === Function: Remote SFENCE.VMA (FID #1)
@@ -56,6 +62,12 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
                             successfully.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
+                            `hart_mask` is not valid, i.e., either the hartid
+                            is not enabled by the platform or is not available
+                            to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Remote SFENCE.VMA with ASID (FID #2)
@@ -84,6 +96,12 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
                             successfully.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `asid`, `hart_mask_base`, or at least one
+                            hartid from `hart_mask` is not valid, i.e., either
+                            the hartid is not enabled by the platform or is not
+                            available to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Remote HFENCE.GVMA with VMID (FID #3)
@@ -116,6 +134,12 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `vmid`, `hart_mask_base`, or at least one
+                            hartid from `hart_mask` is not valid, i.e., either
+                            the hartid is not enabled by the platform or is not
+                            available to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Remote HFENCE.GVMA (FID #4)
@@ -147,6 +171,12 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
+                            `hart_mask` is not valid, i.e., either the hartid
+                            is not enabled by the platform or is not available
+                            to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Remote HFENCE.VVMA with ASID (FID #5)
@@ -180,6 +210,12 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `asid`, `hart_mask_base`, or at least one
+                            hartid from `hart_mask` is not valid, i.e., either
+                            the hartid is not enabled by the platform or is not
+                            available to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Remote HFENCE.VVMA (FID #6)
@@ -211,6 +247,12 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
+| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
+                            `hart_mask` is not valid, i.e., either the hartid
+                            is not enabled by the platform or is not available
+                            to the supervisor.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function Listing
