@@ -38,8 +38,8 @@ endif::[]
 :stem: latexmath
 :footnote:
 :xrefstyle: short
-:table
-  font_size: 12
+//#:table
+//  font_size: 12
 
 // Preamble
 [WARNING]
