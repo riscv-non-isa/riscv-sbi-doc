@@ -17,6 +17,7 @@
 :experimental:
 :reproducible:
 //:WaveDromEditorApp: app/wavedrom-editor.app
+:imagesdir: .
 :imagesoutdir: docs-resources/images
 :bibtex-file: src/references.bib
 :bibtex-order: alphabetical
