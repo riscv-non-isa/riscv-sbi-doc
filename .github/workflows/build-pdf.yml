@@ -29,6 +29,7 @@
     push:
       branches:
         - main
+        - '*'
   
   jobs:
     build:
