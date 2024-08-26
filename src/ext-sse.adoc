@@ -33,7 +33,8 @@ with standard events based on the above encoding.
 
 2+^| Range 0x00000000 - 0x0000ffff
 | 0x00000000                   | Local RAS event
-| 0x00000001 - 0x00003fff      | Local events reserved for future use
+| 0x00000001                   | Local double trap event
+| 0x00000002 - 0x00003fff      | Local events reserved for future use
 | 0x00004000 - 0x00007fff      | Platform specific local events
 | 0x00008000                   | Global RAS event
 | 0x00008001 - 0x0000bfff      | Global events reserved for future use
