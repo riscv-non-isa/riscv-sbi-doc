@@ -98,6 +98,19 @@ If an SBI function needs to pass a shared memory physical address range to
 the SBI implementation (or higher privilege mode), then this physical memory
 address range MUST satisfy the following requirements:
 
+* The SBI implementation MUST check that the specified physical memory range
+  is composed of valid physical addresses and return SBI_ERR_INVALID_ADDRESS
+  when any address in the range is not valid.
+
+NOTE: A valid address is one that is within the platform's physical memory
+  layout. As an SBI implementation may further restrict the allowed range, it
+  may return a generic SBI_ERR_FAILED (instead of SBI_ERR_INVALID_ADDRESS) when
+  input is invalid with respect to its specific limits. Returning SBI_ERR_FAILED
+  instead of SBI_ERR_INVALID_ADDRESS, in this case, is not a violation of the
+  above specification because the SBI implementation should detect the distinct
+  case of violating the more strict range first, making it appropriate to return
+  the error associated with the stricter range case immediately.
+
 * The SBI implementation MUST check that the supervisor-mode software is
   allowed to access the specified physical memory range with the access
   type requested (read and/or write).
