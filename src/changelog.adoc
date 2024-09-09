@@ -2,6 +2,8 @@
 
 === Version 3.0-rc1
 * Clarify SBI IPI and RFENCE error codes
+* Clarify the description of the `set_timer` function
+* Added SBI DBTR extension
 * Added SBI FWFT extension
 * Added SBI SSE extension
 * Added error code SBI_ERR_BAD_RANGE

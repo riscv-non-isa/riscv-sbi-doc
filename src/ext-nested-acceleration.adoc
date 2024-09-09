@@ -2,7 +2,7 @@
 
 Nested virtualization is the ability of a hypervisor to run another hypervisor
 as a guest. RISC-V nested virtualization requires an L0 hypervisor (running
-in hypervisor-mode) to trap-and-emulate the RISC-V H-extension <<priv_v1.12>>
+in hypervisor-mode) to trap-and-emulate the RISC-V H-extension cite:[priv_v1_12]
 functionality (such as CSR accesses, HFENCE instructions, HLV/HSV instructions,
 etc.) for the L1 hypervisor (running in virtualized supervisor-mode).
 
@@ -57,7 +57,7 @@ acceleration shared memory.
                                               a possible RISC-V H-extension
                                               CSR defined in the Table 2.1
                                               of the RISC-V privileged
-                                              specification <<priv_v1.12>>.
+                                              specification cite:[priv_v1_12].
 |===
 
 Any nested acceleration feature may define the contents of the scratch space
@@ -296,7 +296,7 @@ following:
    the SBI call `sbi_nacl_sync_hfence(-1UL)`.
 . Restore GPR `X<i>` registers from the nested SRET context.
 . Emulate the SRET instruction as defined by the RISC-V Privilege
-  specification <<priv_v1.12>>.
+  specification cite:[priv_v1_12].
 
 === Feature: Autoswap CSR (ID #3)
 
