@@ -624,6 +624,74 @@ The possible error codes returned in `sbiret.error` are shown in
                             reasons.
 |===
 
+=== Function: Get PMU Event info (FID #8)
+
+[source, C]
+----
+struct sbiret sbi_pmu_event_get_info(unsigned long shmem_phys_lo,
+                                     unsigned long shmem_phys_hi,
+                                     unsigned long num_entries,
+                                     unsigned long flags)
+----
+
+Get details about any PMU event via shared memory. The supervisor software can
+get event specific information for multiple events in one shot by writing an
+entry for each event in the shared memory. Each entry in the shared memory
+must be encoded as follows:
+
+[#table_event_info_format]
+.Event info entry format
+[cols="1,2,3,7", width=90%, align="center", options="header"]
+|===
+| Word | Name        | ACCESS(SBI Implementation) | Encoding
+| 0    | event_idx   | RO     | BIT[0:19] - Describes the `event_idx`
+                                BIT[20:31] - Reserved for the future purpose.
+                                Must be zero.
+| 1    | output      | RW     | BIT[0] - Boolean value to indicate `event_idx`
+                                is supported or not. The SBI implmenentation
+                                MUST update this entire 32-bit word if valid
+                                `event_idx` and `event_data` (if applicable) are
+                                specified in the entry. BIT[1:31] - Reserved for
+                                the future purpose. Must be zero
+| 2-3  | event_data  | RO     | BIT[0:63] - Valid when `event_idx.type` is
+                                either `0x2`, `0x3` or `0xf`. It describes the
+                                `event_data` for the specific event specified in
+                                `event_idx` if applicable.
+|===
+
+The caller must initialize the shared memory and add `num_entries` of each event
+for which it wishes to discover information about. The `shmem_phys_lo` MUST
+be 16-byte aligned and the size of the share memory must be
+(16 * `num_entries`) bytes.
+
+The `flags` parameter is reserved for future use and MUST be zero.
+
+The SBI implementation MUST NOT touch the shared memory once this call returns
+as supervisor software may free the memory at any time.
+
+The possible error codes returned in `sbiret.error` are shown in
+<<table_pmu_event_get_info_errors>> below.
+
+[#table_pmu_event_get_info_errors]
+.PMU Get Event Info Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | The output field is updated for each event.
+| SBI_ERR_NOT_SUPPORTED	  | The SBI PMU event info retrieval function is not
+                            available in the SBI implementation.
+| SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
+                           `shmem_phys_lo` parameter is not 16-bytes aligned or
+                           `event_idx` value doesn't conform with the encodings
+                            defined in the specification.
+| SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
+                            and `shmem_phys_hi` parameters is not writable or
+                            does not satisfy other requirements of
+                            <<_shared_memory_physical_address_range_parameter>>.
+| SBI_ERR_FAILED          | The write failed for unspecified or unknown other
+                            reasons.
+|===
+
 === Function Listing
 
 [#table_pmu_function_list]
@@ -639,4 +707,5 @@ The possible error codes returned in `sbiret.error` are shown in
 | sbi_pmu_counter_fw_read         | 0.3         | 5   | 0x504D55
 | sbi_pmu_counter_fw_read_hi      | 2.0         | 6   | 0x504D55
 | sbi_pmu_snapshot_set_shmem      | 2.0         | 7   | 0x504D55
+| sbi_pmu_event_get_info      	  | 3.0         | 8   | 0x504D55
 |===
