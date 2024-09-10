@@ -391,9 +391,9 @@ The bit definitions of the `start_flags` parameter are shown in the
 | *RESERVED*                       | 2:(XLEN-1) | Reserved for future use
 |===
 
-NOTE: When SBI_PMU_START_SET_INIT_VALUE is not set in `start_flags`,
-the counter value will not be modified and event counting will start
-from current counter value.
+NOTE: When `SBI_PMU_START_SET_INIT_VALUE` or `SBI_PMU_START_FLAG_INIT_SNAPSHOT`
+is not set in `start_flags`, the counter value will not be modified and event
+counting will start from current counter value.
 
 The shared memory address must be set during boot via
 `sbi_pmu_snapshot_set_shmem` before the `SBI_PMU_START_FLAG_INIT_SNAPSHOT`
