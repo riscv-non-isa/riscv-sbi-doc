@@ -41,6 +41,24 @@ The event_idx is a 20 bits wide number encoded as follows:
     event_idx[15:0] = code
 ----
 
+The below table describes the different types of events supported in this
+specification.
+
+[#table_pmu_event_type]
+.PMU Event Type
+[cols="6,2,4", width=95%, align="center", options="header"]
+|===
+| Event ID Type         | Value    | Description
+| Type #0  		|        0 | Hardware general events
+| Type #1  		|        1 | Hardware Cache events
+| Type #2  		|        2 | Hardware raw events (deprecated)
+                                     Bits allowed for mhpmeventX [0:48]
+| Type #3  		|        3 | Hardware raw events v2
+                                     Bits allowed for mhpmeventX [0:58]
+| Type #15 		|       15 | Firmware events
+|===
+
+
 === Event: Hardware general events (Type #0)
 
 The `event_idx.type` (i.e. *event type*) should be `0x0` for all hardware
@@ -149,15 +167,32 @@ and all non-zero values of `event_data` are reserved for future use.
 The `event_idx.type` (i.e. *event type*) should be `0x2` for all hardware
 raw events and `event_idx.code` (i.e. *event code*) should be zero.
 
-On RISC-V platform with 32 bits wide `mhpmeventX` CSRs, the `event_data`
+On RISC-V platforms with 32 bits wide `mhpmeventX` CSRs, the `event_data`
 configuration (or parameter) should have the 32-bit value to to be programmed
 in the `mhpmeventX` CSR.
 
-On RISC-V platform with 64 bits wide `mhpmeventX` CSRs, the `event_data`
-configuration (or parameter) should have the 48-bit value to to be programmed
+On RISC-V platforms with 64 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 48-bit value to be programmed
 in the lower 48-bits of `mhpmeventX` CSR and the SBI implementation shall
 determine the value to be programmed in the upper 16 bits of `mhpmeventX`
 CSR.
+
+NOTE: This event type is deprecated in favor of `raw events v2`.
+
+=== Event: Hardware raw events v2 (Type #3)
+
+The `event_idx.type` (i.e. *event type*) should be `0x3` for all hardware
+raw events and `event_idx.code` (i.e. *event code*) should be zero.
+
+On RISC-V platforms with 32 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 32-bit value to to be programmed
+in the `mhpmeventX` CSR.
+
+On RISC-V platforms with 64 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 58-bit value be programmed
+in the lower 58-bits of `mhpmeventX` CSR and the SBI implementation shall
+determine the value to be programmed in the upper 6 bits of `mhpmeventX`
+CSR based on privilege specification definition.
 
 NOTE: The RISC-V platform hardware implementation may choose to define
 the expected value to be written to `mhpmeventX` CSR for a hardware event.
