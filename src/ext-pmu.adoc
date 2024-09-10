@@ -432,7 +432,8 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code              | Description
 | SBI_SUCCESS             | counter started successfully.
-| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter or
+                            the given flag parameter has an undefined bit set.
 | SBI_ERR_ALREADY_STARTED | set of counters includes at least one counter which
                             is already started.
 | SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
@@ -485,7 +486,8 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code              | Description
 | SBI_SUCCESS             | counter stopped successfully.
-| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter.
+| SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter or
+                            the given flag parameter has an undefined bit set.
 | SBI_ERR_ALREADY_STOPPED | set of counters includes at least one counter which
                             is already stopped.
 | SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
