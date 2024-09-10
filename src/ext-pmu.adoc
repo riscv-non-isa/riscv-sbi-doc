@@ -159,6 +159,21 @@ in the lower 48-bits of `mhpmeventX` CSR and the SBI implementation shall
 determine the value to be programmed in the upper 16 bits of `mhpmeventX`
 CSR.
 
+=== Event: Hardware raw events v2(Type #3)
+
+The `event_idx.type` (i.e. *event type*) should be `0x3` for all hardware
+raw events and `event_idx.code` (i.e. *event code*) should be zero.
+
+On RISC-V platform with 32 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 32-bit value to to be programmed
+in the `mhpmeventX` CSR.
+
+On RISC-V platform with 64 bits wide `mhpmeventX` CSRs, the `event_data`
+configuration (or parameter) should have the 58-bit value to to be programmed
+in the lower 58-bits of `mhpmeventX` CSR and the SBI implementation shall
+determine the value to be programmed in the upper 6 bits of `mhpmeventX`
+CSR based on privilege specification definition.
+
 NOTE: The RISC-V platform hardware implementation may choose to define
 the expected value to be written to `mhpmeventX` CSR for a hardware event.
 In case of hardware general/cache events, the RISC-V platform hardware
