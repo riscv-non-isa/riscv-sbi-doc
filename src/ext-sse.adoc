@@ -3,8 +3,9 @@
 The SBI Supervisor Software Events (SSE) extension provides a mechanism to
 inject software events from an SBI implementation to supervisor software such
 that it preempts all other traps and interrupts. The supervisor software will
-receive a software event only after it has registered an event handler and
-enabled the software event.
+receive software events only on harts which are ready to receive them. A software
+event is delivered only after supervisor software has registered an event handler
+and enabled the software event.
 
 The software events can be of two types: local or global. A local software
 event is local to a hart and can be handled only on that hart whereas a
@@ -73,9 +74,10 @@ At any point in time, a software event can be in one of the following states:
 . **RUNNING**    - Supervisor software is handling the software event
 
 A **global** software event **MUST** be registered and enabled only once by
-any hart. By default, a global software event will be routed to any hart but
-supervisor software can provide a preferred hart to handle this software event.
-The state of a global software event **MUST** be common to all harts.
+any hart. By default, a global software event will be routed to any hart which
+is ready to receive software events but supervisor software can provide a
+preferred hart to handle this software event. The state of a global software
+event **MUST** be common to all harts.
 
 NOTE: The preferred hart assigned to a global software event by the
 supervisor software is only a hint about supervisor software's preference.
@@ -83,8 +85,10 @@ The SBI implementation may choose a different hart for handling the
 global software event to avoid an inter-processor interrupt.
 
 A **local** software event **MUST** be registered and enabled by all harts
-who want to handle the event. The state of a local software event **MUST**
-be tracked separately for each hart.
+which want to handle this event. A local event is delivered to a hart only
+when the hart is ready to receive software events and the local event is
+registered and enabled on that hart. The state of a local software event
+**MUST** be tracked separately for each hart.
 
 NOTE: If a software event in `RUNNING` state is signalled by the event source
 again, the software event will be taken only after the running event handler
@@ -573,6 +577,58 @@ In case of an error, possible error codes are listed in
 | SBI_ERR_INVALID_PARAM   | `event_id` or `hart_id` is invalid.
 |===
 
+=== Function: Unmask software events on a hart (FID #8)
+
+[source, C]
+----
+struct sbiret sbi_sse_hart_unmask(void)
+----
+
+Start receiving (or unmask) software events on the calling hart. In other
+words, the calling hart is ready to receive software events from the SBI
+implementation.
+
+The software events are masked initially on all harts so the supervisor
+software must explicitly unmask software events on relevant harts at
+boot-time.
+
+In case of an error, possible error codes are listed in
+<<table_sse_hard_unmask_errors>> below.
+
+[#table_sse_hard_unmask_errors]
+.SSE Hart Unmask Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Software events unmasked successfully on the calling hart.
+| SBI_ERR_ALREADY_STARTED | Software events were already unmasked on the calling hart.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other reasons.
+|===
+
+=== Function: Mask software events on a hart (FID #9)
+
+[source, C]
+----
+struct sbiret sbi_sse_hart_mask(void)
+----
+
+Stop receiving (or mask) software events on the calling hart. In other
+words, the calling hart is not ready to receive software events from
+the SBI implementation.
+
+In case of an error, possible error codes are listed in
+<<table_sse_hard_mask_errors>> below.
+
+[#table_sse_hard_mask_errors]
+.SSE Hart Mask Errors
+[cols="2,3", width=90%, align="center", options="header"]
+|===
+| Error code              | Description
+| SBI_SUCCESS             | Software events masked successfully on the calling hart.
+| SBI_ERR_ALREADY_STOPPED | Software events were already masked on the calling hart.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other reasons.
+|===
+
 === Function Listing
 
 [#table_sse_function_list]
@@ -588,4 +644,6 @@ In case of an error, possible error codes are listed in
 | sbi_sse_disable                 | 3.0         | 5   | 0x535345
 | sbi_sse_complete                | 3.0         | 6   | 0x535345
 | sbi_sse_inject                  | 3.0         | 7   | 0x535345
+| sbi_sse_hart_unmask             | 3.0         | 8   | 0x535345
+| sbi_sse_hart_mask               | 3.0         | 9   | 0x535345
 |===
