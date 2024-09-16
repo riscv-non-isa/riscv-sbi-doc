@@ -1,6 +1,7 @@
 == Change Log
 
 === Version 3.0-rc1
+* Added SBI PMU event info function and new raw event type
 * Added SBI MPXY extension
 * Added error code SBI_ERR_TIMEOUT
 * Added error code SBI_ERR_IO
