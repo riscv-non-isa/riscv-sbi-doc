@@ -575,6 +575,8 @@ In case of an error, possible error codes are listed in
 | Error code              | Description
 | SBI_SUCCESS             | Event is successfully injected.
 | SBI_ERR_INVALID_PARAM   | `event_id` or `hart_id` is invalid.
+| SBI_ERR_FAILED          | The injection failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Unmask software events on a hart (FID #8)
