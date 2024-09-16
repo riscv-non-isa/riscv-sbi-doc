@@ -399,6 +399,8 @@ The possible error codes returned in `sbiret.error` are shown in
                             and `shmem_phys_hi` parameters does not satisfy
                             the requirements described in
                             <<_shared_memory_physical_address_range_parameter>>.
+| SBI_ERR_FAILED          | The request failed for unspecified or unknown other
+                            reasons.
 |===
 
 === Function: Synchronize shared memory CSRs (FID #2)
