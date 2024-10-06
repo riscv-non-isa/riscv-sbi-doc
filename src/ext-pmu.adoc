@@ -684,8 +684,7 @@ The possible error codes returned in `sbiret.error` are shown in
                             available in the SBI implementation.
 | SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
                            `shmem_phys_lo` parameter is not 16-bytes aligned or
-                           `event_idx` value doesn't conform with the encodings
-                            defined in the specification.
+                            any reserved bit in an `event_idx` word is set.
 | SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the `shmem_phys_lo`
                             and `shmem_phys_hi` parameters is not writable or
                             does not satisfy other requirements of
