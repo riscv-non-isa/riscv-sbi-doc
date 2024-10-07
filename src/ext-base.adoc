@@ -15,7 +15,8 @@ struct sbiret sbi_get_spec_version(void);
 Returns the current SBI specification version. This function must always
 succeed. The minor number of the SBI specification is encoded in the low 24
 bits, with the major number encoded in the next 7 bits. Bit 31 must be 0 and
-is reserved for future expansion.
+is reserved for future expansion. When XLEN is greater than 32, bits 32 and
+above are also reserved and must be 0.
 
 === Function: Get SBI implementation ID (FID #1)
 
