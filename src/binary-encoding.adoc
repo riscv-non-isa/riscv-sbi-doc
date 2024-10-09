@@ -6,10 +6,12 @@ of SBI extensions. The SBI specification follows the below calling convention.
 * An `ECALL` is used as the control transfer instruction between the supervisor
   and the SEE.
 
-* `a7` encodes the SBI extension ID (*EID*),
+* `a7` encodes the SBI extension ID (*EID*).
 
 * `a6` encodes the SBI function ID (*FID*) for a given extension ID encoded
    in `a7` for any SBI extension defined in or after SBI v0.2.
+
+* `a0` through `a5` contain the arguments for the SBI function call.
 
 * All registers except `a0` & `a1` must be preserved across an SBI call by the
   callee.
@@ -56,10 +58,17 @@ error codes.
 An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
 function ID (*FID*) must return the error code `SBI_ERR_NOT_SUPPORTED`.
 
+If an SBI function call returns an error code other than `SBI_SUCCESS`, the
+value returned in `a1` is unspecified unless explicitly defined for that SBI
+function.
+
 Every SBI function should prefer `unsigned long` as the data type. It keeps
 the specification simple and easily adaptable for all RISC-V ISA types.
 In case the data is defined as 32bit wide, higher privilege software must
-ensure that it only uses 32 bit data.
+ensure that it only uses 32 bit data. Parameters that are 2×XLEN bits wide are
+passed in a pair of argument registers, with the low-order XLEN bits in the
+lower-numbered register and the high-order XLEN bits in the higher-numbered
+register.
 
 === Hart list parameter
 
