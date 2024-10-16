@@ -26,6 +26,7 @@ Luo Jia / Zhouqi Jiang <luojia@hust.edu.cn>
 Nick Kossifidis <mickflemm@gmail.com>
 Palmer Dabbelt <palmer@dabbelt.com>
 Paolo Bonzini <pbonzini@redhat.com>
+Rahul Pathak <rpathak@ventanamicro.com>
 Sean Anderson <seanga2@gmail.com>
 Stefano Stabellini <stefano.stabellini@amd.com>
 Sunil V L <sunilvl@ventanamicro.com>
