@@ -341,7 +341,7 @@ and `attr_count` parameters specifies the range of event attribute ids.
 The event attribute values are written to a output shared memory which is
 specified by the `output_phys_lo` and `output_phys_hi` parameters where:
 
-* The `output_phys_lo` paramter MUST be `XLEN / 8` bytes aligned
+* The `output_phys_lo` parameter MUST be `XLEN / 8` bytes aligned
 * The size of output shared memory is assumed to be `(XLEN / 8) * attr_count`
 * The value of event attribute with id `base_attr_id + i` should be written
   at offset `(XLEN / 8) * (base_attr_id + i)`
@@ -384,7 +384,7 @@ and `attr_count` parameters specifies the range of event attribute ids.
 The event attribute values are read from a input shared memory which is
 specified by the `input_phys_lo` and `input_phys_hi` parameters where:
 
-* The `input_phys_lo` paramter MUST be `XLEN / 8` bytes aligned
+* The `input_phys_lo` parameter MUST be `XLEN / 8` bytes aligned
 * The size of input shared memory is assumed to be `(XLEN / 8) * attr_count`
 * The value of event attribute with id `base_attr_id + i` should be read
   from offset `(XLEN / 8) * (base_attr_id + i)`
