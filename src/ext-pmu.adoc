@@ -52,7 +52,7 @@ specification.
 | Type #0  		|        0 | Hardware general events
 | Type #1  		|        1 | Hardware Cache events
 | Type #2  		|        2 | Hardware raw events (deprecated)
-                                     Bits allowed for mhpmeventX [0:48]
+                                     Bits allowed for mhpmeventX [0:47]
 | Type #3  		|        3 | Hardware raw events v2
                                      Bits allowed for mhpmeventX [0:55]
 | Type #15 		|       15 | Firmware events
