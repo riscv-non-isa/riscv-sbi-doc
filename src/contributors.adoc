@@ -27,6 +27,7 @@ Nick Kossifidis <mickflemm@gmail.com>
 Palmer Dabbelt <palmer@dabbelt.com>
 Paolo Bonzini <pbonzini@redhat.com>
 Rahul Pathak <rpathak@ventanamicro.com>
+Samuel Holland <samuel.holland@sifive.com>
 Sean Anderson <seanga2@gmail.com>
 Stefano Stabellini <stefano.stabellini@amd.com>
 Sunil V L <sunilvl@ventanamicro.com>
