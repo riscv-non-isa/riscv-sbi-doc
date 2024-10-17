@@ -592,7 +592,7 @@ implement it.
 Any future revisions to this structure should be made in a backward compatible
 manner and will be associated with an SBI version.
 
-The logical counter indicies in the `counter_overflow_bitmap` and `counter_values`
+The logical counter indices in the `counter_overflow_bitmap` and `counter_values`
 array are relative w.r.t to `counter_idx_base` argument present in the
 `sbi_pmu_counter_stop` and `sbi_pmu_counter_start` functions. This allows the
 users to use snapshot feature for more than XLEN counters if required.
@@ -650,7 +650,7 @@ must be encoded as follows:
                                 BIT[20:31] - Reserved for the future purpose.
                                 Must be zero.
 | 1    | output      | RW     | BIT[0] - Boolean value to indicate `event_idx`
-                                is supported or not. The SBI implmenentation
+                                is supported or not. The SBI implementation
                                 MUST update this entire 32-bit word if valid
                                 `event_idx` and `event_data` (if applicable) are
                                 specified in the entry. BIT[1:31] - Reserved for
