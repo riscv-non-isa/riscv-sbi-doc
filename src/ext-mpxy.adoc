@@ -452,7 +452,7 @@ returned in `sbiret.error` are below.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Read Channel Attribute (FID #2)
+=== Function: Read Channel Attributes (FID #2)
 
 ```c
 struct sbiret sbi_mpxy_read_attributes(uint32_t channel_id,
@@ -493,7 +493,7 @@ The possible error codes returned in `sbiret.error` are shown below.
 | SBI_ERR_INVALID_PARAM
 | `attribute_count` is `0`. +
 Or the `attribute_count > (shared memory size)/4`.
-Or the `base_attribute_count_id` is not valid.
+Or the `base_attribute_id` is not valid.
 
 | SBI_ERR_NOT_SUPPORTED
 | `channel_id` is not supported or invalid.
@@ -509,7 +509,7 @@ Or the `base_attribute_count_id` is not valid.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Write Channel Attribute (FID #3)
+=== Function: Write Channel Attributes (FID #3)
 
 ```c
 struct sbiret sbi_mpxy_write_attributes(uint32_t channel_id,
@@ -553,7 +553,7 @@ The possible error codes returned in `sbiret.error` are shown below.
 | SBI_ERR_INVALID_PARAM
 | `attribute_count` is `0`. +
 Or the `attribute_count > (shared memory size)/4`. +
-Or the `base_attribute_count_id` is not valid.
+Or the `base_attribute_id` is not valid.
 
 | SBI_ERR_NOT_SUPPORTED
 | `channel_id` is not supported or invalid.
