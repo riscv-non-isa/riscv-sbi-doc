@@ -107,7 +107,7 @@ description. Upon system reset, global and local feature values are reset.
 
 [source, C]
 ----
-struct sbiret sbi_fwft_set(unsigned long feature,
+struct sbiret sbi_fwft_set(uint32_t feature,
                            unsigned long value,
                            unsigned long flags)
 ----
@@ -161,7 +161,7 @@ switch if delegation choices are different between Host and Guest/VM.
 
 [source, C]
 ----
-struct sbiret sbi_fwft_get(unsigned long feature)
+struct sbiret sbi_fwft_get(uint32_t feature)
 ----
 
 A successful return from `sbi_fwft_get()` results in the firmware
