@@ -54,7 +54,7 @@ specification.
 | Type #2  		|        2 | Hardware raw events (deprecated)
                                      Bits allowed for mhpmeventX [0:48]
 | Type #3  		|        3 | Hardware raw events v2
-                                     Bits allowed for mhpmeventX [0:58]
+                                     Bits allowed for mhpmeventX [0:55]
 | Type #15 		|       15 | Firmware events
 |===
 
@@ -189,8 +189,8 @@ configuration (or parameter) should have the 32-bit value to to be programmed
 in the `mhpmeventX` CSR.
 
 On RISC-V platforms with 64 bits wide `mhpmeventX` CSRs, the `event_data`
-configuration (or parameter) should have the 58-bit value be programmed
-in the lower 58-bits of `mhpmeventX` CSR and the SBI implementation shall
+configuration (or parameter) should have the 56-bit value be programmed
+in the lower 56-bits of `mhpmeventX` CSR and the SBI implementation shall
 determine the value to be programmed in the upper 6 bits of `mhpmeventX`
 CSR based on privilege specification definition.
 
