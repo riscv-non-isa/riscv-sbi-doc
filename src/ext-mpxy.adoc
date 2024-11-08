@@ -426,7 +426,7 @@ passed accordingly. The supervisor software may require multiple SBI calls to
 get the complete list of channel IDs depending on the `RETURNED` and
 `REMAINING` fields.
 
-The `sbiret.value` is always set to zero whereas the possible error codes
+The `sbiret.uvalue` is always set to zero whereas the possible error codes
 returned in `sbiret.error` are below.
 
 [#table_sbi_mpxy_get_channel_ids_errors]
@@ -598,7 +598,7 @@ specifications.
 
 Upon calling this function the SBI implementation MUST write the response
 message data at the offset `0x0` in the shared memory setup by the calling hart
-and the number of bytes written will be returned through `sbiret.value`.
+and the number of bytes written will be returned through `sbiret.uvalue`.
 The layout of data in case of both request and response is according to the
 respective message protocol specification message format.
 
@@ -606,7 +606,7 @@ Upon success, this function: +
 1) Writes the message response data at offset `0x0` of the shared memory setup
 by the calling hart. +
 2) Returns `SBI_SUCCESS` in `sbiret.error`. +
-3) Returns message response data length in `sbiret.value`. +
+3) Returns message response data length in `sbiret.uvalue`. +
 
 This function is optional. If this function is implemented, the corresponding
 bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
@@ -769,7 +769,7 @@ SBI implementation at the offset `0x10` in the shared memory setup by the
 calling hart irrespective of events state data reporting. If events state data
 reporting is disabled or not supported, then the values in events state fields
 are undefined. The number of the bytes written to the shared memory will be
-returned through `sbiret.value` which is the number of bytes starting from
+returned through `sbiret.uvalue` which is the number of bytes starting from
 offset `0x10`.  The layout and encoding of notification events are defined by
 the message protocol specification associated with the message proxy channel
 (`channel_id`).
