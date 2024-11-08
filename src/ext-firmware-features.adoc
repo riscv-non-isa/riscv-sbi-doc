@@ -115,7 +115,7 @@ struct sbiret sbi_fwft_set(uint32_t feature,
 A successful return from `sbi_fwft_set()` results in the requested
 firmware feature to be set according to the `value` and `flags` parameters for
 which per feature supported values are described in
-<<table_fw_features_attributes>> and flags in <<table_fw_features_flags>>.
+<<table_fw_features_attribute_values>> and flags in <<table_fw_features_flags>>.
 
 [#table_fw_features_flags]
 .FWFT Firmware Features Set Flags
@@ -166,7 +166,7 @@ struct sbiret sbi_fwft_get(uint32_t feature)
 
 A successful return from `sbi_fwft_get()` results in the firmware
 feature configuration value to be returned in `sbiret.value`. Possible
-`sbiret.value` values are described in <<table_fw_features_attributes>> for each
+`sbiret.value` values are described in <<table_fw_features_attribute_values>> for each
 feature ID.
 
 In case of failure, the content of `sbiret.value` is zero and the possible error
