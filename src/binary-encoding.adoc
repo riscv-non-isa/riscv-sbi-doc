@@ -23,7 +23,10 @@ of SBI extensions. The SBI specification follows the below calling convention.
 ----
     struct sbiret {
         long error;
-        long value;
+        union {
+            long value;
+            unsigned long uvalue;
+        };
     };
 ----
 

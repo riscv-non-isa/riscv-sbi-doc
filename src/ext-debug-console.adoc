@@ -35,7 +35,7 @@ XLEN bits of the input memory physical base address.
 This is a non-blocking SBI call and it may do partial/no writes if
 the debug console is not able to accept more bytes.
 
-The number of bytes written is returned in `sbiret.value` and the
+The number of bytes written is returned in `sbiret.uvalue` and the
 possible error codes returned in `sbiret.error` are shown in
 <<table_debug_console_write_errors>> below.
 
@@ -75,7 +75,7 @@ This is a non-blocking SBI call and it will not write anything
 into the output memory if there are no bytes to be read in the
 debug console.
 
-The number of bytes read is returned in `sbiret.value` and the
+The number of bytes read is returned in `sbiret.uvalue` and the
 possible error codes returned in `sbiret.error` are shown in
 <<table_debug_console_read_errors>> below.
 
@@ -106,7 +106,7 @@ This is a blocking SBI call and it will only return after writing
 the specified byte to the debug console. It will also return, with
 SBI_ERR_FAILED, if there are I/O errors.
 
-The `sbiret.value` is set to zero and the possible error codes returned
+The `sbiret.uvalue` is set to zero and the possible error codes returned
 in `sbiret.error` are shown in <<table_debug_console_write_byte_errors>>
 below.
 
