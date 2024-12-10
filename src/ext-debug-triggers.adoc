@@ -11,7 +11,7 @@ for supervisor-mode software such that it is:
 . Suitable for the rich operating systems and hypervisors running in supervisor-mode.
 . Allows Guest (VS-mode) and Hypervisor (HS-mode) to share debug triggers on a hart.
 
-All harts on a RISC-V platform have a fixed number of debug triggers which is referred
+Each hart on a RISC-V platform has a fixed number of debug triggers which is referred
 to as `trig_max` in this SBI extension. Each debug trigger is assigned a logical index
 called `trig_idx` by the SBI implementation where `-1 < trig_idx < trig_max`.
 
