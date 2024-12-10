@@ -3,7 +3,7 @@
 The RISC-V Sdtrig extension cite:[debug_v1_0] allows machine-mode software to directly
 configure debug triggers which in-turn allows native (or hosted) debugging in machine-mode
 without any external debugger. Unfortunately, the debug triggers are only accessible to
-the machine-mode.
+machine-mode.
 
 The SBI debug trigger extension defines a SBI based abstraction to provide native debugging
 for supervisor-mode software such that it is:
@@ -38,7 +38,7 @@ trigger called `trig_state` which is encoded as shown in <<table_dbtr_trig_state
 
 | hw_trig_idx
 | `trig_state[XLEN-1:8]`
-| hardware (or physical) index of the debug rigger. This field must be ignored when
+| hardware (or physical) index of the debug trigger. This field must be ignored when
   `trig_state.have_hw_trig == 0`.
 
 | reserved
@@ -319,7 +319,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code            | Description
 | SBI_SUCCESS           | Triggers uninstalled successfully.
-| SBI_ERR_INVALID_PARAM | One of the debug trigger with index `trig_idx` in the specified
+| SBI_ERR_INVALID_PARAM | One of the debug triggers with index `trig_idx` in the specified
                           set of debug triggers either not mapped to any HW debug trigger
                           OR has `trig_idx` >= `trig_max`.
 |===
@@ -348,7 +348,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code            | Description
 | SBI_SUCCESS           | Triggers enabled successfully.
-| SBI_ERR_INVALID_PARAM | One of the debug trigger with index `trig_idx` in the specified
+| SBI_ERR_INVALID_PARAM | One of the debug triggers with index `trig_idx` in the specified
                           set of debug triggers either not mapped to any HW debug trigger
                           OR has `trig_idx` >= `trig_max`.
 |===
@@ -376,7 +376,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code            | Description
 | SBI_SUCCESS           | Triggers disabled successfully.
-| SBI_ERR_INVALID_PARAM | One of the debug trigger with index `trig_idx` in the specified
+| SBI_ERR_INVALID_PARAM | One of the debug triggers with index `trig_idx` in the specified
                           set of debug triggers either not mapped to any HW debug trigger
                           OR has `trig_idx` >= `trig_max`.
 |===
