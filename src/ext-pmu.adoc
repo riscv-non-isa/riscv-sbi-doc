@@ -191,7 +191,7 @@ in the `mhpmeventX` CSR.
 On RISC-V platforms with 64 bits wide `mhpmeventX` CSRs, the `event_data`
 configuration (or parameter) should have the 56-bit value be programmed
 in the lower 56-bits of `mhpmeventX` CSR and the SBI implementation shall
-determine the value to be programmed in the upper 6 bits of `mhpmeventX`
+determine the value to be programmed in the upper 8 bits of `mhpmeventX`
 CSR based on privilege specification definition.
 
 NOTE: The RISC-V platform hardware implementation may choose to define
