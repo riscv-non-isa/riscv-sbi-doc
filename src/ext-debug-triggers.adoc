@@ -17,7 +17,7 @@ called `trig_idx` by the SBI implementation where `-1 < trig_idx < trig_max`.
 
 NOTE: The `trig_max` may vary across harts on a platform with asymmetric harts.
 
-The configuration of each debug trigger is expressed by three entities `trig_tdata1`,
+The configuration of each debug trigger is expressed by three parameters `trig_tdata1`,
 `trig_tdata2`, and `trig_tdata3` which are encoded in the same way as the `tdata1`,
 `tdata2`, and `tdata3` CSRs defined by the RISC-V Sdtrig extension cite:[debug_v1_0]
 but with the following additional constraints:

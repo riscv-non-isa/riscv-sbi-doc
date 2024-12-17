@@ -147,7 +147,7 @@ wait for response can use this timeout value.
 
    [1]: SSE Event
 
-   [0]: MSI Interrupt
+   [0]: MSI
 ```
 Any defined bit as `1` means the corresponding capability is supported.
 
@@ -155,7 +155,7 @@ The SBI implementation only needs to support one notification indication method,
 either MSI or SSE. If both are enabled, the MSI is preferred over the SSE event.
 
 If the Get Notifications (FID #6) is not supported then the Events State
-Support, SSE Event and MSI Interrupt bits will be `0`.
+Support, SSE Event and MSI bits will be `0`.
 
 | SSE_EVENT_ID
 | 0x00000006
@@ -169,7 +169,7 @@ unspecified.
 | 0x00000007
 | RW
 | *MSI Control* +
-MSI interrupt control for notification indication.
+MSI control for notification indication.
 ```
 0 = Disable
 1 = Enable

@@ -20,7 +20,7 @@ the features which supervisor-mode software may request to set or get.
                                             supervisor-mode.
 | 0x00000004   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
                                             bits for supervisor-mode.
-| 0x00000005   | POINTER_MASKING_PMLEN    | Control the pointer masking tag
+| 0x00000005   | POINTER_MASKING_PMLEN    | Control the pointer masking
                                             length for supervisor-mode.
 | 0x00000006 -
   0x3fffffff   |                          | Local feature types reserved for
@@ -85,8 +85,8 @@ description. Upon system reset, global and local feature values are reset.
 | DOUBLE_TRAP                                       | 0     | Local |
 [cols="1,4"]
 !===
-! 0 ! Disable double trap for supervisor-mode.
-! 1 ! Enable double trap for supervisor-mode.
+! 0 ! Disable double trap
+! 1 ! Enable double trap
 !===
 | PTE_AD_HW_UPDATING                                | 0     | Local |
 [cols="1,4"]

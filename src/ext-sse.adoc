@@ -9,7 +9,8 @@ and enabled the software event.
 
 The software events can be of two types: local or global. A local software
 event is local to a hart and can be handled only on that hart whereas a
-global software event is a system event and can be handled by any hart.
+global software event is a system event and can be handled by any participating
+hart.
 
 === Software Event Identification
 
