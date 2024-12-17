@@ -301,7 +301,10 @@ struct sbiret sbi_debug_uninstall_triggers(unsigned long trig_idx_base,
 ----
 
 Uninstall a set of debug triggers specified by the `trig_idx_base` and `trig_idx_mask`
-parameters on the calling hart.
+parameters on the calling hart. The `trig_idx_base` specifies the starting trigger index,
+while the `trig_idx_mask` is a bitmask indicating which triggers, relative to the base,
+are to be uninstalled. Each bit in the mask corresponds to a specific trigger, allowing
+for batch operations on multiple triggers simultaneously.
 
 For each debug trigger in the specified set of debug triggers, the SBI implementation MUST:
 
@@ -333,7 +336,10 @@ struct sbiret sbi_debug_enable_triggers(unsigned long trig_idx_base,
 ----
 
 Enable a set of debug triggers specified by the `trig_idx_base` and `trig_idx_mask`
-parameters on the calling hart.
+parameters on the calling hart. The `trig_idx_base` specifies the starting trigger index,
+while the `trig_idx_mask` is a bitmask indicating which triggers, relative to the base,
+are to be enabled. Each bit in the mask corresponds to a specific trigger, allowing
+for batch operations on multiple triggers simultaneously.
 
 To enable a debug trigger in the specified set of debug triggers, the SBI implementation
 MUST restore the `vs`, `vu`, `s`, and `u` bits of the mapped HW debug trigger from their
@@ -362,7 +368,10 @@ struct sbiret sbi_debug_disable_triggers(unsigned long trig_idx_base,
 ----
 
 Disable a set of debug triggers specified by the `trig_idx_base` and `trig_idx_mask`
-parameters on the calling hart.
+parameters on the calling hart. The `trig_idx_base` specifies the starting trigger index,
+while the `trig_idx_mask` is a bitmask indicating which triggers, relative to the base,
+are to be disabled. Each bit in the mask corresponds to a specific trigger, allowing
+for batch operations on multiple triggers simultaneously.
 
 To disable a debug trigger in the specified set of debug triggers, the SBI implementation
 MUST clear the `vs`, `vu`, `s`, and `u` bits of the mapped HW debug trigger.
