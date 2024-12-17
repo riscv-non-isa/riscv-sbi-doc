@@ -742,7 +742,7 @@ attribute, the events state data will start getting accumulated by the SBI
 implementation. A client may enable the `EVENTS_STATE_CONTROL` attribute in the
 initialization phase if it is supported.
 
-In the shared memory, 16 bytes starting from offset `0x0` are used for this
+In the shared memory, 16 bytes starting from offset `0x0` are used to return this
 state data.
 
 Shared memory layout with events state data (each field is of 4 bytes):
