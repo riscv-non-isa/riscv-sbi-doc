@@ -529,14 +529,14 @@ are multiple such attribute ranges then multiple calls of this function may be
 done from supervisor software. Apart from contiguous attribute indices,
 supervisor software MUST also consider the attribute access permissions and
 attributes with RO (Read Only) access MUST be excluded from the attribute range.
-Supervisor software MUST read the message protocol specific attributes via
+Supervisor software MUST write the message protocol specific attributes via
 separate call to this function with `base_attribute_id` and `attribute_count`
 without any overlap with the MPXY standard attributes.
 
-Upon calling this function the message channel attribute values are returned
-starting from the offset `0x0` in the shared memory of the calling hart where
-the value to be written in attribute with
-`attribute_id = base_attribute_id + i` is at the shared memory offset `4 * i`.
+Before calling this function, the supervisor software must populate the shared
+memory of the calling hart starting from offset 0x0 with the message channel
+attribute values. For each attribute with attribute_id = base_attribute_id + i,
+the corresponding value MUST be placed at the shared memory offset 4 * i.
 
 The possible error codes returned in `sbiret.error` are shown below.
 
