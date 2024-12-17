@@ -16,10 +16,9 @@ the features which supervisor-mode software may request to set or get.
                                             supervisor-mode.
 | 0x00000002   | SHADOW_STACK             | Control shadow stack support for
                                             supervisor-mode.
-| 0x00000003   | DOUBLE_TRAP              | Control double trap support for
-                                            supervisor-mode.
+| 0x00000003   | DOUBLE_TRAP              | Control double trap support.
 | 0x00000004   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
-                                            bits for supervisor-mode.
+                                            bits.
 | 0x00000005   | POINTER_MASKING_PMLEN    | Control the pointer masking
                                             length for supervisor-mode.
 | 0x00000006 -
