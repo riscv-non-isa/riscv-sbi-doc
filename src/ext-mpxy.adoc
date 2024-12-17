@@ -589,8 +589,8 @@ protocol to be sent whereas the `message_data_len` parameter represents the
 length of message data in bytes which is located at the offset `0x0` in the
 shared memory setup by the calling hart.
 
-After sending the message, this function waits for SBI implementation for the
-message response. This function only succeeds upon receipt of the response.
+After sending the message, this function waits for the message response from
+the SBI implementation. This function only succeeds upon receipt of the response.
 Some messages may require sending multiple times for complete data transfer so
 the supervisor software is responsible for doing multiple requests in such cases.
 Details of such cases can be found in respective message protocol
@@ -664,10 +664,9 @@ setup by the calling hart.
 This function does not wait for response and returns after successful message
 transmission.
 
-Some messages may require sending multiple times for complete data transfer so
-the supervisor software is responsible for doing multiple requests in such
-cases. Details of such cases can be found in the respective message protocol
-specification.
+In cases where complete data transfer requires multiple transmissions, the
+supervisor software shall issue multiple requests as necessary. Details of such
+cases can be found in the respective message protocol specification.
 
 This function is optional. If this function is implemented, the corresponding
 bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
@@ -719,15 +718,16 @@ and MUST be defined in the respective message protocol specification. The SBI
 implementation may support notification indication mechanisms like MSI or SSE
 to indicate the availability of events to the supervisor software.
 
-NOTE: If any notification indication mechanism like MSI or SSE is not
-supported/configured for the message channel then supervisor software can
-periodically call `sbi_mpxy_get_notification_events()` (i.e. poll).
+NOTE: If the message channel does not support or is not configured for a
+notification indication mechanism, such as MSI or SSE, the supervisor software
+can periodically invoke the poll operation `sbi_mpxy_get_notification_events`.
 
-NOTE: Notifications are asynchronous in nature from Supervisor software
-perspective. Caching or buffering mechanism if any is specific to SBI
-implementation. Supervisor software may fetch the notification events through
-this function periodically if polling and fast enough in order to avoid missing
-any event due to limited buffering in SBI implementation.
+NOTE: Notifications are asynchronous from the perspective of the supervisor
+software. Any caching or buffering mechanism is specific to the SBI
+implementation. The supervisor software may periodically poll for notification
+events using this function, provided that the polling frequency is sufficient
+to prevent the loss of events due to potential buffer limitations in the SBI
+implementation.
 
 Depending on the message protocol implementation, a channel may support events
 state which includes data like number of events `RETURNED`, `REMAINING` and
