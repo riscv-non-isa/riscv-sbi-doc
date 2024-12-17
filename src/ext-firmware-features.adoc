@@ -1,7 +1,8 @@
 == SBI Firmware Features Extension (EID #0x46574654 "FWFT")
 
-The Firmware Features extension is meant to control the behavior of specific
-firmware features. <<table_fw_features_types>> defines 32-bit identifiers for
+The Firmware Features extension enables supervisor-mode software to manage and
+control specific hardware capabilities or SBI implementation features.
+<<table_fw_features_types>> defines 32-bit identifiers for
 the features which supervisor-mode software may request to set or get.
 
 [#table_fw_features_types]
