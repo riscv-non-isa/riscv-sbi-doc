@@ -33,11 +33,11 @@ with standard events based on the above encoding.
 | Software Event ID            | Description
 
 2+^| Range 0x00000000 - 0x0000ffff
-| 0x00000000                   | Local RAS event
+| 0x00000000                   | Local High Priority RAS event
 | 0x00000001                   | Local double trap event
 | 0x00000002 - 0x00003fff      | Local events reserved for future use
 | 0x00004000 - 0x00007fff      | Platform specific local events
-| 0x00008000                   | Global RAS event
+| 0x00008000                   | Global High Priority RAS event
 | 0x00008001 - 0x0000bfff      | Global events reserved for future use
 | 0x0000c000 - 0x0000ffff      | Platform specific global events
 
@@ -49,11 +49,15 @@ with standard events based on the above encoding.
 | 0x00018000 - 0x0001bfff      | Global events reserved for future use
 | 0x0001c000 - 0x0001ffff      | Platform specific global events
 
-2+^| Range 0x00020000 - 0x0002ffff
-| 0x00020000 - 0x00023fff      | Local events reserved for future use
-| 0x00024000 - 0x00027fff      | Platform specific local events
-| 0x00028000 - 0x0002bfff      | Global events reserved for future use
-| 0x0002c000 - 0x0002ffff      | Platform specific global events
+2+^| ...
+
+2+^| Range 0x00100000 - 0x0010ffff
+| 0x00100000                   | Local Low Priority RAS event
+| 0x00100001 - 0x00103fff      | Local events reserved for future use
+| 0x00104000 - 0x00107fff      | Platform specific local events
+| 0x00108000                   | Global Low Priority RAS event
+| 0x00108001 - 0x0010bfff      | Global events reserved for future use
+| 0x0010c000 - 0x0010ffff      | Platform specific global events
 
 2+^| ...
 
