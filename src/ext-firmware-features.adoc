@@ -11,8 +11,7 @@ the features which supervisor-mode software may request to set or get.
 |===
 | Value        | Name                     | Description
 | 0x00000000   | MISALIGNED_EXC_DELEG     | Control misaligned access exception
-                                            delegation to supervisor-mode if
-                                            `medeleg` is present.
+                                            delegation to supervisor-mode
 | 0x00000001   | LANDING_PAD              | Control landing pad support for
                                             supervisor-mode.
 | 0x00000002   | SHADOW_STACK             | Control shadow stack support for
