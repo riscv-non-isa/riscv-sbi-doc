@@ -1,7 +1,8 @@
 == SBI Firmware Features Extension (EID #0x46574654 "FWFT")
 
-The Firmware Features extension is meant to control the behavior of specific
-firmware features. <<table_fw_features_types>> defines 32-bit identifiers for
+The Firmware Features extension enables supervisor-mode software to manage and
+control specific hardware capabilities or SBI implementation features.
+<<table_fw_features_types>> defines 32-bit identifiers for
 the features which supervisor-mode software may request to set or get.
 
 [#table_fw_features_types]
@@ -10,14 +11,12 @@ the features which supervisor-mode software may request to set or get.
 |===
 | Value        | Name                     | Description
 | 0x00000000   | MISALIGNED_EXC_DELEG     | Control misaligned access exception
-                                            delegation to supervisor-mode if
-                                            `medeleg` is present.
+                                            delegation to supervisor-mode
 | 0x00000001   | LANDING_PAD              | Control landing pad support for
                                             supervisor-mode.
 | 0x00000002   | SHADOW_STACK             | Control shadow stack support for
                                             supervisor-mode.
-| 0x00000003   | DOUBLE_TRAP              | Control double trap support for
-                                            supervisor-mode.
+| 0x00000003   | DOUBLE_TRAP              | Control double trap support
 | 0x00000004   | PTE_AD_HW_UPDATING       | Control hardware updating of PTE A/D
                                             bits for supervisor-mode.
 | 0x00000005   | POINTER_MASKING_PMLEN    | Control the pointer masking
