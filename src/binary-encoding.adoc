@@ -30,6 +30,8 @@ of SBI extensions. The SBI specification follows the below calling convention.
     };
 ----
 
+Data type `long` in C pseudocode is XLEN bits wide.
+
 In the name of compatibility, SBI extension IDs (*EIDs*) and SBI function IDs
 (*FIDs*) are encoded as signed 32-bit integers. When passed in registers these
 follow the standard above calling convention rules.
