@@ -12,6 +12,7 @@ of SBI extensions. The SBI specification follows the below calling convention.
    in `a7` for any SBI extension defined in or after SBI v0.2.
 
 * `a0` through `a5` contain the arguments for the SBI function call.
+  Registers that are not defined in the SBI function call are not reserved.
 
 * All registers except `a0` & `a1` must be preserved across an SBI call by the
   callee.
