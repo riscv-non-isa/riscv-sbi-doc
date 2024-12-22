@@ -43,7 +43,7 @@ trigger called `trig_state` which is encoded as shown in <<table_dbtr_trig_state
 
 | reserved
 | `trig_state[7:6]`
-| Reserved for future use
+| Reserved for future use and must be zero.
 
 | have_hw_trig
 | `trig_state[5:5]`
