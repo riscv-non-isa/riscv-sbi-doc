@@ -298,7 +298,7 @@ The `flags` parameter specifies configuration for shared memory setup and it is
 encoded as follows:
 
 ```
-flags[XLEN-1:2]: Reserved for future use and should be zero.
+flags[XLEN-1:2]: Reserved for future use and must be zero.
 flags[1:0]: Shared memory setup mode (Refer table below).
 ```
 
