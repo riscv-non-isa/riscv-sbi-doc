@@ -126,7 +126,7 @@ which per feature supported values are described in
                          be modified until: +
 			 - hart reset for feature with local scope +
 			 - system reset for feature with global scope +
-|      | BIT[XLEN-1:1] | Reserved for future use.
+|      | BIT[XLEN-1:1] | Reserved for future use and must be zero.
 |===
 
 In case of failure, `feature` value is not modified and the possible error codes
