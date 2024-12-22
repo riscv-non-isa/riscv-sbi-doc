@@ -375,7 +375,8 @@ shown in the <<table_pmu_counter_cfg_match_errors>> below.
 |===
 | Error code            | Description
 | SBI_SUCCESS           | counter found and configured successfully.
-| SBI_ERR_INVALID_PARAM | set of counters has at least one invalid counter.
+| SBI_ERR_INVALID_PARAM | set of counters has at least one invalid counter or
+                          the given flag parameter has an undefined bit set.
 | SBI_ERR_NOT_SUPPORTED | none of the counters can monitor the specified event.
 |===
 
