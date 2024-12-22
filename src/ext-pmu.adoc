@@ -349,8 +349,8 @@ shown in the <<table_pmu_counter_cfg_match_flags>> below.
                                              in S-mode
 | SBI_PMU_CFG_FLAG_SET_MINH   | 7:7        | Event counting inhibited +
                                              in M-mode
-| *RESERVED*                  | 8:(XLEN-1) | All non-zero values are
-                                             reserved for future use
+| *RESERVED*                  | 8:(XLEN-1) | Reserved for future use and must
+                                             be zero.
 |===
 
 NOTE: When *SBI_PMU_CFG_FLAG_SKIP_MATCH* is set in `config_flags`, the
@@ -376,7 +376,7 @@ shown in the <<table_pmu_counter_cfg_match_errors>> below.
 | Error code            | Description
 | SBI_SUCCESS           | counter found and configured successfully.
 | SBI_ERR_INVALID_PARAM | set of counters has at least one invalid counter or
-                          the given flag parameter has an undefined bit set.
+                          the given flag parameter has a reserved bit set.
 | SBI_ERR_NOT_SUPPORTED | none of the counters can monitor the specified event.
 |===
 
@@ -409,7 +409,8 @@ The bit definitions of the `start_flags` parameter are shown in the
 | SBI_PMU_START_FLAG_INIT_SNAPSHOT | 1:1        | Initialize the given counters
                                                   from shared memory if
                                                   available.
-| *RESERVED*                       | 2:(XLEN-1) | Reserved for future use
+| *RESERVED*                       | 2:(XLEN-1) | Reserved for future use and
+                                                  must be zero.
 |===
 
 NOTE: When `SBI_PMU_START_SET_INIT_VALUE` or `SBI_PMU_START_FLAG_INIT_SNAPSHOT`
@@ -434,7 +435,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code              | Description
 | SBI_SUCCESS             | counter started successfully.
 | SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter or
-                            the given flag parameter has an undefined bit set.
+                            the given flag parameter has a reserved bit set.
 | SBI_ERR_ALREADY_STARTED | set of counters includes at least one counter which
                             is already started.
 | SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
@@ -466,7 +467,8 @@ definitions of the `stop_flags` parameter are shown in the
 | SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT | 1:1        | Save a snapshot of the given
                                                  counter's values in the shared
                                                  memory if available.
-| *RESERVED*                      | 2:(XLEN-1) | Reserved for future use
+| *RESERVED*                      | 2:(XLEN-1) | Reserved for future use and
+                                                 must be zero.
 |===
 
 
@@ -488,7 +490,7 @@ The possible error codes returned in `sbiret.error` are shown in the
 | Error code              | Description
 | SBI_SUCCESS             | counter stopped successfully.
 | SBI_ERR_INVALID_PARAM   | set of counters has at least one invalid counter or
-                            the given flag parameter has an undefined bit set.
+                            the given flag parameter has a reserved bit set.
 | SBI_ERR_ALREADY_STOPPED | set of counters includes at least one counter which
                             is already stopped.
 | SBI_ERR_NO_SHMEM        | the snapshot shared memory is not available and
