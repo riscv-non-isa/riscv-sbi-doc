@@ -357,6 +357,9 @@ In case of an error, the possible error codes are shown in the
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event attribute values read successfully.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid or `attr_count` is zero.
 | SBI_ERR_BAD_RANGE       | One of the event attribute in the range specified
                             by `base_attr_id` and `attr_count` does not exist.
@@ -403,6 +406,9 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code            | Description
 | SBI_SUCCESS             | Event attribute values written successfully.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid or `attr_count` is zero.
 | SBI_ERR_BAD_RANGE       | One of the event attribute in the range specified
                             by `base_attr_id` and `attr_count` does not exist
@@ -451,6 +457,9 @@ below.
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event handler is registered successfully.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_STATE   | The event is not in `UNUSED` state.
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid or `handler_entry_pc`
                             is not 2-bytes aligned.
@@ -480,6 +489,9 @@ below.
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event handler is unregistered successfully.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_STATE   | Event is not in `REGISTERED` state.
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid.
 |===
@@ -508,6 +520,9 @@ below.
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event is successfully enabled.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is not valid.
 | SBI_ERR_INVALID_STATE   | The event is not in `REGISTERED` state.
 |===
@@ -536,6 +551,9 @@ below.
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event is successfully disabled.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is not valid.
 | SBI_ERR_INVALID_STATE   | Event is not in `ENABLED` state.
 |===
@@ -581,6 +599,9 @@ In case of an error, possible error codes are listed in
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Event is successfully injected.
+| SBI_ERR_NOT_SUPPORTED   | `event` is not reserved and valid, but the platform
+                            does not support it due to one or more missing
+                            dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` or `hart_id` is invalid.
 | SBI_ERR_FAILED          | The injection failed for unspecified or unknown other
                             reasons.
