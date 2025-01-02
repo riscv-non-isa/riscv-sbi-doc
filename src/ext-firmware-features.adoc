@@ -138,9 +138,9 @@ returned in `sbiret.error` are shown in <<table_fw_features_set_errors>> below.
 |===
 | Error code            | Description
 | SBI_SUCCESS           | `feature` was set successfully.
-| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and is implemented, but the
-                          platform does not support it due to one or more
-                          missing dependencies.
+| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and valid, but the platform
+                          does not support it due to one or more missing
+                          dependencies (Hardware or SBI implementation).
 | SBI_ERR_INVALID_PARAM | Provided `value` or `flags` parameter is invalid.
 | SBI_ERR_DENIED        | `feature` set operation failed because either: +
                           - it was denied by the SBI implementation +
@@ -178,9 +178,9 @@ codes returned in `sbiret.error` are shown in <<table_fw_features_get_errors>>.
 |===
 | Error code            | Description
 | SBI_SUCCESS           | Feature status was retrieved successfully.
-| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and is implemented, but the
-                          platform does not support it due to one or more
-                          missing dependencies.
+| SBI_ERR_NOT_SUPPORTED | `feature` is not reserved and valid, but the platform
+                          does not support it due to one or more missing
+                          dependencies (Hardware or SBI implementation).
 | SBI_ERR_DENIED        | `feature` is reserved or is platform-specific and
                           unimplemented.
 | SBI_ERR_FAILED        | The get operation failed for unspecified or unknown
