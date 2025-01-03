@@ -116,6 +116,9 @@ firmware feature to be set according to the `value` and `flags` parameters for
 which per feature supported values are described in
 <<table_fw_features_attribute_values>> and flags in <<table_fw_features_flags>>.
 
+NOTE: The set operation will succeed if requested `value` matches the existing
+value.
+
 [#table_fw_features_flags]
 .FWFT Firmware Features Set Flags
 [cols="1,1,3", width=90%, align="center", options="header"]
@@ -143,9 +146,10 @@ returned in `sbiret.error` are shown in <<table_fw_features_set_errors>> below.
 | SBI_ERR_INVALID_PARAM | Provided `value` or `flags` parameter is invalid.
 | SBI_ERR_DENIED        | `feature` set operation failed because either: +
                           - it was denied by the SBI implementation +
-                          - `feature` is locked +
                           - `feature` is reserved or is platform-specific and
                           unimplemented
+| SBI_ERR_DENIED_LOCKED | `feature` set operation failed because the `feature`
+			  is locked
 | SBI_ERR_FAILED        | The set operation failed for unspecified or unknown
                           other reasons.
 |===

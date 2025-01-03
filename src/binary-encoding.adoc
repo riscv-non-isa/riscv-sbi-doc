@@ -59,6 +59,7 @@ error codes.
 |  SBI_ERR_BAD_RANGE         | -11   | Bad (or invalid) range
 |  SBI_ERR_TIMEOUT           | -12   | Failed due to timeout
 |  SBI_ERR_IO                | -13   | Input/Output error
+|  SBI_ERR_DENIED_LOCKED     | -14   | Denied or not allowed due to lock status
 |===
 
 An `ECALL` with an unsupported SBI extension ID (*EID*) or an unsupported SBI
