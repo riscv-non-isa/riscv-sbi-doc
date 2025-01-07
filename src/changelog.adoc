@@ -1,6 +1,11 @@
 == Change Log
 
-=== Version 3.0-rc1
+=== Version 3.0-rc3
+* Added low priority RAS events in SSE.
+* Miscallenous clarification around reserved bits, fwft, notification events.
+* Added a dedicated error code for fwft set denial due to lock status.
+
+=== Version 3.0-rc1/rc2
 * Added SBI PMU event info function and new raw event type
 * Added SBI MPXY extension
 * Added error code SBI_ERR_TIMEOUT
