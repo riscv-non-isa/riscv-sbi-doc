@@ -7,7 +7,7 @@ receive software events only on harts which are ready to receive them. A softwar
 event is delivered only after supervisor software has registered an event handler
 and enabled the software event.
 
-The software events can be of two types: local or global. A local software
+The software events are one of two types: local or global. A local software
 event is local to a hart and can be handled only on that hart whereas a
 global software event is a system event and can be handled by any participating
 hart.
@@ -72,7 +72,8 @@ with standard events based on the above encoding.
 
 === Software Event States
 
-At any point in time, a software event can be in one of the following states:
+At any point in time, a software event **MUST** be in one of the following
+states:
 
 . **UNUSED**     - Software event is not used by supervisor software
 . **REGISTERED** - Supervisor software has provided an event handler for
@@ -112,7 +113,7 @@ image::images/riscv-sbi-sse-sm.png[]
 === Software Event Priority
 
 Each software event has an associated priority (referred as `event_priority`)
-which can be used by an SBI implementation to select a software event for
+which is used by an SBI implementation to select a software event for
 injection when multiple software events are pending on the same hart.
 
 The priority of a software event is a 32-bit unsigned integer where lower
@@ -132,7 +133,7 @@ previous lower priority software event will be resumed.
 
 A software event can have various XLEN bits wide attributes associated to it
 where each event attribute is identified by a unique 32-bit unsigned integer
-called `attr_id`. A software event attribute can have a Read-Only or Read-Write
+called `attr_id`. A software event attribute has Read-Only or Read-Write
 access permissions. The <<table_sse_event_attributes>> below provides a list
 event attributes.
 
@@ -451,8 +452,8 @@ For global events, the event is registered for all the harts.
 The event MUST be in `UNUSED` state otherwise this function will fail.
 
 NOTE: It is advisable to use different values for `handler_entry_arg` for
-different events because a higher priority event can preempt a lower priority
-event.
+different events because higher priority events preempt lower priority
+events.
 
 Upon success, the event state moves from `UNUSED` to `REGISTERED`. In case
 of an error, possible error codes are listed in <<table_sse_register_errors>>
