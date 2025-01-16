@@ -469,7 +469,8 @@ below.
                             platform does not support it due to one or more
                             missing dependencies (Hardware or SBI
                             implementation).
-| SBI_ERR_INVALID_STATE   | The event is not in `UNUSED` state.
+| SBI_ERR_INVALID_STATE   | `event_id` is valid but the event is not in
+                            `UNUSED` state.
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid or `handler_entry_pc`
                             is not 2-bytes aligned.
 |===
@@ -502,7 +503,8 @@ below.
                             platform does not support it due to one or more
                             missing dependencies (Hardware or SBI
                             implementation).
-| SBI_ERR_INVALID_STATE   | Event is not in `REGISTERED` state.
+| SBI_ERR_INVALID_STATE   | `event_id` is valid but the event is not in
+                            `REGISTERED` state.
 | SBI_ERR_INVALID_PARAM   | `event_id` is invalid.
 |===
 
@@ -535,7 +537,8 @@ below.
                             missing dependencies (Hardware or SBI
                             implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is not valid.
-| SBI_ERR_INVALID_STATE   | The event is not in `REGISTERED` state.
+| SBI_ERR_INVALID_STATE   | `event_id` is valid but the event is not in
+                            `REGISTERED` state.
 |===
 
 === Function: Disable a software event (FID #5)
@@ -567,7 +570,8 @@ below.
                             missing dependencies (Hardware or SBI
                             implementation).
 | SBI_ERR_INVALID_PARAM   | `event_id` is not valid.
-| SBI_ERR_INVALID_STATE   | Event is not in `ENABLED` state.
+| SBI_ERR_INVALID_STATE   | `event_id` is valid but the event is not in
+                            `ENABLED` state.
 |===
 
 === Function: Complete software event handling (FID #6)
