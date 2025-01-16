@@ -192,8 +192,8 @@ event attributes.
 | 0x00000003
 |  RW (global) +
    RO (local)
-| Hart id of the preferred hart that should handle the global software event.
-  The value of this attribute must always be valid hart id for both local and
+| Hart ID of the preferred hart that should handle the global software event.
+  The value of this attribute must always be valid hart ID for both local and
   global software events. This attribute is read-only for local software events
   and for global software events it can be updated only when the software event
   is in `UNUSED` or `REGISTERED` state. +
@@ -291,7 +291,7 @@ following:
   .. Set `INTERRUPTED_A6` event attribute = interrupted `A6` GPR value
   .. Set `INTERRUPTED_A7` event attribute = interrupted `A7` GPR value
 . Redirect execution to supervisor event handler
-  .. Set `A6` GPR = Current Hart id
+  .. Set `A6` GPR = Current Hart ID
   .. Set `A7` GPR = `ENTRY_ARG` event attribute value
   .. Set `sepc` = Interrupted program counter value
   .. Set `sstatus.SPP` CSR bit = interrupted privilege mode
@@ -342,14 +342,14 @@ struct sbiret sbi_sse_read_attrs(uint32_t event_id,
 Read a range of event attribute values from a software event.
 
 The `event_id` parameter specifies the software event whereas `base_attr_id`
-and `attr_count` parameters specifies the range of event attribute ids.
+and `attr_count` parameters specifies the range of event attribute IDs.
 
 The event attribute values are written to a output shared memory which is
 specified by the `output_phys_lo` and `output_phys_hi` parameters where:
 
 * The `output_phys_lo` parameter MUST be `XLEN / 8` bytes aligned
 * The size of output shared memory is assumed to be `(XLEN / 8) * attr_count`
-* The value of event attribute with id `base_attr_id + i` should be written
+* The value of event attribute with ID `base_attr_id + i` should be written
   at offset `(XLEN / 8) * (base_attr_id + i)`
 
 In case of an error, the possible error codes are shown in the
@@ -388,14 +388,14 @@ struct sbiret sbi_sse_write_attrs(uint32_t event_id,
 Write a range of event attribute values to a software event.
 
 The `event_id` parameter specifies the software event whereas `base_attr_id`
-and `attr_count` parameters specifies the range of event attribute ids.
+and `attr_count` parameters specifies the range of event attribute IDs.
 
 The event attribute values are read from a input shared memory which is
 specified by the `input_phys_lo` and `input_phys_hi` parameters where:
 
 * The `input_phys_lo` parameter MUST be `XLEN / 8` bytes aligned
 * The size of input shared memory is assumed to be `(XLEN / 8) * attr_count`
-* The value of event attribute with id `base_attr_id + i` should be read
+* The value of event attribute with ID `base_attr_id + i` should be read
   from offset `(XLEN / 8) * (base_attr_id + i)`
 
 For local events, the event attributes are updated only for the calling hart.
