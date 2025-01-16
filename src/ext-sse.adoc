@@ -162,7 +162,7 @@ event attributes.
   `bit[3:3]`: Event injection using the `sbi_sse_inject` call (1 = Allowed
   and 0 = Not allowed) +
   +
-  `bit[XLEN-1:4]`: Reserved for future use and should be zero +
+  `bit[XLEN-1:4]`: Reserved for future use and must be zero +
   +
   The reset value of this attribute is zero.
 
@@ -184,7 +184,7 @@ event attributes.
   +
   `bit[0:0]`: Disable software event upon `sbi_sse_complete` call (one-shot) +
   +
-  `bit[XLEN-1:1]`: Reserved for future use and should be zero +
+  `bit[XLEN-1:1]`: Reserved for future use and must be zero +
   +
   The reset value of this attribute is zero.
 
@@ -244,7 +244,7 @@ event attributes.
   +
   `bit[3:3]`: interrupted `hstatus.SPVP` CSR bit value +
   +
-  `bit[XLEN-1:4]`: Reserved for future use and should be zero +
+  `bit[XLEN-1:4]`: Reserved for future use and must be set to zero +
 
 | INTERRUPTED_A6
 | 0x00000008
