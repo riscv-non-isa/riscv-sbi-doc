@@ -269,7 +269,7 @@ event attributes.
 | RESERVED
 | > 0x00000009
 | ---
-| Reserved for future use
+| Reserved for future use.
 |===
 
 === Software Event Injection
@@ -591,8 +591,8 @@ interrupted supervisor state as decribed in <<_software_event_completion>>.
 struct sbiret sbi_sse_inject(uint32_t event_id, unsigned long hart_id)
 ----
 
-The supervisor software can inject a software event with the help of this
-function. The `event_id` paramater refers to the ID of the event to be injected.
+The supervisor software can inject a software event with this function.
+The `event_id` paramater refers to the ID of the event to be injected.
 
 For local events, the `hart_id` parameter refers to the hart on which the
 event is to be injected.
@@ -655,8 +655,8 @@ struct sbiret sbi_sse_hart_mask(void)
 ----
 
 Stop receiving (or mask) software events on the calling hart. In other
-words, the calling hart is not ready to receive software events from
-the SBI implementation.
+words, the calling hart will no longer be ready to receive software events
+from the SBI implementation.
 
 In case of an error, possible error codes are listed in
 <<table_sse_hard_mask_errors>> below.
