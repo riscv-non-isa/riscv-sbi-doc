@@ -583,19 +583,17 @@ sbi_mpxy_send_message_with_response(uint32_t channel_id,
                                     uint32_t message_id,
                                     unsigned long message_data_len)
 ```
+Send a message to the MPXY channel specified by the `channel_id` parameter and
+wait until a message response is received from the MPXY channel. The `message_id`
+parameter specifies the message protocol specific identification of the message
+to be sent whereas the `message_data_len` parameter represents the length of
+message data in bytes which is located at the offset `0x0` in the shared memory
+setup by the calling hart.
 
-Send a message to the MPXY channel specified by the `channel_id`
-parameter. The `message_id` parameter specifies a message specific to a message
-protocol to be sent whereas the `message_data_len` parameter represents the
-length of message data in bytes which is located at the offset `0x0` in the
-shared memory setup by the calling hart.
-
-After sending the message, this function waits for the message response from
-the SBI implementation. This function only succeeds upon receipt of the response.
-Some messages may require sending multiple times for complete data transfer so
-the supervisor software is responsible for doing multiple requests in such cases.
-Details of such cases can be found in respective message protocol
-specifications.
+This function only succeeds upon receipt of a message response from the MPXY
+channel. In cases where complete data transfer requires multiple transmissions,
+the supervisor software shall send multiple messages as necessary. Details of
+such cases can be found in respective message protocol specifications.
 
 Upon calling this function the SBI implementation MUST write the response
 message data at the offset `0x0` in the shared memory setup by the calling hart
@@ -655,19 +653,24 @@ sbi_mpxy_send_message_without_response(uint32_t channel_id,
                                        uint32_t message_id,
                                        unsigned long message_data_len)
 ```
-
-Send a message to the MPXY channel specified by the `channel_id` parameter.
-The `message_id` parameter specifies a message specific to a message protocol
+Send a message to the MPXY channel specified by the `channel_id` parameter
+without waiting for a message response from the MPXY channel. The `message_id`
+parameter specifies the message protocol specific identification of the message
 to be sent whereas the `message_data_len` parameter represents the length of
 message data in bytes which is located at the offset `0x0` in the shared memory
 setup by the calling hart.
 
-This function does not wait for response and returns after successful message
-transmission.
+This function does not wait for message response from the channel and returns
+after successful message transmission. In cases where complete data transfer
+requires multiple transmissions, the supervisor software shall send multiple
+messages as necessary. Details of such cases can be found in the respective
+message protocol specification.
 
-In cases where complete data transfer requires multiple transmissions, the
-supervisor software shall issue multiple requests as necessary. Details of such
-cases can be found in the respective message protocol specification.
+NOTE: The messages which do not have an expected response as per the underlying
+message protocol specification are also referred to as posted messages. This
+function should be only used for such posted messages. The respective message
+protocol specification should define a mechanism to track the status of posted
+messages using notification events or some other message with response if required.
 
 This function is optional. If this function is implemented, the corresponding
 bit in the `CHANNEL_CAPABILITY` attribute is set to `1`.
