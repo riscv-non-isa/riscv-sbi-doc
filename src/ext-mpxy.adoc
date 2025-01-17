@@ -66,11 +66,11 @@ MUST support these attributes. Apart from standard attributes, a message
 channel may also have message protocol attributes which are defined by the
 message protocol specification.
 
-Once a client in supervisor software has verified the channel and its
-associated attributes, it can use the MPXY interface to send messages over the
-message channel where each message is identified by a 32 bits unsigned integer
-called `message_id`. The set of `message_id` that can be sent over an MPXY
-channel are defined by the message protocol specification.
+Once supervisor software has verified the channel and its associated attributes,
+it can use the MPXY interface to send messages over the message channel where
+each message is identified by a 32 bit unsigned integer called `message_id`.
+The set of `message_id` that can be sent over an MPXY channel are defined by
+the message protocol specification.
 
 [#table_mpxy_channel_attributes]
 .MPXY Channel Attributes
@@ -151,11 +151,12 @@ wait for response can use this timeout value.
 ```
 Any defined bit as `1` means the corresponding capability is supported.
 
-The SBI implementation only needs to support one notification indication method,
-either MSI or SSE. If both are enabled, the MSI is preferred over the SSE event.
+The SBI implementation only needs to support one method to indicate the
+availability of notifications, either MSI or SSE. If both are enabled, the
+MSI is preferred over the SSE event.
 
-If the Get Notifications (FID #6) is not supported then the Events State
-Support, SSE Event and MSI bits will be `0`.
+If Get Notifications function (FID #6) is not supported then the Events State
+Support, SSE Event and MSI bits must be `0`.
 
 | SSE_EVENT_ID
 | 0x00000006
@@ -169,7 +170,7 @@ unspecified.
 | 0x00000007
 | RW
 | *MSI Control* +
-MSI control for notification indication.
+Control for MSI based indication.
 ```
 0 = Disable
 1 = Enable
@@ -177,9 +178,9 @@ MSI control for notification indication.
 This attribute can be set to `1` if  `MSI_ADDR_LOW` and `MSI_ADDR_HIGH`
 attributes point to a valid MSI target.
 
-If the message channel does not support MSI based notification indication
-discovered via the `CHANNEL_CAPABILITY` attribute, then the `MSI_CONTROL` will
-ignore writes and always reads zero.
+If the message channel does not support MSI based indication as discovered via
+the `CHANNEL_CAPABILITY` attribute, then `MSI_CONTROL` ignore writes and always
+reads zero.
 
 The reset value of this attribute is `0`.
 
@@ -189,8 +190,8 @@ The reset value of this attribute is `0`.
 | *MSI Address Low* +
 Low 32 bits of the MSI target physical address.
 
-If the message channel does not support MSI based notification indication then
-this attribute ignores writes and always reads `0`.
+If the message channel does not support MSI based indication then this attribute
+ignores writes and always reads `0`.
 
 The reset value of this attribute is `0`.
 
@@ -200,8 +201,8 @@ The reset value of this attribute is `0`.
 | *MSI Address High* +
 High 32 bits of the MSI target physical address.
 
-If the message channel does not support MSI based notification indication then
-this attribute ignores writes and always reads `0`.
+If the message channel does not support MSI based indication then this attribute
+ignores writes and always reads `0`.
 
 The reset value of this attribute is `0`.
 
@@ -211,8 +212,8 @@ The reset value of this attribute is `0`.
 | *MSI Data* +
 MSI data word written to the MSI target.
 
-If the message channel does not support MSI based notification indication then
-this attribute ignores writes and always reads `0`.
+If the message channel does not support MSI based indication then this attribute
+ignores writes and always reads `0`.
 
 The reset value of this attribute is `0`.
 
@@ -225,9 +226,9 @@ attribute can be used to enable state reporting like number of events
 `RETURNED`, `REMAINING` or `LOST` after a call to
 Get Notifications (FID #6) function.
 
-The reset value of this attribute is `0`, which means disabled. If a client
-wants to enable events state reporting, it MUST write `1`. If the events
-state reporting is not supported by the channel or the
+The reset value of this attribute is `0`, which means disabled. If supervisor
+software wants to enable events state reporting, it MUST write `1`. If the
+events state reporting is not supported by the channel or the
 Get Notifications (FID #6) function is not implemented as indicated by
 the `CHANNEL_CAPABILITY` attribute, then the writes to this attribute will be
 ignored.
@@ -715,12 +716,12 @@ struct sbiret sbi_mpxy_get_notification_events(uint32_t channel_id)
 Get the message protocol specific notification events on the MPXY channel
 specified by the `channel_id` parameter. The events are message protocol specific
 and MUST be defined in the respective message protocol specification. The SBI
-implementation may support notification indication mechanisms like MSI or SSE
-to indicate the availability of events to the supervisor software.
+implementation may support indication mechanisms like MSI or SSE to inform the
+supervisor software about the availability of events.
 
-NOTE: If the message channel does not support or is not configured for a
-notification indication mechanism, such as MSI or SSE, the supervisor software
-can periodically invoke the poll operation `sbi_mpxy_get_notification_events`.
+NOTE: If the message channel does not support or is not configured for an
+indication mechanism, such as MSI or SSE, the supervisor software can periodically
+invoke the poll operation `sbi_mpxy_get_notification_events`.
 
 NOTE: Notifications are asynchronous from the perspective of the supervisor
 software. Any caching or buffering mechanism is specific to the SBI
@@ -731,16 +732,16 @@ implementation.
 
 Depending on the message protocol implementation, a channel may support events
 state which includes data like number of events `RETURNED`, `REMAINING` and
-`LOST`. Events state data is optional and if the message protocol
-implementation supports then the channel will have a corresponding bit set in
-`CHANNEL_CAPABILITY` attribute. +
-By default the events state is disabled and clients can explicitly enable it
-through the `EVENTS_STATE_CONTROL` attribute.
+`LOST`. Events state data is optional, and if the message protocol implementation
+supports it, then the channel will have the corresponding bit set in the
+`CHANNEL_CAPABILITY` attribute. By default the events state is disabled and
+supervisor software can explicitly enable it through the `EVENTS_STATE_CONTROL`
+attribute.
 
 NOTE: Only after enabling the events state reporting through `EVENTS_STATE_CONTROL`
 attribute, the events state data will start getting accumulated by the SBI
-implementation. A client may enable the `EVENTS_STATE_CONTROL` attribute in the
-initialization phase if it is supported.
+implementation. The supervisor software may enable the `EVENTS_STATE_CONTROL`
+attribute in the initialization phase if it is supported.
 
 In the shared memory, 16 bytes starting from offset `0x0` are used to return this
 state data.
@@ -755,10 +756,10 @@ Offset 0x10: Start of message protocol specific notification events data
 ```
 
 The `RETURNED` field represents the number of events which are returned in the
-shared memory when this function is called. The `REMAINING` field
-represents the number of events still remaining with SBI implementation and the
-client may need to call this function again until the `REMAINING` field becomes
-`0`.
+shared memory when this function is called. The `REMAINING` field represents
+the number of events still remaining with SBI implementation. The supervisor
+software may need to call this function again until the `REMAINING` field
+becomes `0`.
 
 The `LOST` field represents the number of events which are lost due to limited
 buffer size managed by the message protocol implementation. Details of
