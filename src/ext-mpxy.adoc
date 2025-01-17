@@ -108,7 +108,8 @@ message protocol specification.
 | 0x00000002
 | RO
 | *Maximum Message Data Length* +
-Maximum message data size in bytes supported by the message channel.
+Maximum message data size in bytes supported by the message channel to send
+or receive message.
 
 | MSG_SEND_TIMEOUT
 | 0x00000003
@@ -134,14 +135,14 @@ wait for response can use this timeout value.
 ```
 [31:6]: Reserved and `0`
 
-   [5]: Get Notifications (FID #6)
+   [5]: Get Notifications (FID #7)
         Support
 
    [4]: Send Message without
-        Response (FID #5) Support
+        Response (FID #6) Support
 
    [3]: Send Message with
-        Response (FID #4) Support
+        Response (FID #5) Support
 
    [2]: Events State Support
 
@@ -155,7 +156,7 @@ The SBI implementation only needs to support one method to indicate the
 availability of notifications, either MSI or SSE. If both are enabled, the
 MSI is preferred over the SSE event.
 
-If Get Notifications function (FID #6) is not supported then the Events State
+If Get Notifications function (FID #7) is not supported then the Events State
 Support, SSE Event and MSI bits must be `0`.
 
 | SSE_EVENT_ID
@@ -224,17 +225,17 @@ The reset value of this attribute is `0`.
 If the message channel supports notification events state data then this
 attribute can be used to enable state reporting like number of events
 `RETURNED`, `REMAINING` or `LOST` after a call to
-Get Notifications (FID #6) function.
+Get Notifications (FID #7) function.
 
 The reset value of this attribute is `0`, which means disabled. If supervisor
 software wants to enable events state reporting, it MUST write `1`. If the
 events state reporting is not supported by the channel or the
-Get Notifications (FID #6) function is not implemented as indicated by
+Get Notifications (FID #7) function is not implemented as indicated by
 the `CHANNEL_CAPABILITY` attribute, then the writes to this attribute will be
 ignored.
 
 More details on events state data are mentioned in the function
-Get Notifications (FID #6) description.
+Get Notifications (FID #7) description.
 
 | RESERVED
 | 0x0000000C - 0x7fffffff
@@ -275,11 +276,30 @@ assigned ID.
 | Custom vendor specific message protocol
 |===
 
-=== Function: Set shared memory (FID #0)
+=== Function: Get shared memory size (FID #0)
 
 ```c
-struct sbiret sbi_mpxy_set_shmem(unsigned long shmem_size,
-                                 unsigned long shmem_phys_lo,
+struct sbiret sbi_mpxy_get_shmem_size(void)
+```
+
+Get the shared memory size in number of bytes for sending and receiving messages.
+
+The shared memory size returned by the SBI implementation MUST satisfy the
+following requirements:
+
+. The shared memory size MUST be same for all HARTs
+. The shared memory size MUST be at least 4096 bytes
+. The shared memory size MUST be multiple of 4096 bytes
+. The shared memory size MUST not be less than the biggest MSG_DATA_MAX_LEN
+  attribute value across all MPXY channels
+
+This function always returns SBI_SUCCESS in `sbiret.error` and it will return
+the shared memory size in `sbiret.uvalue`.
+
+=== Function: Set shared memory (FID #1)
+
+```c
+struct sbiret sbi_mpxy_set_shmem(unsigned long shmem_phys_lo,
                                  unsigned long shmem_phys_hi,
                                  unsigned long flags)
 ```
@@ -287,13 +307,14 @@ struct sbiret sbi_mpxy_set_shmem(unsigned long shmem_size,
 Set the shared memory for sending and receiving messages on the calling hart.
 
 If both `shmem_phys_lo` and `shmem_phys_hi` parameters are not all-ones
-bit-wise then the `shmem_phys_lo` specifies the lower XLEN bits and 
-`shmem_phys_hi` specifies the upper XLEN bits of the shared memory physical base
-address. The `shmem_phys_lo` MUST be 4096 bytes aligned and the `shmem_size`
-MUST be multiples of 4096 bytes.
+bit-wise then the `shmem_phys_lo` parameter specifies the lower XLEN bits
+and the `shmem_phys_hi` parameter specifies the upper XLEN bits of the
+shared memory physical base address. The `shmem_phys_lo` parameter MUST
+be 4096 bytes aligned and the shared memory size is assumed to be same as
+returned by the Get shared memory size function (FID #0).
 
 If both `shmem_phys_lo` and `shmem_phys_hi` parameters are all-ones bit-wise
-then shared memory is disabled and `shmem_size` parameter is ignored.
+then shared memory is disabled.
 
 The `flags` parameter specifies configuration for shared memory setup and it is
 encoded as follows:
@@ -318,10 +339,9 @@ based on the passed parameters.
 
 | OVERWRITE-RETURN
 | 0b01
-|Same as `OVERWRITE` mode and additionally after the new shared memory state is
-enabled, the old shared memory `shmem_size`, `shmem_phys_lo` and
-`shmem_phys_hi` are written in the same order to the new shared memory at
-offset `0x0`. +
+| Same as `OVERWRITE` mode and additionally after the new shared memory state is
+enabled, the old shared memory `shmem_phys_lo` and `shmem_phys_hi` are written
+in the same order to the new shared memory at offset `0x0`. +
 
 This flag provide provision to software layers in the supervisor software
 that want to send messages using the shared memory but do not know the shared
@@ -360,9 +380,7 @@ The possible error codes returned in `sbiret.error` are below.
 
 | SBI_ERR_INVALID_PARAM
 | The `flags` parameter has invalid value or the bits set are within the reserved
-range. +
-Or the `shmem_phys_lo` parameter is not 4096 bytes aligned or `shmem_size`
-is not multiple of 4096 bytes.
+range. Or the `shmem_phys_lo` parameter is not 4096 bytes aligned.
 
 | SBI_ERR_INVALID_ADDRESS
 | The shared memory pointed to by the `shmem_phys_lo` and `shmem_phys_hi`
@@ -376,7 +394,7 @@ parameters does not satisfy the requirements described in
 NOTE: The supervisor software MUST call this function to setup the shared
 memory first before calling any other function in this extension.
 
-=== Function: Get Channel IDs (FID #1)
+=== Function: Get Channel IDs (FID #2)
 
 ```c
 struct sbiret sbi_mpxy_get_channel_ids(uint32_t start_index)
@@ -453,7 +471,7 @@ returned in `sbiret.error` are below.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Read Channel Attributes (FID #2)
+=== Function: Read Channel Attributes (FID #3)
 
 ```c
 struct sbiret sbi_mpxy_read_attributes(uint32_t channel_id,
@@ -510,7 +528,7 @@ Or the `base_attribute_id` is not valid.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Write Channel Attributes (FID #3)
+=== Function: Write Channel Attributes (FID #4)
 
 ```c
 struct sbiret sbi_mpxy_write_attributes(uint32_t channel_id,
@@ -575,7 +593,7 @@ overlaps with standard and message protocol specific attributes.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Send Message with Response (FID #4)
+=== Function: Send Message with Response (FID #5)
 
 ```c
 struct sbiret
@@ -645,7 +663,7 @@ Or this function is not supported.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Send Message without Response (FID #5)
+=== Function: Send Message without Response (FID #6)
 
 ```c
 struct sbiret
@@ -710,7 +728,7 @@ Or this function is not supported.
 | Failed due to other unspecified errors.
 |===
 
-=== Function: Get Notifications (FID #6)
+=== Function: Get Notifications (FID #7)
 
 ```c
 struct sbiret sbi_mpxy_get_notification_events(uint32_t channel_id)
@@ -818,38 +836,43 @@ Or this function is not supported.
 | FID
 | EID
 
-| sbi_mpxy_set_shmem
+| sbi_mpxy_get_shmem_size
 | 3.0
 | 0
 | 0x4D505859
 
-| sbi_mpxy_get_channel_ids
+| sbi_mpxy_set_shmem
 | 3.0
 | 1
 | 0x4D505859
 
-| sbi_mpxy_read_attributes
+| sbi_mpxy_get_channel_ids
 | 3.0
 | 2
 | 0x4D505859
 
-| sbi_mpxy_write_attributes
+| sbi_mpxy_read_attributes
 | 3.0
 | 3
 | 0x4D505859
 
-| sbi_mpxy_send_message_with_response
+| sbi_mpxy_write_attributes
 | 3.0
 | 4
 | 0x4D505859
 
-| sbi_mpxy_send_message_without_response
+| sbi_mpxy_send_message_with_response
 | 3.0
 | 5
 | 0x4D505859
 
-| sbi_mpxy_get_notification_events
+| sbi_mpxy_send_message_without_response
 | 3.0
 | 6
+| 0x4D505859
+
+| sbi_mpxy_get_notification_events
+| 3.0
+| 7
 | 0x4D505859
 |===
