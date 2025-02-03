@@ -245,7 +245,10 @@ event attributes.
   +
   `bit[3:3]`: interrupted `hstatus.SPVP` CSR bit value +
   +
-  `bit[XLEN-1:4]`: Reserved for future use and must be set to zero +
+  `bit[4:4]`: interrupted `sstatus.SPELP` CSR bit value if `Zicfilp` extension
+  is available to supervisor mode +
+  +
+  `bit[XLEN-1:5]`: Reserved for future use and must be set to zero +
 
 | INTERRUPTED_A6
 | 0x00000008
@@ -282,12 +285,14 @@ following:
   .. Set `INTERRUPTED_FLAGS` event attribute as follows:
      ... `INTERRUPTED_FLAGS[0:0]` = interrupted `sstatus.SPP` CSR bit value
      ... `INTERRUPTED_FLAGS[1:1]` = interrupted `sstatus.SPIE` CSR bit value
+     ... if `Zicfilp` extension is available to supervisor mode:
+     ....  `INTERRUPTED_FLAGS[4:4]` = interrupted `sstatus.SPELP` CSR bit value
      ... if H-extension is available to supervisor mode:
      ....  Set `INTERRUPTED_FLAGS[2:2]` = interrupted `hstatus.SPV` CSR bit value
      ....  Set `INTERRUPTED_FLAGS[3:3]` = interrupted `hstatus.SPVP` CSR bit value
      ... else
      ....  Set `INTERRUPTED_FLAGS[3:2]` = zero
-     ... Set `INTERRUPTED_FLAGS[XLEN-1:4]` = zero
+     ... Set `INTERRUPTED_FLAGS[XLEN-1:5]` = zero
   .. Set `INTERRUPTED_SEPC` event attribute = interrupted `sepc` CSR
   .. Set `INTERRUPTED_A6` event attribute = interrupted `A6` GPR value
   .. Set `INTERRUPTED_A7` event attribute = interrupted `A7` GPR value
@@ -298,6 +303,9 @@ following:
   .. Set `sstatus.SPP` CSR bit = interrupted privilege mode
   .. Set `sstatus.SPIE` CSR bit = `sstatus.SIE` CSR bit value
   .. Set `sstatus.SIE` CSR bit = zero
+  .. if `Zicfilp` extension is available to supervisor mode:
+     ... Set `sstatus.SPELP` = interrupted landing pad state
+     ... Set landing pad state = NO_LP_EXPECTED
   .. if H-extension is available to supervisor mode:
      ... Set `hstatus.SPV` CSR bit = interrupted virtualization state
      ... if `hstatus.SPV` CSR bit == 1:
@@ -320,6 +328,8 @@ resume the interrupted state for a completed event:
   .. Set `hstatus.SPV` CSR bit = `INTERRUPTED_FLAGS[2:2]` event attribute value
   .. Set `hstatus.SPVP` CSR bit = `INTERRUPTED_FLAGS[3:3]` event attribute value
 . Set `sstatus.SIE` CSR bit = `sstatus.SPIE` CSR bit
+. if `Zicfilp` extension is available to supervisor mode:
+  .. Set `sstatus.SPELP` CSR bit = `INTERRUPTED_FLAGS[4:4]` event attribute value
 . Set `sstatus.SPIE` CSR bit = `INTERRUPTED_FLAGS[1:1]` event attribute value
 . Set `sstatus.SPP` CSR bit = `INTERRUPTED_FLAGS[0:0]` event attribute value
 . Set `A7` GPR = `INTERRUPTED_A7` event attribute value
