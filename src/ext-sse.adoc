@@ -606,8 +606,14 @@ Complete the supervisor event handling for the highest priority event in
 
 If there were no events in `RUNNING` state on the calling hart then this
 function does nothing and returns `SBI_SUCCESS` otherwise it moves the
-highest priority event in `RUNNING` state to `ENABLED` state and resumes
-interrupted supervisor state as decribed in <<_software_event_completion>>.
+highest priority event in `RUNNING` state to:
+
+* `REGISTERED` if the event is configured as one-shot (see the `CONFIG`
+attribute in <<table_sse_event_attributes>>.)
+* `ENABLED` state otherwise
+
+It then resumes the interrupted supervisor state as described in
+<<_software_event_completion>>.
 
 === Function: Inject a software event (FID #7)
 
