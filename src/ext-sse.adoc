@@ -110,6 +110,7 @@ software event.
 .SBI SSE State Machine
 image::images/riscv-sbi-sse-sm.png[]
 
+[#software_event_priority]
 === Software Event Priority
 
 Each software event has an associated priority (referred as `event_priority`)
@@ -624,6 +625,15 @@ For global events, the `hart_id` parameter is ignored.
 
 An event can only be injected if it is allowed by the event attribute as
 described in <<table_sse_event_attributes>>.
+
+If an event is injected from within an SSE event handler, if it is ready to be
+run, it will be handled according to the priority rules described in
+<<software_event_priority>>:
+
+ * If it has a higher priority than the one currently running, then it will be
+   handled immediately, effectively preempting the currently running one.
+ * If it has a lower priority, it will be run after the one that is currently
+   running completes.
 
 In case of an error, possible error codes are listed in
 <<table_sse_inject_errors>> below.
