@@ -29,9 +29,9 @@ The possible error codes returned in `sbiret.error` are shown in the
 |===
 | Error code            | Description
 | SBI_SUCCESS           | IPI was sent to all the targeted harts successfully.
-| SBI_ERR_INVALID_PARAM | Either `hart_mask_base` or at least one hartid from
-                          `hart_mask` is not valid, i.e., either the hartid is
-                          not enabled by the platform or is not available to
+| SBI_ERR_INVALID_PARAM | At least one hartid constructed from `hart_mask_base`
+                          and `hart_mask`, is not valid, i.e. either the hartid
+                          is not enabled by the platform or is not available to
                           the supervisor.
 | SBI_ERR_FAILED        | The request failed for unspecified or unknown other
                           reasons.
@@ -62,10 +62,10 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
                             successfully.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
-                            `hart_mask` is not valid, i.e., either the hartid
-                            is not enabled by the platform or is not available
-                            to the supervisor.
+| SBI_ERR_INVALID_PARAM   | At least one hartid constructed from `hart_mask_base`
+                            and `hart_mask`, is not valid, i.e. either the hartid
+                            is not enabled by the platform or is not available to
+                            the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
@@ -96,10 +96,10 @@ The possible error codes returned in `sbiret.error` are shown in the
 | SBI_SUCCESS             | IPI was sent to all the targeted harts
                             successfully.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `asid`, `hart_mask_base`, or at least one
-                            hartid from `hart_mask` is not valid, i.e., either
-                            the hartid is not enabled by the platform or is not
-                            available to the supervisor.
+| SBI_ERR_INVALID_PARAM   | Either `asid`, or at least one hartid constructed
+                            from `hart_mask_base` and `hart_mask`, is not valid,
+                            i.e. either the hartid is not enabled by the platform
+                            or is not available to the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
@@ -134,10 +134,10 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `vmid`, `hart_mask_base`, or at least one
-                            hartid from `hart_mask` is not valid, i.e., either
-                            the hartid is not enabled by the platform or is not
-                            available to the supervisor.
+| SBI_ERR_INVALID_PARAM   | Either `vmid`, or at least one hartid constructed
+                            from `hart_mask_base` and `hart_mask`, is not valid,
+                            i.e. either the hartid is not enabled by the platform
+                            or is not available to the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
@@ -171,10 +171,10 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
-                            `hart_mask` is not valid, i.e., either the hartid
-                            is not enabled by the platform or is not available
-                            to the supervisor.
+| SBI_ERR_INVALID_PARAM   | At least one hartid constructed from `hart_mask_base`
+                            and `hart_mask`, is not valid, i.e. either the hartid
+                            is not enabled by the platform or is not available to
+                            the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
@@ -210,10 +210,10 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `asid`, `hart_mask_base`, or at least one
-                            hartid from `hart_mask` is not valid, i.e., either
-                            the hartid is not enabled by the platform or is not
-                            available to the supervisor.
+| SBI_ERR_INVALID_PARAM   | Either `asid`, or at least one hartid constructed
+                            from `hart_mask_base` and `hart_mask`, is not valid,
+                            i.e. either the hartid is not enabled by the platform
+                            or is not available to the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
@@ -247,10 +247,10 @@ The possible error codes returned in `sbiret.error` are shown in the
                             implemented or one of the target hart doesn't
                             support hypervisor extension.
 | SBI_ERR_INVALID_ADDRESS | `start_addr` or `size` is not valid.
-| SBI_ERR_INVALID_PARAM   | Either `hart_mask_base` or at least one hartid from
-                            `hart_mask` is not valid, i.e., either the hartid
-                            is not enabled by the platform or is not available
-                            to the supervisor.
+| SBI_ERR_INVALID_PARAM   | At least one hartid constructed from `hart_mask_base`
+                            and `hart_mask`, is not valid, i.e. either the hartid
+                            is not enabled by the platform or is not available to
+                            the supervisor.
 | SBI_ERR_FAILED          | The request failed for unspecified or unknown other
                             reasons.
 |===
