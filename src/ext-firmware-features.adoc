@@ -97,8 +97,7 @@ description. Upon system reset, global and local feature values are reset.
 [cols="1,4"]
 !===
 ! 0 ! Disable pointer masking for supervisor-mode.
-! N ! Enable pointer masking for supervisor-mode with PMLEN >= N.
-      A call to `sbi_fwft_get()` returns the actual value of PMLEN.
+! N ! Enable pointer masking for supervisor-mode with PMLEN = N.
 !===
 |===
 
