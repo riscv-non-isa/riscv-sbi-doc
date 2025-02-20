@@ -1,5 +1,10 @@
 == Change Log
 
+=== Version 3.0-rc4
+* Added landing pad and double trap related bits to the SSE extension.
+* Several clarifications in SSE and MPXY extensions.
+* Added a new function to retrieve the shared memory size in MPXY extension.
+
 === Version 3.0-rc3
 * Added low priority RAS events in SSE.
 * Miscallenous clarification around reserved bits, fwft, notification events.
