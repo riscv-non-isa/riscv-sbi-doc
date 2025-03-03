@@ -291,8 +291,12 @@ following:
      ... `INTERRUPTED_FLAGS[1:1]` = interrupted `sstatus.SPIE` CSR bit value
      ... if `Zicfilp` extension is available to supervisor mode:
      ....  `INTERRUPTED_FLAGS[4:4]` = interrupted `sstatus.SPELP` CSR bit value
+     ... else
+     ....  `INTERRUPTED_FLAGS[4:4]` = zero
      ... if `Ssdbltrp` extension is available to supervisor mode:
      ....  `INTERRUPTED_FLAGS[5:5]` = interrupted `sstatus.SDT` CSR bit value
+     ... else
+     ....  `INTERRUPTED_FLAGS[5:5]` = zero
      ... if H-extension is available to supervisor mode:
      ....  Set `INTERRUPTED_FLAGS[2:2]` = interrupted `hstatus.SPV` CSR bit value
      ....  Set `INTERRUPTED_FLAGS[3:3]` = interrupted `hstatus.SPVP` CSR bit value
