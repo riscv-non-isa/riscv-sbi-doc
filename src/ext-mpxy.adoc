@@ -641,7 +641,7 @@ The possible error codes returned in `sbiret.error` are below.
 | Message sent and response received successfully.
 
 | SBI_ERR_INVALID_PARAM
-| The `message_data_len > max_message_data_len` for specified `channel_id`. +
+| The `message_data_len > MSG_DATA_MAX_LEN` for specified `channel_id`. +
 Or the `message_data_len` is greater than the size of shared memory on the
 calling hart.
 
@@ -706,7 +706,7 @@ The possible error codes returned in `sbiret.error` are below.
 | Message sent successfully.
 
 | SBI_ERR_INVALID_PARAM
-| The `message_data_len > max_message_data_len` for specified `channel_id`. +
+| The `message_data_len > MSG_DATA_MAX_LEN` for specified `channel_id`. +
 Or the `message_data_len` is greater than the size of shared memory on the
 calling hart.
 
