@@ -1,5 +1,9 @@
 == Change Log
 
+=== Version 3.0-rc5
+* Update doc-resourses
+* Clarifications/minor semantic fixes in mpxy/sse.
+
 === Version 3.0-rc4
 * Added landing pad and double trap related bits to the SSE extension.
 * Several clarifications in SSE and MPXY extensions.
