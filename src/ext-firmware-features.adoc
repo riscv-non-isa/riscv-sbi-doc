@@ -125,8 +125,8 @@ value.
 | Name | Encoding      | Description
 | LOCK | BIT[0]        | If provided, once set, the feature value can no longer
                          be modified until: +
-			 - hart reset for feature with local scope +
-			 - system reset for feature with global scope +
+                         - hart reset for feature with local scope +
+                         - system reset for feature with global scope +
 |      | BIT[XLEN-1:1] | Reserved for future use and must be zero.
 |===
 
@@ -148,7 +148,7 @@ returned in `sbiret.error` are shown in <<table_fw_features_set_errors>> below.
                           - `feature` is reserved or is platform-specific and
                           unimplemented
 | SBI_ERR_DENIED_LOCKED | `feature` set operation failed because the `feature`
-			  is locked
+                          is locked
 | SBI_ERR_FAILED        | The set operation failed for unspecified or unknown
                           other reasons.
 |===
