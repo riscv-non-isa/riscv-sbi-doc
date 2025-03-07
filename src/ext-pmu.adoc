@@ -49,13 +49,13 @@ specification.
 [cols="6,2,4", width=95%, align="center", options="header"]
 |===
 | Event ID Type         | Value    | Description
-| Type #0  		|        0 | Hardware general events
-| Type #1  		|        1 | Hardware Cache events
-| Type #2  		|        2 | Hardware raw events (deprecated)
+| Type #0               |        0 | Hardware general events
+| Type #1               |        1 | Hardware Cache events
+| Type #2               |        2 | Hardware raw events (deprecated)
                                      Bits allowed for mhpmeventX [0:47]
-| Type #3  		|        3 | Hardware raw events v2
+| Type #3               |        3 | Hardware raw events v2
                                      Bits allowed for mhpmeventX [0:55]
-| Type #15 		|       15 | Firmware events
+| Type #15              |       15 | Firmware events
 |===
 
 
@@ -579,16 +579,16 @@ implement it.
 | Name                    | Offset   | Size | Description
 | counter_overflow_bitmap | 0x0000   | 8    | A bitmap of all logical overflown
                                               counters relative to the
-					      `counter_idx_base`. This is valid
-					      only if the `Sscofpmf` ISA
-					      extension is available. Otherwise,
-					      it must be zero.
+                                              `counter_idx_base`. This is valid
+                                              only if the `Sscofpmf` ISA
+                                              extension is available. Otherwise,
+                                              it must be zero.
 | counter_values          | 0x0008   | 512  | An array of 64-bit logical
                                               counters where each index
                                               represents the value of each
                                               logical counter associated with
                                               hardware/firmware relative to the
-					      `counter_idx_base`.
+                                              `counter_idx_base`.
 | Reserved                | 0x0208   | 3576 | Reserved for future use
 |===
 
@@ -617,7 +617,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code              | Description
 | SBI_SUCCESS             | Shared memory was set or cleared successfully.
-| SBI_ERR_NOT_SUPPORTED	  | The SBI PMU snapshot functionality is not available
+| SBI_ERR_NOT_SUPPORTED   | The SBI PMU snapshot functionality is not available
                             in the SBI implementation. 
 | SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
                            `shmem_phys_lo` parameter is not 4096 bytes aligned.
@@ -683,7 +683,7 @@ The possible error codes returned in `sbiret.error` are shown in
 |===
 | Error code              | Description
 | SBI_SUCCESS             | The output field is updated for each event.
-| SBI_ERR_NOT_SUPPORTED	  | The SBI PMU event info retrieval function is not
+| SBI_ERR_NOT_SUPPORTED   | The SBI PMU event info retrieval function is not
                             available in the SBI implementation.
 | SBI_ERR_INVALID_PARAM   | The `flags` parameter is not zero or the
                            `shmem_phys_lo` parameter is not 16-bytes aligned or
@@ -711,5 +711,5 @@ The possible error codes returned in `sbiret.error` are shown in
 | sbi_pmu_counter_fw_read         | 0.3         | 5   | 0x504D55
 | sbi_pmu_counter_fw_read_hi      | 2.0         | 6   | 0x504D55
 | sbi_pmu_snapshot_set_shmem      | 2.0         | 7   | 0x504D55
-| sbi_pmu_event_get_info      	  | 3.0         | 8   | 0x504D55
+| sbi_pmu_event_get_info          | 3.0         | 8   | 0x504D55
 |===
