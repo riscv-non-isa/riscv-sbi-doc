@@ -43,7 +43,7 @@ with standard events based on the above encoding.
 
 2+^| Range 0x00010000 - 0x0001ffff
 | 0x00010000                   | Local PMU overflow event (depends on overflow
-				 IRQ)
+                                 IRQ)
 | 0x00010001 - 0x00013fff      | Local events reserved for future use
 | 0x00014000 - 0x00017fff      | Platform specific local events
 | 0x00018000 - 0x0001bfff      | Global events reserved for future use
