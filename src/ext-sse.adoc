@@ -429,7 +429,8 @@ For local events, the event attributes are updated only for the calling hart.
 For global events, the event attributes are updated for all the harts.
 
 The possible error codes returned in `sbiret.error` are shown in
-<<table_sse_write_attrs_errors>> below.
+<<table_sse_write_attrs_errors>> below. In case of errors with attribute values,
+the first error encountered (based on attributes ID order) is returned.
 
 [#table_sse_write_attrs_errors]
 .SSE Event Attributes Write Errors
@@ -441,10 +442,20 @@ The possible error codes returned in `sbiret.error` are shown in
                             platform does not support it due to one or more
                             missing dependencies (Hardware or SBI
                             implementation).
-| SBI_ERR_INVALID_PARAM   | `event_id` is invalid or `attr_count` is zero.
+| SBI_ERR_INVALID_PARAM   | Attribute write operation failed because either: +
+                            - `event_id` is invalid +
+                            - `attr_count` is zero +
+                            - `event_id` is valid but one of the attribute
+                            values violates the legal values described in
+                            <<table_sse_event_attributes>>.
+| SBI_ERR_DENIED          | `event_id` is valid but one of the attributes is
+                            read-only.
+| SBI_ERR_INVALID_STATE   | `event_id` is valid but one of the attribute values
+                            violates the state rules described in
+                            <<table_sse_event_attributes>>.
 | SBI_ERR_BAD_RANGE       | One of the event attribute IDs in the range
                             specified by `base_attr_id` and `attr_count` is
-                            reserved or is read-only.
+                            reserved.
 | SBI_ERR_INVALID_ADDRESS | The shared memory pointed to by the
                             `input_phys_lo` and `input_phys_hi` parameters
                             does not satisfy the requirements described in
