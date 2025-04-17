@@ -8,7 +8,7 @@ on:
         description: 'Release version, e.g. X.Y.Z:'
         required: true
         type: string
-      revision_mark: 
+      revision_mark:
           description: 'Set revision mark as Draft, Release or Stable:'
           required: true
           type: string
@@ -26,8 +26,8 @@ on:
   pull_request:
   push:
     branches:
+      - master
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
