@@ -50,6 +50,7 @@ ASCIIDOCTOR_PDF := asciidoctor-pdf
 OPTIONS := --trace \
            -a compress \
            -a mathematical-format=svg \
+		   -a bibtex-file=src/example.bib
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-theme=docs-resources/themes/riscv-pdf.yml \
            --failure-level=ERROR
