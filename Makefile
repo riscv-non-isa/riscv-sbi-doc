@@ -50,10 +50,12 @@ ASCIIDOCTOR_PDF := asciidoctor-pdf
 OPTIONS := --trace \
            -a compress \
            -a mathematical-format=svg \
+           -a bibtex-file=src/references.bib \
            -a pdf-fontsdir=docs-resources/fonts \
            -a pdf-theme=docs-resources/themes/riscv-pdf.yml \
            --failure-level=ERROR
 REQUIRES := --require=asciidoctor-diagram \
+            --require=asciidoctor-bibtex \
             --require=asciidoctor-mathematical
 
 .PHONY: all images clean
