@@ -14,8 +14,8 @@ The page and access faults taken by the SBI implementation while accessing
 memory on behalf of the supervisor are redirected back to the supervisor
 with `sepc` CSR pointing to the faulting `ECALL` instruction.
 
-The legacy SBI extensions is deprecated in favor of the other extensions
-listed below.
+The legacy SBI extensions are deprecated in favor of the TIME, IPI, RFENCE,
+SRST, and DBCN extensions.
 
 === Extension: Set Timer (EID #0x00)
 
