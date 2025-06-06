@@ -70,6 +70,10 @@ with standard events based on the above encoding.
 | 0xffffc000 - 0xffffffff      | Platform specific global events
 |===
 
+NOTE: Local double trap event: For SSE double trap events to be generated,
+supervisor software **MUST** enable the double trap feature (`DOUBLE_TRAP`)
+via the Firmware Feature extension (<<sbi_firmware_features_extension>>).
+
 === Software Event States
 
 At any point in time, a software event **MUST** be in one of the following

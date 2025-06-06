@@ -1,3 +1,4 @@
+[#sbi_firmware_features_extension]
 == SBI Firmware Features Extension (EID #0x46574654 "FWFT")
 
 The Firmware Features extension enables supervisor-mode software to manage and
