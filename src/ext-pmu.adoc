@@ -23,7 +23,7 @@ The SBI PMU extension provides:
 
 1. An interface for supervisor-mode software to discover and configure
    per-hart hardware/firmware counters
-2. A typical https://en.wikipedia.org/wiki/Perf_(Linux)[perf] compatible
+2. A typical Linux perf cite:[perf_linux] compatible
    interface for hardware/firmware performance counters and events
 3. Full access to microarchitecture's raw event encodings
 
