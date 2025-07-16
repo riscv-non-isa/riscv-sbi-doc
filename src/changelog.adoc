@@ -1,5 +1,8 @@
 == Change Log
 
+=== Version 3.0
+* Update the document state to Ratified
+
 === Version 3.0-rc8
 * Clarifications around legacy extension and SSE events 
 
