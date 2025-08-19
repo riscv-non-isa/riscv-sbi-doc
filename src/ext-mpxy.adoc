@@ -18,7 +18,7 @@ that implements the message protocol. The remote entity can be implemented as a
 system-level partition on the same hart or as firmware running on a platform
 microcontroller or emulated by an SBI implementation. The supervisor software
 MUST call the `sbi_mpxy_set_shmem` function to set up the shared memory before
-calling any other function defined in the extension.
+calling any other function which uses shared memory for any kind of data transfer.
 
 === SBI MPXY and Dedicated SBI extension rule
 The implementation may only provide either an SBI MPXY or a dedicated SBI
@@ -296,6 +296,9 @@ following requirements:
 This function always returns SBI_SUCCESS in `sbiret.error` and it will return
 the shared memory size in `sbiret.uvalue`.
 
+NOTE: This function does not require the prior setup of shared memory using the
+`sbi_mpxy_set_shmem` function.
+
 === Function: Set shared memory (FID #1)
 
 ```c
@@ -392,7 +395,8 @@ parameters does not satisfy the requirements described in
 |===
 
 NOTE: The supervisor software MUST call this function to setup the shared
-memory first before calling any other function in this extension.
+memory first before calling any other function which uses shared memory for any
+kind of data transfer.
 
 === Function: Get Channel IDs (FID #2)
 
