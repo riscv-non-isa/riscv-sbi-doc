@@ -1,5 +1,6 @@
 .RISC-V Supervisor Binary Interface Specification
 * xref:index.adoc[RISC-V Supervisor Binary Interface]
+* xref:copyright.adoc[Copyright and License]
 * xref:contributors.adoc[Contributors]
 * xref:changelog.adoc[Changelog]
 * xref:intro.adoc[Introduction]
