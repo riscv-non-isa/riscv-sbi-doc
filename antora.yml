@@ -3,3 +3,7 @@ title: RISC-V Supervisor Binary Interface
 version: v3.0
 nav:
 - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    page-group: platform-software
