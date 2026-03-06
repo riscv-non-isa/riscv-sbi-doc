@@ -3,7 +3,7 @@
 #
 
 DOCKER_RUN := docker run --rm -v ${PWD}:/build -w /build \
-riscvintl/riscv-docs-base-container-image:latest
+ghcr.io/riscv/riscv-docs-base-container-image:latest
 
 DEPS = src/contributors.adoc
 DEPS += src/changelog.adoc
