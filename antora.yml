@@ -6,4 +6,6 @@ nav:
 
 asciidoc:
   attributes:
+    page-pdf_url: _attachments/riscv-sbi.pdf
+    more_details_url: https://riscv.atlassian.net/wiki/external/NDZmZTk3MDI0ZTA0NDVhOTg5Y2ZlZWI3NGNjZTlmYTQ
     page-group: platform-software
