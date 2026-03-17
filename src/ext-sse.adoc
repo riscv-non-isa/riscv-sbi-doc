@@ -63,7 +63,8 @@ with standard events based on the above encoding.
 
 2+^| Range 0xffff0000 - 0xffffffff
 | 0xffff0000                   | Software injected local event
-| 0xffff0001 - 0xffff3fff      | Local events reserved for future use
+| 0xffff0001                   | Local unknown nmi event
+| 0xffff0002 - 0xffff3fff      | Local events reserved for future use
 | 0xffff4000 - 0xffff7fff      | Platform specific local events
 | 0xffff8000                   | Software injected global event
 | 0xffff8001 - 0xffffbfff      | Global events reserved for future use
