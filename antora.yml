@@ -1,11 +1,13 @@
 name: sbi
-title: RISC-V Supervisor Binary Interface
+title: Supervisor Binary Interface
 version: v3.0
 nav:
 - modules/ROOT/nav.adoc
 
 asciidoc:
   attributes:
+    page-group: platform-software
+    page-card-description: 'Standard interface between supervisor software and firmware.'
+    page-release-date: 'July 2025'
     page-pdf_url: _attachments/riscv-sbi.pdf
     more_details_url: https://riscv.atlassian.net/wiki/external/NDZmZTk3MDI0ZTA0NDVhOTg5Y2ZlZWI3NGNjZTlmYTQ
-    page-group: platform-software
