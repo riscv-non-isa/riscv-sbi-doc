@@ -1,1 +1,0 @@
-../../../src/binary-encoding.adoc

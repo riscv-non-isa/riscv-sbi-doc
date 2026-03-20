@@ -112,7 +112,7 @@ software event.
 
 [#figure_sbi_sse_state_machine]
 .SBI SSE State Machine
-image::riscv-sbi-sse-sm.png[]
+image::images/riscv-sbi-sse-sm.png[]
 
 [#software_event_priority]
 === Software Event Priority
