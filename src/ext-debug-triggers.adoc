@@ -159,7 +159,7 @@ The possible error codes returned in `sbiret.error` are shown in
 | SBI_SUCCESS       | State and configuration of triggers read successfully.
 | SBI_ERR_NO_SHMEM  | Shared memory for debug triggers is disabled.
 | SBI_ERR_BAD_RANGE | Either `trig_idx_base >= trig_max` or
-                      `trig_idx_base + trig_count >= trig_max`
+                      `trig_idx_base + trig_count > trig_max`
 |===
 
 === Function: Install triggers (FID #3)
@@ -222,7 +222,7 @@ The possible error codes returned in `sbiret.error` are shown in
 | Error code            | Description
 | SBI_SUCCESS           | Triggers installed successfully.
 | SBI_ERR_NO_SHMEM      | Shared memory for debug triggers is disabled.
-| SBI_ERR_BAD_RANGE     | `trig_count >= trig_max`
+| SBI_ERR_BAD_RANGE     | `trig_count > trig_max`
 | SBI_ERR_INVALID_PARAM | One of the trigger configuration words `trig_tdata1`, `trig_tdata2`,
                           or `trig_tdata3` has an invalid value.
 | SBI_ERR_FAILED        | Failed to assign `trig_idx` or HW debug trigger for one of the
@@ -282,7 +282,7 @@ The possible error codes returned in `sbiret.error` are shown in
 | Error code            | Description
 | SBI_SUCCESS           | Triggers updated successfully.
 | SBI_ERR_NO_SHMEM      | Shared memory for debug triggers is disabled.
-| SBI_ERR_BAD_RANGE     | `trig_count >= trig_max`
+| SBI_ERR_BAD_RANGE     | `trig_count > trig_max`
 | SBI_ERR_INVALID_PARAM | One of the trigger configuration in the shared memory has an
                           invalid of `trig_idx` (i.e. `trig_idx >= trig_max`), `trig_tdata1`,
                           `trig_tdata2`, or `trig_tdata3`.
