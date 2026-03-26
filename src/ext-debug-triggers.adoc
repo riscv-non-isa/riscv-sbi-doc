@@ -133,7 +133,7 @@ struct sbiret sbi_debug_read_triggers(unsigned long trig_idx_base,
                                       unsigned long trig_count)
 ----
 
-Read the debug trigger state and configuration into shared memory for a range of debug
+Read the current debug trigger state and configuration into shared memory for a range of debug
 triggers specified by the `trig_idx_base` and `trig_count` parameters on the calling hart.
 
 For each debug trigger with index `trig_idx_base + i` where `-1 < i < trig_count`, the
