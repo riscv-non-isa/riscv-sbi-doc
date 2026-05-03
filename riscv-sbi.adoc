@@ -105,6 +105,8 @@ include::src/ext-debug-triggers.adoc[]
 
 include::src/ext-mpxy.adoc[]
 
+include::src/ext-watchdog.adoc[]
+
 include::src/ext-experimental.adoc[]
 
 include::src/ext-vendor.adoc[]

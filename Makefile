@@ -27,6 +27,7 @@ DEPS += src/ext-sse.adoc
 DEPS += src/ext-firmware-features.adoc
 DEPS += src/ext-debug-triggers.adoc
 DEPS += src/ext-mpxy.adoc
+DEPS += src/ext-watchdog.adoc
 DEPS += src/ext-experimental.adoc
 DEPS += src/ext-vendor.adoc
 DEPS += src/ext-firmware.adoc
@@ -39,6 +40,7 @@ IMAGES = images/riscv-sbi-intro1.png
 IMAGES += images/riscv-sbi-intro2.png
 IMAGES += images/riscv-sbi-hsm.png
 IMAGES += images/riscv-sbi-sse-sm.png
+IMAGES += images/riscv-sbi-watchdog.png
 
 TARGETS = riscv-sbi.pdf
 
