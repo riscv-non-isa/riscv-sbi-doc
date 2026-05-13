@@ -1,1 +1,39 @@
-../../../src/changelog.adoc
+[preface]
+== Change Log
+
+=== Version 1.0.0
+* Updated the version for ratification
+
+=== Version 1.0-rc3
+* Updated the calling convention
+* Fixed a typo in PMU extension
+* Added a abbreviation table
+
+=== Version 1.0-rc2
+* Update to RISC-V formatting
+* Improved the introduction
+* Removed all references to RV32
+
+=== Version 1.0-rc1
+* A typo fix
+
+=== Version 0.3.0
+* Few typo fixes
+* Updated the LICENSE with detailed text instead of a hyperlink
+
+=== Version 0.3-rc1
+
+* Improved document styling and naming conventions
+* Added SBI system reset extension
+* Improved SBI introduction section
+* Improved documentation of SBI hart state management extension
+* Added suspend function to SBI hart state management extension
+* Added performance monitoring unit extension
+* Clarified that an SBI extension shall not be partially implemented
+
+=== Version 0.2
+
+* The entire v0.1 SBI has been moved to the legacy extension, which is now
+  an optional extension. This is technically a backwards-incompatible change
+  because the legacy extension is optional and v0.1 of the SBI doesn't allow
+  probing, but it's as good as we can do.

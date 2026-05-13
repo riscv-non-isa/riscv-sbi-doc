@@ -1,1 +1,18 @@
-../../../src/terms.adoc
+== Terms and Abbreviations
+
+This specification uses the following terms and abbreviations:
+
+[width=80%]
+|===
+| Term  | Meaning
+
+| SBI   | Supervisor Binary Interface
+| SEE   | Supervisor Execution Environment
+| EID   | Extension ID
+| FID   | Function ID
+| HSM   | Hart State Management
+| PMU   | Performance Monitoring Unit
+| IPI   | Inter Processor Interrupt
+| ASID  | Address Space Identifier
+| VMID  | Virtual Machine Identifier
+|===

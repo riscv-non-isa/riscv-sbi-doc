@@ -1,1 +1,0 @@
-../../../src/ext-debug-console.adoc
