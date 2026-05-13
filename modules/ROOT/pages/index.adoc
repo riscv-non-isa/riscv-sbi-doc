@@ -8,7 +8,7 @@ image::common::risc-v_logo.svg[id="riscvlogo"xs,alt="RISCV"]
 
 RISC-V Platform Runtime Services Task Group
 
-Version v3.0, 2025-07-16: Ratified
+Version 1.0.0, March 22, 2022: Ratified
 
 // Preamble
 [WARNING]
