@@ -1,0 +1,19 @@
+                                +-----------------+
+                                |                 |
+                         /----->|cF78 STOPPED     |------\
+      sbi_watchdog_stop()|      |                 |      |sbi_watchdog_start()
+            called by the|      +-----------------+      |called by the
+      supervisor software|                               |supervisor software
+                         |                               |
+                         |      +-----------------+      |                +-----------------+
+                         \------|                 |<-----/   watch period |                 |
+                                |c0DB RUNNING     |---------------------->|c003 EXPIRED     |
+                         /----->|                 |------\     expired    |                 |
+                         |      +-----------------+      |                +-----------------+
+                         |                               |
+   Watchdog timer resumed|                               |Watchdog timer paused
+by the SBI implementation|      +-----------------+      |by the SBI implementation
+     after a system event|      |                 |      |due to a system event
+                         \------|c1CF PAUSED      |<-----/
+                                |                 |
+                                +-----------------+

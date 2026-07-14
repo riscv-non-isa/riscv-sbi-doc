@@ -1,0 +1,380 @@
+== Watchdog Timer Extension (EID #0x574454 "WDT")
+
+The Watchdog Timer (WDT) extension allows the SBI implementation
+to provide watchdog timer functionality for the supervisor software.
+This watchdog timer functionality is crucial for high availability
+environments to ensure that if the supervisor software hangs, the
+SBI implementation can trigger a system reset.
+
+A single watchdog timer instance for the entire system is provided
+by the SBI WDT extension and the supervisor software on any hart can
+program it using SBI WDT calls. At any point in time, the watchdog
+timer is in the `STOPPED` or `RUNNING` or `PAUSED` or `EXPIRED` state.
+The watchdog timer state transitions by the SBI implementation must
+follow the state machine shown below in the <<figure_watchdog>>.
+
+[#figure_watchdog]
+.SBI Watchdog State Machine
+image::images/riscv-sbi-watchdog.png[]
+
+At system boot, the watchdog timer is in the `STOPPED` state and the
+supervisor software must use `sbi_watchdog_start()` to configure the
+watchdog timer in the `RUNNING` state. When the watchdog timer is
+in the `RUNNING` state, it counts for a fixed watch period duration
+(microseconds) and upon watch period expiry the watchdog timer moves
+to the `EXPIRED` state. A system reset equivalent to warm reboot
+defined in the System Reset (SRST) extension is initiated by the SBI
+implementation after the watchdog timer reaches the `EXPIRED` state.
+While in the `RUNNING` state, the watchdog timer must be re-started
+or patted by the supervisor software using `sbi_watchdog_pat()` before
+the current watch period expires, indicating normal operation.
+
+Upon system events (such as system suspend or external debug) where
+the supervisor software will not get chance to re-start or pat the
+watchdog timer, the SBI implementation should transition the watchdog
+timer from `RUNNING` to `PAUSED` state and pause counting. After
+resuming normal operation, if the watchdog timer is in the `PAUSED`
+state then the SBI implementation must transition it back to the
+`RUNNING` state and resume counting.
+
+The supervisor software can optionally subscribe for a watchdog
+notification which is delivered as a message signaled interrupt
+(MSI) before the current watch period expires while the watchdog
+timer is in the `RUNNING` state. The supervisor software can also
+optionally subscribe for a watchdog expiry event which is delivered
+as a supervisor software event (SSE) after the watchdog timer moves
+to the `EXPIRED` state and before initiating the system reset. After
+delivering watchdog expiry event, the SBI implementation must wait
+for a fixed amount of time (microseconds) before initiating the
+system reset to allow the supervisor software handle the watchdog
+expiry event. The <<table_sse_event_ids>> defines standard Software
+Event ID `0x00008001` for the watchdog expiry event.
+
+The term "system" refers to the world-view of supervisor software
+and the underlying SBI implementation could be machine mode firmware
+or a hypervisor.
+
+=== Watchdog Timer Attributes
+
+The watchdog timer defined by the SBI WDT extension has a set of
+attributes which are identified by a unique 32 bits unsigned integer
+called `attribute_id` where each attribute value is 32 bits wide.
+
+[#table_wdt_attributes]
+.Watchdog Timer Attributes
+[cols="6,3,2,9a", width=95%, align="center", options="header"]
+|===
+| Attribute Name
+| Attribute ID
+| Access
+| Description
+
+| WDT_CAPABILITY
+| 0x00000000
+| RO
+| Watchdog timer capability bits.
+```
+[31:2]: Reserved and must be `0`
+
+   [1]: MSI based watchdog notification
+
+   [0]: SSE based watchdog expiry event
+```
+Any defined bit as `1` means the corresponding capability
+is supported.
+
+| WDT_STATE
+| 0x00000001
+| RO
+| State of the watchdog timer. +
+  +
+  0: `STOPPED` +
+  1: `RUNNING` +
+  2: `PAUSED`  +
+  3: `EXPIRED` +
+  +
+  The reset value of this attribute is `STOPPED`.
+
+| WDT_MIN_PERIOD
+| 0x00000002
+| RO
+| Minimum watch period duration (in microseconds). The value of this
+  attribute must be non-zero.
+
+| WDT_PERIOD
+| 0x00000003
+| RW
+| Watch period duration (in microseconds). +
+  +
+  The value of this attribute must be greater than or equals minimum
+  watch period duration. +
+  +
+  If watch period duration is updated while the watchdog timer is in
+  the `RUNNING` state then the new watch period duration will be used
+  only from the next watch period. +
+  +
+  The reset value of this attribute is same as minimum watch period
+  duration.
+
+| WDT_TIME_LEFT
+| 0x00000004
+| RO
+| Time left until expiry in the current watch period (in microseconds). +
+  +
+  If the watchdog timer is in the `STOPPED` state then this attribute
+  must be zero.
+
+| WDT_NOTIF_TIME
+| 0x00000005
+| RW
+| Time (in microseconds) before the end of watch period at which
+  watchdog notification is received by the supervisor software. +
+  +
+  The value of this attribute must be less than the current watch
+  period duration `WDT_PERIOD` and a value `0` of this attribute
+  implies watchdog notifications are disabled. +
+  +
+  If watchdog notifications are not supported then this attribute
+  ignores writes and always reads `0`. +
+  +
+  If this attribute is updated while the watchdog timer is in the
+  `RUNNING` state then the value will be used only from next watch
+  period. +
+  +
+  The reset value of this attribute is `0`.
+
+| WDT_NOTIF_MSI_ADDR_LOW
+| 0x00000006
+| RW
+| Low 32 bits of the MSI target physical address for watchdog
+  notification. +
+  +
+  If MSI based watchdog notifications are not supported then this
+  attribute ignore writes and always reads zero. +
+  +
+  This attribute is writeable only when watchdog notifications
+  are disabled (i.e. `WDT_NOTIF_TIME` attribute is `0`). +
+  +
+  The reset value of this attribute is `0`.
+
+| WDT_NOTIF_MSI_ADDR_HIGH
+| 0x00000007
+| RW
+| High 32 bits of the MSI target physical address for watchdog
+  notification. +
+  +
+  If MSI based watchdog notifications are not supported then this
+  attribute ignore writes and always reads zero. +
+  +
+  This attribute is writeable only when watchdog notifications
+  are disabled (i.e. `WDT_NOTIF_TIME` attribute is `0`). +
+  +
+  The reset value of this attribute is `0`.
+
+| WDT_NOTIF_MSI_DATA
+| 0x00000008
+| RW
+| MSI data word written to the MSI target for watchdog notification. +
+  +
+  If MSI based watchdog notifications are not supported then this
+  attribute ignore writes and always reads zero. +
+  +
+  This attribute is writeable only when watchdog notifications
+  are disabled (i.e. `WDT_NOTIF_TIME` attribute is `0`). +
+  +
+  The reset value of this attribute is `0`.
+
+| WDT_SSE_TIMEOUT
+| 0x00000009
+| RW
+| Time (in microseconds) to wait after delivering the watchdog
+  expiry event to the supervisor software. +
+  +
+  A value `0` of this attribute implies watchdog expiry event
+  is disabled. +
+  +
+  If watchdog expiry event is not supported then this attribute
+  ignores writes and always reads `0`. +
+  +
+  This attribute is writeable only when the watchdog timer is in
+  the `STOPPED` state. +
+  +
+  The reset value of this attribute is `0`.
+
+| *Reserved*
+| 0x0000000A - 0xFFFFFFFF
+| --
+| Reserved for future use.
+|===
+
+=== Function: Read watchdog attribute (FID #0)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_read_attribute(uint32_t attribute_id)
+----
+
+Read a watchdog timer attribute. The `attribute_id` parameter
+specifies the watchdog timer attribute to be read as defined
+in the <<table_wdt_attributes>>.
+
+Upon success, the value of the watchdog timer attribute is returned
+in `sbiret.uvalue`. The possible error codes returned in `sbiret.error`
+are shown in the <<table_watchdog_read_attribute_errors>> below.
+
+[#table_watchdog_read_attribute_errors]
+.Watchdog Read Attribute Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog timer attribute read successfully.
+| SBI_ERR_INVALID_PARAM | Watchdog timer attribute specified by the
+                          `attribute_id` parameter is reserved.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function: Write watchdog attribute (FID #1)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_write_attribute(uint32_t attribute_id,
+                                           uint32_t attribute_value)
+----
+
+Write a watchdog timer attribute. The `attribute_id` parameter specifies
+the watchdog timer attribute to be written whereas the `attribute_value`
+specifies the new watchdog timer attribute value as defined in the
+<<table_wdt_attributes>>.
+
+The possible error codes returned in `sbiret.error` are shown in the
+<<table_watchdog_write_attribute_errors>> below.
+
+[#table_watchdog_write_attribute_errors]
+.Watchdog Write Attribute Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog timer attribute written successfully.
+| SBI_ERR_INVALID_PARAM | Watchdog timer attribute specified by the
+                          `attribute_id` parameter is reserved.
+| SBI_ERR_DENIED        | Watchdog timer attribute specified by the
+                          `attribute_id` parameter is read-only.
+| SBI_ERR_BAD_RANGE     | The `attribute_value` does not satisfy constraints
+                          defined in the <<table_wdt_attributes>>.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function: Write watchdog notification MSI message (FID #2)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_write_notif_msi_message(uint32_t msi_addr_low,
+                                                   uint32_t msi_addr_high,
+                                                   uint32_t msi_data)
+----
+
+Atomically update the watchdog notification MSI attributes namely
+`WDT_NOTIF_MSI_ADDR_LOW`, `WDT_NOTIF_MSI_ADDR_HIGH`, and `WDT_NOTIF_MSI_DATA`
+so that the SBI implementation does not send watchdog notification
+MSI using partially updated watchdog notification attributes.
+
+The possible error codes returned in `sbiret.error` are shown in
+the <<table_watchdog_write_notif_msi_message_errors>> below.
+
+[#table_watchdog_write_notif_msi_message_errors]
+.Watchdog Write Notification MSI Message Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog notification MSI attributes written
+                          successfully.
+| SBI_ERR_NOT_SUPPORTED | This function is not supported because watchdog
+                          does not support MSI based notifications.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function: Start watchdog (FID #3)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_start(void)
+----
+
+Start the watchdog timer with the watch period duration specified
+by the `WDT_PERIOD` attribute of the watchdog timer.
+
+Upon success, the watchdog timer will be in the `RUNNING` state.
+The possible error codes returned in `sbiret.error` are shown in
+the <<table_watchdog_start_errors>> below.
+
+[#table_watchdog_start_errors]
+.Watchdog Start Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog timer started successfully.
+| SBI_ERR_INVALID_STATE | Watchdog timer was not in the `STOPPED` state.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function: Stop watchdog (FID #4)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_stop(void)
+----
+
+Stop the watchdog timer.
+
+Upon success, the watchdog timer will be in the `STOPPED` state.
+The possible error codes returned in `sbiret.error` are shown in
+the <<table_watchdog_stop_errors>> below.
+
+[#table_watchdog_stop_errors]
+.Watchdog Stop Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog timer stopped successfully.
+| SBI_ERR_INVALID_STATE | Watchdog timer was not in the `RUNNING` state.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function: Pat watchdog (FID #5)
+
+[source, C]
+----
+struct sbiret sbi_watchdog_pat(void)
+----
+
+Pat the watchdog timer.
+
+Upon success, the watchdog timer in the `RUNNING` state will re-start
+it's watch period with duration specified by the `WDT_PERIOD` attribute
+of the watchdog timer. The possible error codes returned in `sbiret.error`
+are shown in the <<table_watchdog_pat_errors>> below.
+
+[#table_watchdog_pat_errors]
+.Watchdog Pat Errors
+[cols="1,2", width=100%, align="center", options="header"]
+|===
+| Error code            | Description
+| SBI_SUCCESS           | Watchdog timer pat successfully.
+| SBI_ERR_INVALID_STATE | Watchdog timer was not in the `RUNNING` state.
+| SBI_ERR_FAILED        | Failed due to other unspecified errors.
+|===
+
+=== Function Listing
+
+[#table_watchdog_function_list]
+.Watchdog Function List
+[cols="3,2,1,2", width=80%, align="center", options="header"]
+|===
+| Function Name                        | SBI Version | FID | EID
+| sbi_watchdog_read_attribute          | 4.0         |   0 | 0x574454
+| sbi_watchdog_write_attribute         | 4.0         |   1 | 0x574454
+| sbi_watchdog_write_notif_msi_message | 4.0         |   2 | 0x574454
+| sbi_watchdog_start                   | 4.0         |   3 | 0x574454
+| sbi_watchdog_stop                    | 4.0         |   4 | 0x574454
+| sbi_watchdog_pat                     | 4.0         |   5 | 0x574454
+|===
