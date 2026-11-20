@@ -43,14 +43,14 @@ possible error codes returned in `sbiret.error` are shown in
 .Debug Console Write Errors
 [cols="2,3", width=90%, align="center", options="header"]
 |===
-| Error code            | Description
-| SBI_SUCCESS           | Bytes written successfully.
-| SBI_ERR_INVALID_PARAM | The memory pointed to by the `num_bytes`,
-                          `base_addr_lo`, and `base_addr_hi` parameters
-                          does not satisfy the requirements described in the
-                          <<_shared_memory_physical_address_range_parameter>>
-| SBI_ERR_DENIED        | Writes to the debug console is not allowed.
-| SBI_ERR_FAILED        | Failed to write due to I/O errors.
+| Error code              | Description
+| SBI_SUCCESS             | Bytes written successfully.
+| SBI_ERR_INVALID_ADDRESS | The memory pointed to by the `num_bytes`,
+                            `base_addr_lo`, and `base_addr_hi` parameters
+                            does not satisfy the requirements described in the
+                            <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_DENIED          | Writes to the debug console is not allowed.
+| SBI_ERR_FAILED          | Failed to write due to I/O errors.
 |===
 
 === Function: Console Read (FID #1)
@@ -83,14 +83,14 @@ possible error codes returned in `sbiret.error` are shown in
 .Debug Console Read Errors
 [cols="2,3", width=90%, align="center", options="header"]
 |===
-| Error code            | Description
-| SBI_SUCCESS           | Bytes read successfully.
-| SBI_ERR_INVALID_PARAM | The memory pointed to by the `num_bytes`,
-                          `base_addr_lo`, and `base_addr_hi` parameters
-                          does not satisfy the requirements described in the
-                          <<_shared_memory_physical_address_range_parameter>>
-| SBI_ERR_DENIED        | Reads from the debug console is not allowed.
-| SBI_ERR_FAILED        | Failed to read due to I/O errors.
+| Error code              | Description
+| SBI_SUCCESS             | Bytes read successfully.
+| SBI_ERR_INVALID_ADDRESS | The memory pointed to by the `num_bytes`,
+                            `base_addr_lo`, and `base_addr_hi` parameters
+                            does not satisfy the requirements described in the
+                            <<_shared_memory_physical_address_range_parameter>>
+| SBI_ERR_DENIED          | Reads from the debug console is not allowed.
+| SBI_ERR_FAILED          | Failed to read due to I/O errors.
 |===
 
 === Function: Console Write Byte (FID #2)
